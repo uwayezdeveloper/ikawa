@@ -1,6 +1,9 @@
 
 <script>
 // Supplier Statement initialization function
+let supplierStatementRetryCount = 0;
+const SUPPLIER_STATEMENT_MAX_RETRIES = 20; // Max 1 second of retries
+
 function initSupplierStatement() {
     console.log('initSupplierStatement called');
     const BASE_URL = '<?= App::baseUrl() ?>';
@@ -23,11 +26,19 @@ function initSupplierStatement() {
     });
 
     if (!supplierSelect.length || !btnFetch.length) {
-        console.log('Elements not ready, retrying...');
-        setTimeout(initSupplierStatement, 50);
-        return;
+        supplierStatementRetryCount++;
+        if (supplierStatementRetryCount < SUPPLIER_STATEMENT_MAX_RETRIES) {
+            console.log('Elements not ready, retrying... (' + supplierStatementRetryCount + '/' + SUPPLIER_STATEMENT_MAX_RETRIES + ')');
+            setTimeout(initSupplierStatement, 50);
+            return;
+        } else {
+            console.log('Max retries reached for supplier statement. Elements not found on this page.');
+            return;
+        }
     }
 
+    // Reset retry count on successful initialization
+    supplierStatementRetryCount = 0;
     console.log('Initializing supplier statement...');
 
     // Remove any existing event handlers to prevent duplicates

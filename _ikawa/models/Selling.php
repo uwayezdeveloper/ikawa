@@ -53,7 +53,7 @@ class Selling
                 ':address' => $data['address'] ?? null
             ]);
             return $this->conn->lastInsertId();
-        } catch (\\PDOException $e) {
+        } catch (\PDOException $e) {
             error_log("Error creating client: " . $e->getMessage());
             return false;
         }

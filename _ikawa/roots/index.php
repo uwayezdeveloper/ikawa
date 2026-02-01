@@ -23,6 +23,7 @@ require_once __DIR__ . '/../controllers/StockController.php';
 require_once __DIR__ . '/../controllers/ProductionTransferController.php';
 require_once __DIR__ . '/../controllers/ProductMixingController.php';
 require_once __DIR__ . '/../controllers/SellingController.php';
+require_once __DIR__ . '/../controllers/ReportsController.php';
 
 
 require_once __DIR__ . '/../controllers/TransferProductController.php';
@@ -40,7 +41,6 @@ use Controllers\ExpenseConsumeController;
 use Controllers\ExpenseConsumerController;
 use Controllers\ExpenseCategoryController;
 use Controllers\InvestmentController;
-use Controllers\ReportsController;
 use Controllers\AccountController;
 use Controllers\UsersController;
 use Controllers\SettingController;
@@ -52,12 +52,13 @@ use Controllers\ProductionTransferController;
 use Controllers\StockController;
 use Controllers\ProductMixingController;
 use Controllers\SellingController;
+use Controllers\ReportsController;
 
 // Get request URI
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Remove base path dynamically - CHANGE THIS LINE FOR PRODUCTION
-$basePath = '/ikawa.itectab.rw/_ikawa'; // Full path for localhost setup
+$basePath = '/_ikawa'; // Base path for both localhost and production
 $route = str_replace($basePath, '', $requestUri);
 $route = rtrim($route, '/');
 $route = $route === '' ? '/' : $route;
@@ -862,6 +863,30 @@ switch ( true ) {
     $sale_id = isset($_GET['sale_id']) ? intval($_GET['sale_id']) : 0;
     $sellingController->getSaleDetails($sale_id);
     break;
+
+    // Reports Routes
+    case $route === '/reports/get-product-types':
+    $reportsController = new ReportsController();
+    $reportsController->getProductTypes();
+    break;
+
+    case $route === '/reports/general-sales-report':
+    $reportsController = new ReportsController();
+    $reportsController->getGeneralSalesReport();
+    break;
+
+    case $route === '/reports/export-sales-report':
+    $reportsController = new ReportsController();
+    $reportsController->exportSalesReport();
+    break;
+
+    case $route === '/reports/analyze-sales-structure':
+    $reportsController = new ReportsController();
+    $reportsModel = new \Models\Reports();
+    $analysis = $reportsModel->analyzeSalesStructure();
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'data' => $analysis]);
+    exit;
 
 
     ############################################################# TRANSFER STAFF ENDS HERE ###########################################

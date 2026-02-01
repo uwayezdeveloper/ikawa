@@ -107,3 +107,7 @@ require __DIR__ . '/../../pages/footer.php';
 <!-- Sales Price Approval -->
 <?php require __DIR__ . '/scripts/sales-price-approval-script.php';
 ?>
+<!-- Reports -->
+<?php require __DIR__ . '/scripts/reports-script.php'; ?>
+<?php require __DIR__ . '/scripts/reports-script.php';
+?>

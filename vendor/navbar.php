@@ -98,11 +98,11 @@ $permittedMenus = MenuHelper::getMenus($_SESSION['role_id'] ?? 0);
                             <i class="notika-icon notika-dollar"></i> Investment
                         </a>
                     </li>
-                    <!--<li>-->
-                    <!--    <a data-toggle="tab" href="#Reports">-->
-                    <!--        <i class="notika-icon notika-bar-chart"></i> Reports-->
-                    <!--    </a>-->
-                    <!--</li>-->
+                    <li>
+                        <a data-toggle="tab" href="#Reports">
+                            <i class="notika-icon notika-bar-chart"></i> Reports
+                        </a>
+                    </li>
                 </ul>
                 <?php }
                 else if (!empty($permittedMenus)){
@@ -173,7 +173,7 @@ $permittedMenus = MenuHelper::getMenus($_SESSION['role_id'] ?? 0);
                     <!-- Reports -->
                     <div id="Reports" class="tab-pane notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
-                            <li><a href="javascript:void(0)" onclick="loadContent('reports')">Account Operations</a></li>
+                            <li><a href="javascript:void(0)" onclick="loadContent('general-items-sales-report')">General Items Sales Report</a></li>
                         </ul>
                     </div>
                     <!-- Products -->
@@ -230,6 +230,13 @@ $permittedMenus = MenuHelper::getMenus($_SESSION['role_id'] ?? 0);
                         <ul class="notika-main-menu-dropdown">
                             <li><a href="javascript:void(0)" onclick="loadContent('manage-selling')">Manage Selling</a></li>
                             <li><a href="javascript:void(0)" onclick="loadContent('sales-price-approval')">Sales Price Approval</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Reports -->
+                    <div id="Reports" class="tab-pane notika-tab-menu-bg animated flipInX">
+                        <ul class="notika-main-menu-dropdown">
+                            <li><a href="javascript:void(0)" onclick="loadContent('general-items-sales-report')">General Items Sales Report</a></li>
                         </ul>
                     </div>
                 </div>

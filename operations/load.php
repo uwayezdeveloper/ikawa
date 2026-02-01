@@ -25,7 +25,6 @@ $allowed_pages = [
     'sellize-management'=>'views/sellize-management.php',
     'coffee-categories'=>'views/coffee-categories.php',
     'coffee-types'=>'views/coffee-types.php',
-    'reports' => 'views/reports.php',
     'coffee-types-assign-unity'=>'views/coffee-types-assign-unity.php',
     'unity'=>'views/unity.php',
     'company-clients'=>'views/company-clients-data.php',
@@ -44,6 +43,7 @@ $allowed_pages = [
     'product-mixing'=>'views/product-mixing.php',
     'manage-selling'=>'views/manage-selling.php',
     'sales-price-approval'=>'views/sales-price-approval.php',
+    'general-items-sales-report'=>'views/general-items-sales-report.php',
 
 ];
 
