@@ -1,0 +1,2 @@
+# Redirect only root to /public
+RedirectMatch 301 ^/$ /public/

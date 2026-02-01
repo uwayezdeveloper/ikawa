@@ -1,0 +1,818 @@
+[09-Jan-2026 12:40:23 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:40:23 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/users/get-all-users): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:40:23 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 228
+[09-Jan-2026 12:52:22 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:52:22 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/users/get-all-users): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:52:22 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 228
+[09-Jan-2026 12:52:23 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:52:23 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/roles): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:52:23 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 101
+[09-Jan-2026 12:52:25 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/request-Advance-data.php on line 225
+[09-Jan-2026 12:52:25 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelist): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/request-Advance-data.php on line 225
+[09-Jan-2026 12:52:25 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/request-Advance-data.php on line 248
+[09-Jan-2026 12:52:26 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 75
+[09-Jan-2026 12:52:26 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistpending): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 75
+[09-Jan-2026 12:52:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 78
+[09-Jan-2026 12:52:27 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 76
+[09-Jan-2026 12:52:27 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistapproved): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 76
+[09-Jan-2026 12:52:27 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 79
+[09-Jan-2026 12:52:37 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:52:37 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/users/get-all-users): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:52:37 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 228
+[09-Jan-2026 12:52:39 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:52:39 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/roles): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:52:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 101
+[09-Jan-2026 12:53:27 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:53:27 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/users/get-all-users): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:53:27 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 228
+[09-Jan-2026 12:53:28 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:53:28 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/roles): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:53:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 101
+[09-Jan-2026 12:53:31 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/FinancialManagement/accounts-transfer-data.php on line 187
+[09-Jan-2026 12:53:31 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/accounts/get-all): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/FinancialManagement/accounts-transfer-data.php on line 187
+[09-Jan-2026 12:53:31 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/FinancialManagement/accounts-transfer-data.php on line 189
+[09-Jan-2026 12:53:53 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:53:53 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/users/get-all-users): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:53:53 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 228
+[09-Jan-2026 12:53:55 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:53:55 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/roles): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:53:55 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 101
+[09-Jan-2026 12:53:56 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:53:56 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/users/get-all-users): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 226
+[09-Jan-2026 12:53:56 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-users.php on line 228
+[09-Jan-2026 12:56:43 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:56:43 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/roles): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 99
+[09-Jan-2026 12:56:43 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-roles.php on line 101
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 108
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 108
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $clientCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 112
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 112
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $supplierCount in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #1 ($min) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:08 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 120
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:56:44 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:05 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:57:54 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 144
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:10 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 142
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Warning:  Undefined variable $total in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[09-Jan-2026 14:58:40 UTC] PHP Deprecated:  rand(): Passing null to parameter #2 ($max) of type int is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/dashboard.php on line 143
+[13-Jan-2026 08:21:06 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/ManageAccess/manage-access-data.php on line 185
+[13-Jan-2026 08:21:06 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/getaccessdata): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/ManageAccess/manage-access-data.php on line 185
+[13-Jan-2026 08:21:06 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/ManageAccess/manage-access-data.php on line 188
+[13-Jan-2026 08:21:08 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/ManageAccess/manage-access-data.php on line 185
+[13-Jan-2026 08:21:08 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/settings/getaccessdata): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/ManageAccess/manage-access-data.php on line 185
+[13-Jan-2026 08:21:08 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/ManageAccess/manage-access-data.php on line 188
+[13-Jan-2026 08:41:43 UTC] PHP Warning:  Undefined variable $conn in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 7
+[13-Jan-2026 08:41:43 UTC] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php:7
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 7
+[13-Jan-2026 08:41:55 UTC] PHP Warning:  Undefined variable $conn in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 12
+[13-Jan-2026 08:41:55 UTC] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php:12
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 12
+[13-Jan-2026 08:41:58 UTC] PHP Warning:  Undefined variable $conn in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 12
+[13-Jan-2026 08:41:58 UTC] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php:12
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 12
+[13-Jan-2026 08:42:25 UTC] PHP Warning:  require_once(/home/tabrw/public_html/ikawa.itectab.rw/vendor/_ikawa/config/Database.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 2
+[13-Jan-2026 08:42:25 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/vendor/_ikawa/config/Database.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php:2
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 2
+[13-Jan-2026 09:21:10 UTC] PHP Fatal error:  Uncaught Error: Class "Database" not found in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php:17
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php(2): App::getUserMenus(1)
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require('/home/tabrw/pub...')
+#2 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#3 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 17
+[13-Jan-2026 09:22:14 UTC] PHP Fatal error:  Cannot redeclare fetchApiData() (previously declared in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php:31) in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 52
+[13-Jan-2026 09:24:09 UTC] PHP Fatal error:  Uncaught Error: Class "Database" not found in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php:17
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php(4): App::getUserMenus(1)
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require('/home/tabrw/pub...')
+#2 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#3 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 17
+[13-Jan-2026 09:25:35 UTC] PHP Fatal error:  Uncaught Error: Class "Database" not found in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php:17
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php(3): App::getUserMenus(1)
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require('/home/tabrw/pub...')
+#2 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#3 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 17
+[13-Jan-2026 09:26:12 UTC] PHP Fatal error:  Uncaught Error: Class "Database" not found in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php:17
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php(10): App::getUserMenus(1)
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require('/home/tabrw/pub...')
+#2 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#3 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 17
+[13-Jan-2026 09:28:11 UTC] PHP Fatal error:  Uncaught Error: Class "App" not found in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php:243
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(5): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php on line 243
+[13-Jan-2026 09:29:20 UTC] PHP Fatal error:  Uncaught Error: Class "Database" not found in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php:18
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php(10): App::getUserMenus(1)
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(6): require('/home/tabrw/pub...')
+#2 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#3 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 18
+[13-Jan-2026 09:31:03 UTC] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/config/App.php on line 3
+[13-Jan-2026 09:32:39 UTC] PHP Fatal error:  Uncaught Error: Class "App" not found in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php:243
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(5): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php on line 243
+[13-Jan-2026 09:33:01 UTC] PHP Fatal error:  Uncaught Error: Class "App" not found in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php:243
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(5): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php on line 243
+[13-Jan-2026 09:34:55 UTC] PHP Fatal error:  Uncaught Error: Class "App" not found in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php:243
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(5): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php on line 243
+[13-Jan-2026 09:35:39 UTC] PHP Fatal error:  Uncaught Error: Class "App" not found in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php:243
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(5): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/topcontent.php on line 243
+[13-Jan-2026 09:44:59 UTC] PHP Fatal error:  Uncaught Error: Class "MenuHelper" not found in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php:3
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(7): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/vendor/navbar.php on line 3
+[16-Jan-2026 07:18:18 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:18 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:18 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:18 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:18 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:18 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:19 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:19 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:25 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:25 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:26 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[16-Jan-2026 07:18:26 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/manage-account-recharge.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:38
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 38
+[17-Jan-2026 08:06:06 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:06 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:07 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:07 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:09 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:13 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:13 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:06:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:39
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 39
+[17-Jan-2026 08:12:23 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:12:23 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:12:35 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:12:35 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:14:23 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:14:23 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:21:12 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:21:12 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:22:01 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:22:01 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:26:02 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:26:02 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:26:46 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:26:46 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:31:06 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:31:06 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:32:21 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:32:21 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:33:40 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:33:40 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:35:55 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:35:55 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:38:46 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:38:46 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:38:48 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:38:48 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/TransfersDdata/station-to-warehouse-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:84
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 84
+[17-Jan-2026 08:46:19 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:46:19 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:39
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:47:18 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:47:18 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:39
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:47:22 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:22 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:23 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:23 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:23 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:23 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:24 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:24 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:25 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:25 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:27 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:27 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:28 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:28 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:28 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:28 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:28 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:28 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:29 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:41 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:41 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:41 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:47:41 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:48:00 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:48:00 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/approve-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:51:19 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:51:19 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:39
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:52:53 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:52:53 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:39
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:55:29 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:55:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/scripts/investment-scripts.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php:39
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php on line 39
+[17-Jan-2026 08:59:57 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 08:59:57 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:00:26 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:00:26 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:00:27 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:00:27 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:05 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:05 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:07 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:07 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:07 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:07 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:10 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:10 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:12 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:12 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:13 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:13 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:13 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:13 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:14 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:01:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/TransfersDdata/station-to-warehouse.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:02:09 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:02:09 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/my-rejected-investments.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:42
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 42
+[17-Jan-2026 09:05:41 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 43
+[17-Jan-2026 09:05:41 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:43
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 43
+[17-Jan-2026 09:13:54 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 50
+[17-Jan-2026 09:13:54 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/accounts/get-allbylocation?st_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 50
+[17-Jan-2026 09:13:54 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 53
+[17-Jan-2026 09:13:54 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 190
+[17-Jan-2026 09:13:54 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistapproved?loc_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 190
+[17-Jan-2026 09:13:54 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 193
+[17-Jan-2026 09:13:55 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 50
+[17-Jan-2026 09:13:55 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/accounts/get-allbylocation?st_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 50
+[17-Jan-2026 09:13:55 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 53
+[17-Jan-2026 09:13:55 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 190
+[17-Jan-2026 09:13:55 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistapproved?loc_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 190
+[17-Jan-2026 09:13:55 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 193
+[17-Jan-2026 10:47:08 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 50
+[17-Jan-2026 10:47:08 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/accounts/get-allbylocation?st_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 50
+[17-Jan-2026 10:47:08 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 53
+[17-Jan-2026 10:47:08 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 190
+[17-Jan-2026 10:47:08 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistapproved?loc_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 190
+[17-Jan-2026 10:47:08 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/disburse-approved-Advance-data.php on line 193
+[17-Jan-2026 10:59:39 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 77
+[17-Jan-2026 10:59:39 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistpending?loc_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 77
+[17-Jan-2026 10:59:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 80
+[17-Jan-2026 10:59:41 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 77
+[17-Jan-2026 10:59:41 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistpending?loc_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 77
+[17-Jan-2026 10:59:41 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 80
+[17-Jan-2026 10:59:45 UTC] PHP Warning:  file_get_contents(): https:// wrapper is disabled in the server configuration by allow_url_fopen=0 in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 77
+[17-Jan-2026 10:59:45 UTC] PHP Warning:  file_get_contents(https://ikawa.itectab.rw/_ikawa/inadvance/advancelistpending?loc_id=3): Failed to open stream: no suitable wrapper could be found in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 77
+[17-Jan-2026 10:59:45 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/AdvanceManagment/pending-request-Advance-data.php on line 80
+[17-Jan-2026 14:59:30 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[17-Jan-2026 14:59:30 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:44
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[17-Jan-2026 14:59:33 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[17-Jan-2026 14:59:33 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:44
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[17-Jan-2026 14:59:39 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[17-Jan-2026 14:59:39 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:44
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[19-Jan-2026 06:46:21 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[19-Jan-2026 06:46:21 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:44
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[19-Jan-2026 06:46:23 UTC] PHP Warning:  require(/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php): Failed to open stream: No such file or directory in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[19-Jan-2026 06:46:23 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/tabrw/public_html/ikawa.itectab.rw/operations/views/reports.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php:44
+Stack trace:
+#0 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php on line 44
+[20-Jan-2026 08:32:10 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php(3): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:32:18 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php(3): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:32:23 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/load.php(3): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:32:27 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:32:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:32:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:32:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:33:18 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:33:18 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[20-Jan-2026 08:33:20 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Models\User::getById() in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php:42
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/operations/views/layout.php(3): require()
+#1 /home/tabrw/public_html/ikawa.itectab.rw/operations/index.php(8): require('/home/tabrw/pub...')
+#2 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/_ikawa/middleware/auth.php on line 42
+[28-Jan-2026 11:52:11 UTC] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-manage-stock.php on line 115
+[28-Jan-2026 11:52:11 UTC] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/tabrw/public_html/ikawa.itectab.rw/operations/views/station-manage-stock.php on line 116

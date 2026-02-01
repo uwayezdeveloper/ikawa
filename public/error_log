@@ -1,0 +1,5 @@
+[03-Jan-2026 10:31:12 UTC] PHP Fatal error:  Uncaught Error: Class "App" not found in /home/tabrw/public_html/ikawa.itectab.rw/pages/footer.php:193
+Stack trace:
+#0 /home/tabrw/public_html/ikawa.itectab.rw/public/index.php(12): require()
+#1 {main}
+  thrown in /home/tabrw/public_html/ikawa.itectab.rw/pages/footer.php on line 193
