@@ -24,6 +24,7 @@ require_once __DIR__ . '/../controllers/ProductionTransferController.php';
 require_once __DIR__ . '/../controllers/ProductMixingController.php';
 require_once __DIR__ . '/../controllers/SellingController.php';
 require_once __DIR__ . '/../controllers/ReportsController.php';
+require_once __DIR__ . '/../controllers/ItemPricesController.php';
 
 
 require_once __DIR__ . '/../controllers/TransferProductController.php';
@@ -53,15 +54,24 @@ use Controllers\StockController;
 use Controllers\ProductMixingController;
 use Controllers\SellingController;
 use Controllers\ReportsController;
+use Controllers\ItemPricesController;
 
 // Get request URI
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Remove base path dynamically - CHANGE THIS LINE FOR PRODUCTION
-$basePath = '/_ikawa'; // Base path for both localhost and production
+// Remove base path dynamically - PRODUCTION FIX
+$basePath = '/_ikawa'; // Corrected base path for production server
+// For localhost development, adjust base path
+if (strpos($_SERVER['REQUEST_URI'], '/ikawa.itectab.rw') !== false) {
+    $basePath = '/ikawa.itectab.rw/_ikawa';
+}
 $route = str_replace($basePath, '', $requestUri);
 $route = rtrim($route, '/');
 $route = $route === '' ? '/' : $route;
+
+// Debug logging
+error_log("DEBUG: Request URI: " . $_SERVER['REQUEST_URI']);
+error_log("DEBUG: Parsed route: " . $route);
 
 
 
@@ -866,27 +876,73 @@ switch ( true ) {
 
     // Reports Routes
     case $route === '/reports/get-product-types':
-    $reportsController = new ReportsController();
+    $reportsController = new \Controllers\ReportsController();
     $reportsController->getProductTypes();
     break;
 
     case $route === '/reports/general-sales-report':
-    $reportsController = new ReportsController();
+    $reportsController = new \Controllers\ReportsController();
     $reportsController->getGeneralSalesReport();
     break;
 
     case $route === '/reports/export-sales-report':
-    $reportsController = new ReportsController();
+    $reportsController = new \Controllers\ReportsController();
     $reportsController->exportSalesReport();
     break;
 
+    case $route === '/reports/general-stock-report':
+    $reportsController = new \Controllers\ReportsController();
+    $reportsController->getGeneralStockReport();
+    break;
+
+    case $route === '/reports/test':
+    $reportsController = new \Controllers\ReportsController();
+    $reportsController->testConnection();
+    break;
+
+    case $route === '/reports/export-stock-report':
+    $reportsController = new \Controllers\ReportsController();
+    $reportsController->exportStockReport();
+    break;
+
     case $route === '/reports/analyze-sales-structure':
-    $reportsController = new ReportsController();
+    $reportsController = new \Controllers\ReportsController();
     $reportsModel = new \Models\Reports();
     $analysis = $reportsModel->analyzeSalesStructure();
     header('Content-Type: application/json');
     echo json_encode(['success' => true, 'data' => $analysis]);
     exit;
+
+    // Item Prices Routes
+    case $route === '/item-prices/get-all-products-latest-prices':
+    $itemPricesController = new \Controllers\ItemPricesController();
+    $itemPricesController->getAllProductsWithLatestPrices();
+    break;
+
+    case $route === '/item-prices/export-products-latest-prices':
+    $itemPricesController = new \Controllers\ItemPricesController();
+    $itemPricesController->exportProductsWithLatestPrices();
+    break;
+
+    case $route === '/item-prices/get-product-assignments':
+    $itemPricesController = new \Controllers\ItemPricesController();
+    $itemPricesController->getProductAssignments();
+    break;
+
+    case $route === '/item-prices/get-price-status-options':
+    $itemPricesController = new \Controllers\ItemPricesController();
+    $itemPricesController->getPriceStatusOptions();
+    break;
+
+    case $route === '/item-prices/get-record-type-options':
+    $itemPricesController = new \Controllers\ItemPricesController();
+    $itemPricesController->getRecordTypeOptions();
+    break;
+
+    case $route === '/item-prices/test':
+    $itemPricesController = new \Controllers\ItemPricesController();
+    $itemPricesController->testConnection();
+    break;
 
 
     ############################################################# TRANSFER STAFF ENDS HERE ###########################################

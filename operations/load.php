@@ -44,6 +44,8 @@ $allowed_pages = [
     'manage-selling'=>'views/manage-selling.php',
     'sales-price-approval'=>'views/sales-price-approval.php',
     'general-items-sales-report'=>'views/general-items-sales-report.php',
+    'general-items-stock-report'=>'views/general-items-stock-report.php',
+    'general-items-prices-report'=>'views/general-items-prices-report.php',
 
 ];
 

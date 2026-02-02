@@ -174,6 +174,8 @@ $permittedMenus = MenuHelper::getMenus($_SESSION['role_id'] ?? 0);
                     <div id="Reports" class="tab-pane notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li><a href="javascript:void(0)" onclick="loadContent('general-items-sales-report')">General Items Sales Report</a></li>
+                            <li><a href="javascript:void(0)" onclick="loadContent('general-items-stock-report')">General Items Stock Report</a></li>
+                            <li><a href="javascript:void(0)" onclick="loadContent('general-items-prices-report')">General Items Prices Report</a></li>
                         </ul>
                     </div>
                     <!-- Products -->
@@ -230,13 +232,6 @@ $permittedMenus = MenuHelper::getMenus($_SESSION['role_id'] ?? 0);
                         <ul class="notika-main-menu-dropdown">
                             <li><a href="javascript:void(0)" onclick="loadContent('manage-selling')">Manage Selling</a></li>
                             <li><a href="javascript:void(0)" onclick="loadContent('sales-price-approval')">Sales Price Approval</a></li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Reports -->
-                    <div id="Reports" class="tab-pane notika-tab-menu-bg animated flipInX">
-                        <ul class="notika-main-menu-dropdown">
-                            <li><a href="javascript:void(0)" onclick="loadContent('general-items-sales-report')">General Items Sales Report</a></li>
                         </ul>
                     </div>
                 </div>

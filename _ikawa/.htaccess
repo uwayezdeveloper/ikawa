@@ -1,5 +1,12 @@
 RewriteEngine On
+
+# For localhost (XAMPP)
+RewriteCond %{HTTP_HOST} ^localhost
 RewriteBase /ikawa.itectab.rw/_ikawa/
+
+# For production server
+RewriteCond %{HTTP_HOST} ^ikawa\.itectab\.rw
+RewriteBase /_ikawa/
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

@@ -1,0 +1,52 @@
+    public function getGeneralStockReport($fromDate, $toDate, $locationId = null, $productId = null) {
+        try {
+            // Simple working query based on actual table structure
+            $sql = "
+                SELECT 
+                    stock_summary_id,
+                    loc_id,
+                    assignment_id,
+                    total_quantity,
+                    updated_at,
+                    CONCAT('Location ', loc_id) as location_name,
+                    'Stock Item' as category_name,
+                    'Item' as type_name,
+                    'Unit' as unit_name
+                FROM tbl_stock_summary 
+                WHERE 1=1
+            ";
+
+            $params = [];
+
+            // Add date filter only if we have valid dates
+            if ($fromDate && $toDate) {
+                $sql .= " AND DATE(updated_at) >= ? AND DATE(updated_at) <= ?";
+                $params[] = $fromDate;
+                $params[] = $toDate;
+            }
+
+            // Add location filter if specified
+            if ($locationId !== null && $locationId !== '') {
+                $sql .= " AND loc_id = ?";
+                $params[] = $locationId;
+            }
+
+            // For now, skip product filtering since we need assignment_id mapping
+            // TODO: Add product type filtering later
+
+            $sql .= " ORDER BY updated_at DESC LIMIT 100";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
+            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            
+            error_log("Stock report found " . count($result) . " rows with params: " . print_r($params, true));
+            
+            return $result;
+
+        } catch (\PDOException $e) {
+            error_log("Reports::getGeneralStockReport - Error: " . $e->getMessage());
+            error_log("Reports::getGeneralStockReport - SQL: " . (isset($sql) ? $sql : 'SQL not set'));
+            return [];
+        }
+    }

@@ -17,6 +17,17 @@ class ReportsController
         $this->reportsModel = new Reports();
     }
 
+    public function testConnection() {
+        try {
+            Response::success([
+                'message' => 'Reports controller is working',
+                'time' => date('Y-m-d H:i:s')
+            ]);
+        } catch (Exception $e) {
+            Response::error('Test failed: ' . $e->getMessage());
+        }
+    }
+
     public function getProductTypes()
     {
         try {
@@ -170,6 +181,109 @@ class ReportsController
                 number_format($sale['total_amount'], 2),
                 $sale['payment_method'] ?: 'Cash',
                 ucfirst($sale['payment_status'])
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    public function getGeneralStockReport()
+    {
+        try {
+            // Start session if needed
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            // Get filter parameters
+            $from_date = $_GET['from_date'] ?? date('Y-m-01');
+            $to_date = $_GET['to_date'] ?? date('Y-m-d');
+            $location_id = $_GET['location_id'] ?? null;
+            $product_id = $_GET['product_id'] ?? null;
+
+            // Validate dates
+            if (!$from_date || !$to_date) {
+                Response::error('From date and to date are required', 400);
+                return;
+            }
+
+            $reportData = $this->reportsModel->getGeneralStockReport($from_date, $to_date, $location_id, $product_id);
+
+            if ($reportData !== false && is_array($reportData)) {
+                Response::success('Stock report retrieved successfully', $reportData);
+            } else {
+                Response::error('Failed to retrieve stock report', 500);
+            }
+        } catch (Exception $e) {
+            error_log("ReportsController::getGeneralStockReport - Error: " . $e->getMessage());
+            Response::error('Server error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function exportStockReport()
+    {
+        try {
+            // Start session if needed
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            // Get filter parameters
+            $from_date = $_GET['from_date'] ?? date('Y-m-01');
+            $to_date = $_GET['to_date'] ?? date('Y-m-d');
+            $location_id = $_GET['location_id'] ?? null;
+            $product_id = $_GET['product_id'] ?? null;
+
+            $reportData = $this->reportsModel->getGeneralStockReport($from_date, $to_date, $location_id, $product_id);
+
+            if ($reportData !== false && !empty($reportData)) {
+                $filters = [
+                    'from_date' => $from_date,
+                    'to_date' => $to_date,
+                    'location_id' => $location_id,
+                    'product_id' => $product_id
+                ];
+                $this->generateStockCSVExport($reportData, $filters);
+            } else {
+                Response::error('No stock data to export', 404);
+            }
+        } catch (Exception $e) {
+            error_log("ReportsController::exportStockReport - Error: " . $e->getMessage());
+            Response::error('Server error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    private function generateStockCSVExport($reportData, $filters)
+    {
+        $filename = 'stock_report_' . $filters['from_date'] . '_to_' . $filters['to_date'] . '.csv';
+        
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $output = fopen('php://output', 'w');
+
+        // CSV Header
+        fputcsv($output, [
+            'Location',
+            'Product Category',
+            'Product Type',
+            'Unit',
+            'Stock Quantity',
+            'Last Updated'
+        ]);
+
+        // CSV Data
+        foreach ($reportData as $stock) {
+            fputcsv($output, [
+                $stock['location_name'] ?? 'N/A',
+                $stock['category_name'] ?? 'N/A',
+                $stock['type_name'] ?? 'N/A',
+                $stock['unit_name'] ?? 'N/A',
+                number_format($stock['total_quantity'], 2),
+                $stock['updated_at'] ? date('Y-m-d H:i:s', strtotime($stock['updated_at'])) : 'N/A'
             ]);
         }
 

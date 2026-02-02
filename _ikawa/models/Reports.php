@@ -188,4 +188,105 @@ class Reports {
             return ['error' => $e->getMessage()];
         }
     }
+
+
+    
+    public function getGeneralStockReport($fromDate, $toDate, $locationId = null, $productId = null) {
+        try {
+            // Complete joins - add real location names from tbl_location
+            $sql = "
+                SELECT 
+                    ss.stock_summary_id,
+                    ss.loc_id,
+                    ss.assignment_id,
+                    ss.total_quantity,
+                    ss.updated_at,
+                    COALESCE(l.location_name, CONCAT('Location ', ss.loc_id)) as location_name,
+                    COALESCE(c.category_name, 'Unknown Category') as category_name,
+                    COALESCE(ct.type_name, 'Unknown Type') as type_name,
+                    'Unit' as unit_name
+                FROM tbl_stock_summary ss
+                LEFT JOIN tbl_location l ON ss.loc_id = l.loc_id
+                LEFT JOIN tbl_category_type_units ctu ON ss.assignment_id = ctu.assignment_id
+                LEFT JOIN tbl_category_types ct ON ctu.type_id = ct.type_id
+                LEFT JOIN tbl_categories c ON ct.category_id = c.category_id
+                WHERE 1=1
+            ";
+
+            $params = [];
+
+            // Add date filter only if we have valid dates
+            if ($fromDate && $toDate) {
+                $sql .= " AND DATE(ss.updated_at) >= ? AND DATE(ss.updated_at) <= ?";
+                $params[] = $fromDate;
+                $params[] = $toDate;
+            }
+
+            // Add location filter if specified
+            if ($locationId !== null && $locationId !== '') {
+                $sql .= " AND ss.loc_id = ?";
+                $params[] = $locationId;
+            }
+
+            // Add product type filter if specified
+            if ($productId !== null && $productId !== '') {
+                $sql .= " AND ct.type_id = ?";
+                $params[] = $productId;
+            }
+
+            $sql .= " ORDER BY location_name, category_name, type_name, ss.updated_at DESC LIMIT 100";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
+            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            
+            error_log("Stock report with joins found " . count($result) . " rows");
+            
+            return $result;
+
+        } catch (\PDOException $e) {
+            error_log("Reports::getGeneralStockReport - Error with joins: " . $e->getMessage());
+            
+            // Fall back to simple query without joins
+            try {
+                $simpleSql = "
+                    SELECT 
+                        stock_summary_id,
+                        loc_id,
+                        assignment_id,
+                        total_quantity,
+                        updated_at,
+                        CONCAT('Location ', loc_id) as location_name,
+                        'Stock Item' as category_name,
+                        'Item' as type_name,
+                        'Unit' as unit_name
+                    FROM tbl_stock_summary 
+                    WHERE 1=1
+                ";
+                
+                $simpleParams = [];
+                if ($fromDate && $toDate) {
+                    $simpleSql .= " AND DATE(updated_at) >= ? AND DATE(updated_at) <= ?";
+                    $simpleParams[] = $fromDate;
+                    $simpleParams[] = $toDate;
+                }
+                if ($locationId !== null && $locationId !== '') {
+                    $simpleSql .= " AND loc_id = ?";
+                    $simpleParams[] = $locationId;
+                }
+                $simpleSql .= " ORDER BY updated_at DESC LIMIT 100";
+                
+                $stmt = $this->conn->prepare($simpleSql);
+                $stmt->execute($simpleParams);
+                $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                
+                error_log("Stock report fallback found " . count($result) . " rows");
+                return $result;
+                
+            } catch (\PDOException $e2) {
+                error_log("Reports::getGeneralStockReport - Fallback Error: " . $e2->getMessage());
+                return [];
+            }
+        }
+    }
 }
