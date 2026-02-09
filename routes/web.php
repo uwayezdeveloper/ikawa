@@ -193,14 +193,12 @@ $router->get('/finance/expense-transactions/export', [ExpenseTransactionControll
 $router->get('/api/finance/expense-types/by-category', [ExpenseTransactionController::class, 'getExpenseTypesByCategory'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/finance/consumers/search', [ExpenseTransactionController::class, 'searchConsumers'], ['AuthMiddleware', 'AdminMiddleware']);
 
-// Worker Loans
-$router->get('/finance/worker-loans', [WorkerLoanController::class, 'index'], ['AuthMiddleware']);
-$router->get('/finance/worker-loans/create', [WorkerLoanController::class, 'create'], ['AuthMiddleware']);
-$router->post('/finance/worker-loans/store', [WorkerLoanController::class, 'store'], ['AuthMiddleware']);
-$router->get('/finance/worker-loans/{id}', [WorkerLoanController::class, 'show'], ['AuthMiddleware']);
-$router->post('/finance/worker-loans/{id}/status', [WorkerLoanController::class, 'updateStatus'], ['AuthMiddleware']);
-$router->post('/finance/worker-loans/{id}/delete', [WorkerLoanController::class, 'delete'], ['AuthMiddleware']);
-$router->get('/finance/my-loans', [WorkerLoanController::class, 'myLoans'], ['AuthMiddleware']);
+// Worker Loan Requests
+$router->get('/finance/loans/create', [WorkerLoanController::class, 'create'], ['AuthMiddleware']);
+$router->post('/finance/loans/store', [WorkerLoanController::class, 'store'], ['AuthMiddleware']);
+$router->get('/finance/loans/my-loans', [WorkerLoanController::class, 'myLoans'], ['AuthMiddleware']);
+
+
 
 // ============================================
 // API ROUTES
