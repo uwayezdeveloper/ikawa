@@ -291,6 +291,11 @@
                                     <span class="menu-text">Transaction History</span>
                                 </a>
                             </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/worker-loans" class="side-nav-link">
+                                    <span class="menu-text">Request Loan</span>
+                                </a>
+                            </li>
                             <?php endif; ?>
                         </ul>
                     </div>
