@@ -1,0 +1,22 @@
+{
+  "main": "Main",
+  "dashboards": "Dashboards",
+  "dashboard-ecommerce": "Ecommerce",
+  "dashboard-analytics": "Analytics",
+  "dashboard-crm": "CRM",
+  "dashboard-finance": "Finance",
+  "dashboard-projects": "Projects",
+  "apps": "Apps",
+  "ecommerce": "Ecommerce",
+  "products": "Products",
+  "orders": "Orders",
+  "customers": "Customers",
+  "categories": "Categories",
+  "settings": "Settings",
+  "users": "Users",
+  "profile": "Profile",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "user-role": "User"
+}

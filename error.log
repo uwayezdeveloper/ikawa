@@ -1,0 +1,212 @@
+[06-Feb-2026 16:21:36 Africa/Kigali] PHP Warning:  Undefined array key "COUNT(*)" in C:\xampp\htdocs\gihanga\app\Models\ExpenseTransaction.php on line 61
+[06-Feb-2026 16:22:09 Africa/Kigali] PHP Warning:  Undefined array key "COUNT(*)" in C:\xampp\htdocs\gihanga\app\Models\ExpenseTransaction.php on line 61
+[06-Feb-2026 16:22:29 Africa/Kigali] PHP Warning:  Undefined array key "COUNT(*)" in C:\xampp\htdocs\gihanga\app\Models\ExpenseTransaction.php on line 61
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined variable $userLocation in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 46
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 46
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 46
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:54:17 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 115
+[06-Feb-2026 16:55:27 Africa/Kigali] PHP Warning:  Undefined array key "account_id" in C:\xampp\htdocs\gihanga\app\Views\finance\expenses\transactions\create.php on line 116
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 5
+)
+
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 5
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 5
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EXP20260207090806557
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EXP20260207090806557
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.user_id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.user_id' in 'on clause'
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransactionController::show - Details count: 0
+[07-Feb-2026 09:19:40 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[07-Feb-2026 09:20:13 Africa/Kigali] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\gihanga\app\Core\Autoloader.php on line 43
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 7
+)
+
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 7
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 7
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EXP20260207093932886
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EXP20260207093932886
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.user_id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.user_id' in 'on clause'
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - Details count: 0
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 3
+[07-Feb-2026 09:39:41 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => export
+)
+
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 0
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 0
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 0
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransactionController::show - Transaction result: not found
+[07-Feb-2026 09:49:58 Africa/Kigali] ExpenseTransactionController::show - Transaction not found, redirecting
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => export
+)
+
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 0
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 0
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 0
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransactionController::show - Transaction result: not found
+[07-Feb-2026 09:50:01 Africa/Kigali] ExpenseTransactionController::show - Transaction not found, redirecting
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 3
+)
+
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 3
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 3
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EXP20260206170233399
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EXP20260206170233399
+[09-Feb-2026 08:35:51 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.user_id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[09-Feb-2026 08:35:52 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.user_id' in 'on clause'
+[09-Feb-2026 08:35:52 Africa/Kigali] ExpenseTransactionController::show - Details count: 0
+[09-Feb-2026 08:35:52 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 0
+[09-Feb-2026 08:35:52 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 8
+)
+
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 8
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 8
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EXP20260207143811770
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EXP20260207143811770
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.user_id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.user_id' in 'on clause'
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - Details count: 0
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 2
+[09-Feb-2026 08:40:46 Africa/Kigali] ExpenseTransactionController::show - About to render view
