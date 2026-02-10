@@ -296,6 +296,16 @@
                                     <span class="menu-text">Request Loan</span>
                                 </a>
                             </li>
+                              <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans" class="side-nav-link">
+                                    <span class="menu-text">Manage Loans</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans/disbursement" class="side-nav-link">
+                                    <span class="menu-text">Loan Disbursement</span>
+                                </a>
+                            </li>
                             <?php endif; ?>
                         </ul>
                     </div>
@@ -333,6 +343,7 @@
                                     <span class="menu-text">Expense Transactions</span>
                                 </a>
                             </li>
+                          
                         </ul>
                     </div>
                 </li>

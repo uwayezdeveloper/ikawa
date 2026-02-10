@@ -198,6 +198,18 @@ $router->get('/finance/loans/create', [WorkerLoanController::class, 'create'], [
 $router->post('/finance/loans/store', [WorkerLoanController::class, 'store'], ['AuthMiddleware']);
 $router->get('/finance/loans/my-loans', [WorkerLoanController::class, 'myLoans'], ['AuthMiddleware']);
 
+// Admin Loan Management
+$router->get('/finance/loans', [WorkerLoanController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Loan Disbursement (must come before {id} route)
+$router->get('/finance/loans/disbursement', [WorkerLoanController::class, 'disbursementIndex'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/loans/disbursement/{id}', [WorkerLoanController::class, 'disbursementForm'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/loans/disbursement/process', [WorkerLoanController::class, 'processDisbursement'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Individual loan routes (must come after specific routes)
+$router->get('/finance/loans/{id}', [WorkerLoanController::class, 'show'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/loans/status', [WorkerLoanController::class, 'updateStatus'], ['AuthMiddleware', 'AdminMiddleware']);
+
 
 
 // ============================================

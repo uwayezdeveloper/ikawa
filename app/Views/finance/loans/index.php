@@ -33,8 +33,11 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">All Loan Applications</h4>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">All Loan Applications</h4>
+                <a href="<?= APP_URL ?>/finance/loans/disbursement" class="btn btn-success">
+                    <i class="bx bx-money-withdraw me-1"></i>Loan Disbursement
+                </a>
             </div>
             <div class="card-body">
                 <?php if (empty($loans)): ?>
@@ -118,11 +121,9 @@
                                             <i class="ti ti-x"></i> Reject
                                         </button>
                                         <?php elseif ($loan['status'] === 'outstanding'): ?>
-                                        <button type="button" class="btn btn-sm btn-info" 
-                                                onclick="updateLoanStatus(<?= $loan['l_id'] ?>, 'disbursed')"
-                                                title="Mark as Disbursed">
-                                            <i class="ti ti-cash"></i> Mark Paid
-                                        </button>
+                                        <span class="badge bg-success">
+                                            <i class="ti ti-check"></i> Approved
+                                        </span>
                                         <?php endif; ?>
                                         
                                         <button type="button" class="btn btn-sm btn-outline-primary" 
@@ -149,13 +150,32 @@
     <input type="hidden" id="newStatus" name="status" value="">
 </form>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function updateLoanStatus(loanId, status) {
-    if (confirm('Are you sure you want to update this loan status?')) {
-        document.getElementById('loanId').value = loanId;
-        document.getElementById('newStatus').value = status;
-        document.getElementById('statusUpdateForm').submit();
-    }
+    const actionText = status === 'outstanding' ? 'approve' : 
+                      status === 'disbursed' ? 'mark as disbursed' : 'reject';
+    const confirmText = status === 'outstanding' ? 'Yes, approve it!' : 
+                       status === 'disbursed' ? 'Yes, mark it!' : 'Yes, reject it!';
+    const successText = status === 'outstanding' ? 'Loan has been approved!' : 
+                       status === 'disbursed' ? 'Loan has been marked as disbursed!' : 'Loan has been rejected!';
+    
+    Swal.fire({
+        title: `Are you sure you want to ${actionText} this loan?`,
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: status === 'rejected' ? '#d33' : '#3085d6',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: confirmText,
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('loanId').value = loanId;
+            document.getElementById('newStatus').value = status;
+            document.getElementById('statusUpdateForm').submit();
+        }
+    });
 }
 
 function viewLoanDetails(loanId) {

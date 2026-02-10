@@ -283,4 +283,14 @@ class Account extends Model
         
         return Database::fetchAll($sql, $params);
     }
+
+    /**
+     * Set account balance to specific amount
+     */
+    public function setBalance(int $id, float $balance): bool
+    {
+        $sql = "UPDATE {$this->table} SET balance = :balance WHERE id = :id";
+        Database::query($sql, ['balance' => $balance, 'id' => $id]);
+        return true;
+    }
 }

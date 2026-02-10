@@ -95,12 +95,9 @@
                 </div>
                 <?php elseif ($loan['status'] === 'outstanding'): ?>
                 <hr>
-                <div class="d-flex justify-content-center">
-                    <button type="button" class="btn btn-info" 
-                            onclick="updateLoanStatus(<?= $loan['l_id'] ?>, 'disbursed')">
-                        <i class="ti ti-cash me-1"></i>
-                        Mark as Disbursed/Paid
-                    </button>
+                <div class="alert alert-success text-center">
+                    <i class="ti ti-check-circle me-2"></i>
+                    <strong>Loan Approved!</strong> This loan has been approved and is now outstanding.
                 </div>
                 <?php endif; ?>
             </div>
@@ -114,15 +111,29 @@
     <input type="hidden" id="newStatus" name="status" value="">
 </form>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function updateLoanStatus(loanId, status) {
-    const statusText = status === 'outstanding' ? 'approve' : 
+    const actionText = status === 'outstanding' ? 'approve' : 
                       status === 'disbursed' ? 'mark as disbursed' : 'reject';
+    const confirmText = status === 'outstanding' ? 'Yes, approve it!' : 
+                       status === 'disbursed' ? 'Yes, mark it!' : 'Yes, reject it!';
     
-    if (confirm(`Are you sure you want to ${statusText} this loan?`)) {
-        document.getElementById('loanId').value = loanId;
-        document.getElementById('newStatus').value = status;
-        document.getElementById('statusUpdateForm').submit();
-    }
+    Swal.fire({
+        title: `Are you sure you want to ${actionText} this loan?`,
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: status === 'rejected' ? '#d33' : '#3085d6',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: confirmText,
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('loanId').value = loanId;
+            document.getElementById('newStatus').value = status;
+            document.getElementById('statusUpdateForm').submit();
+        }
+    });
 }
 </script>
