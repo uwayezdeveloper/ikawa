@@ -17,6 +17,9 @@
     <!-- Vendor css -->
     <link href="<?= \App\Core\View::asset('css/vendors.min.css') ?>" rel="stylesheet" type="text/css" />
 
+    <!-- Boxicons CSS from CDN (fallback for missing font files) -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
     <!-- SweetAlert2 CSS -->
     <link href="<?= \App\Core\View::asset('plugins/sweetalert2/sweetalert2.min.css') ?>" rel="stylesheet" type="text/css" />
 

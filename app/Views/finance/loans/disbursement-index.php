@@ -35,6 +35,9 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Outstanding Loans Ready for Disbursement</h5>
+            <div class="alert alert-info alert-sm mb-0 py-1 px-2">
+                <small><i class="bx bx-info-circle me-1"></i><strong>Note:</strong> Each payment account can have individual processing charges that will be deducted separately.</small>
+            </div>
         </div>
         
         <div class="card-body">

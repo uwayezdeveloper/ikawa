@@ -95,7 +95,7 @@
                             <h6 class="mb-3">Payment Accounts Distribution</h6>
                             <div id="payment-accounts">
                                 <div class="row payment-account-row mb-3">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label">Select Account</label>
                                         <select class="form-select account-select" name="account_ids[]" required>
                                             <option value="">Choose account...</option>
@@ -108,10 +108,15 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Amount</label>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Payment Amount</label>
                                         <input type="number" class="form-control amount-input" 
                                                name="amounts[]" min="1" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Account Charges</label>
+                                        <input type="number" class="form-control charges-input" 
+                                               name="charges[]" min="0" value="0">
                                     </div>
                                     <div class="col-md-2 d-flex align-items-end">
                                         <button type="button" class="btn btn-outline-danger remove-account" disabled>
@@ -128,14 +133,23 @@
 
                         <!-- Summary Section -->
                         <div class="row mb-4">
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h6 class="card-title">Disbursement Summary</h6>
                                         <div class="d-flex justify-content-between">
-                                            <span>Total Amount:</span>
+                                            <span>Total Payment:</span>
                                             <span id="total-amount">RWF 0</span>
                                         </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Total Account Charges:</span>
+                                            <span id="total-charges">RWF 0</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Total Deduction:</strong></span>
+                                            <span id="total-deduction" class="fw-bold">RWF 0</span>
+                                        </div>
+                                        <hr>
                                         <div class="d-flex justify-content-between">
                                             <span>Required Amount:</span>
                                             <span class="text-primary">RWF <?= number_format($loan['request_amount']) ?></span>
@@ -147,11 +161,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Processing Charges (Optional)</label>
-                                <input type="number" class="form-control" name="charges" 
-                                       min="0" value="0" id="charges-input">
-                                <small class="text-muted">Any additional charges for processing the loan</small>
+                            <div class="col-md-4">
+                                <div class="alert alert-info">
+                                    <h6><i class="bx bx-info-circle me-2"></i>Account Charges</h6>
+                                    <small>Each account can have different processing charges. The total amount deducted from each account will be: <strong>Payment Amount + Account Charges</strong></small>
+                                </div>
                             </div>
                         </div>
 
@@ -178,26 +192,77 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateSummary() {
         let totalAmount = 0;
+        let totalCharges = 0;
+        
+        // Calculate total payment amount and total charges
         document.querySelectorAll('.amount-input').forEach(input => {
             if (input.value) {
                 totalAmount += parseFloat(input.value) || 0;
             }
         });
+        
+        document.querySelectorAll('.charges-input').forEach(input => {
+            if (input.value) {
+                totalCharges += parseFloat(input.value) || 0;
+            }
+        });
 
+        // Update display
         document.getElementById('total-amount').textContent = 'RWF ' + totalAmount.toLocaleString();
+        document.getElementById('total-charges').textContent = 'RWF ' + totalCharges.toLocaleString();
+        document.getElementById('total-deduction').textContent = 'RWF ' + (totalAmount + totalCharges).toLocaleString();
         
         const remaining = requiredAmount - totalAmount;
         const remainingElement = document.getElementById('remaining-amount');
         remainingElement.textContent = 'RWF ' + remaining.toLocaleString();
         
-        if (remaining === 0) {
+        // Validate account balances including individual charges
+        let balanceValid = true;
+        const paymentRows = document.querySelectorAll('.payment-account-row');
+        
+        paymentRows.forEach(row => {
+            const accountSelect = row.querySelector('.account-select');
+            const amountInput = row.querySelector('.amount-input');
+            const chargesInput = row.querySelector('.charges-input');
+            
+            if (accountSelect.value && amountInput.value) {
+                const balance = parseFloat(accountSelect.options[accountSelect.selectedIndex].dataset.balance) || 0;
+                const paymentAmount = parseFloat(amountInput.value) || 0;
+                const accountCharges = parseFloat(chargesInput.value) || 0;
+                const totalRequired = paymentAmount + accountCharges;
+                
+                if (balance < totalRequired) {
+                    balanceValid = false;
+                    amountInput.classList.add('is-invalid');
+                    chargesInput.classList.add('is-invalid');
+                    
+                    // Show error feedback
+                    let feedback = row.querySelector('.invalid-feedback');
+                    if (!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        amountInput.parentNode.appendChild(feedback);
+                    }
+                    feedback.textContent = `Insufficient balance! Required: RWF ${totalRequired.toLocaleString()} (Payment: RWF ${paymentAmount.toLocaleString()} + Charges: RWF ${accountCharges.toLocaleString()}), Available: RWF ${balance.toLocaleString()}`;
+                } else {
+                    amountInput.classList.remove('is-invalid');
+                    chargesInput.classList.remove('is-invalid');
+                    const feedback = row.querySelector('.invalid-feedback');
+                    if (feedback) feedback.remove();
+                }
+            }
+        });
+        
+        // Update submit button state
+        if (remaining === 0 && balanceValid) {
             remainingElement.className = 'text-success';
             document.getElementById('submit-btn').disabled = false;
-        } else if (remaining > 0) {
-            remainingElement.className = 'text-warning';
-            document.getElementById('submit-btn').disabled = true;
         } else {
-            remainingElement.className = 'text-danger';
+            if (remaining > 0) {
+                remainingElement.className = 'text-warning';
+            } else {
+                remainingElement.className = 'text-danger';
+            }
             document.getElementById('submit-btn').disabled = true;
         }
     }
@@ -224,15 +289,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function addEventListeners(row) {
         const accountSelect = row.querySelector('.account-select');
         const amountInput = row.querySelector('.amount-input');
+        const chargesInput = row.querySelector('.charges-input');
         const removeBtn = row.querySelector('.remove-account');
 
         accountSelect.addEventListener('change', function() {
             const balance = this.options[this.selectedIndex].dataset.balance || 0;
-            amountInput.max = balance;
+            // Don't set max on amount input since charges also need to be considered
             updateSummary();
         });
 
         amountInput.addEventListener('input', updateSummary);
+        chargesInput.addEventListener('input', updateSummary);
 
         removeBtn.addEventListener('click', function() {
             row.remove();
@@ -258,6 +325,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form validation
     document.getElementById('disbursementForm').addEventListener('submit', function(e) {
         let totalAmount = 0;
+        let balanceValid = true;
+        
         document.querySelectorAll('.amount-input').forEach(input => {
             totalAmount += parseFloat(input.value) || 0;
         });
@@ -273,6 +342,31 @@ document.addEventListener('DOMContentLoaded', function() {
         if (totalAmount !== requiredAmount) {
             e.preventDefault();
             alert('Total disbursement amount must equal the requested loan amount of RWF ' + requiredAmount.toLocaleString());
+            return false;
+        }
+        
+        // Validate account balances with individual charges
+        const paymentRows = document.querySelectorAll('.payment-account-row');
+        paymentRows.forEach(row => {
+            const accountSelect = row.querySelector('.account-select');
+            const amountInput = row.querySelector('.amount-input');
+            const chargesInput = row.querySelector('.charges-input');
+            
+            if (accountSelect.value && amountInput.value) {
+                const balance = parseFloat(accountSelect.options[accountSelect.selectedIndex].dataset.balance) || 0;
+                const paymentAmount = parseFloat(amountInput.value) || 0;
+                const accountCharges = parseFloat(chargesInput.value) || 0;
+                const totalRequired = paymentAmount + accountCharges;
+                
+                if (balance < totalRequired) {
+                    balanceValid = false;
+                }
+            }
+        });
+        
+        if (!balanceValid) {
+            e.preventDefault();
+            alert('One or more accounts have insufficient balance to cover the payment amount plus account charges. Please adjust the amounts or select different accounts.');
             return false;
         }
     });

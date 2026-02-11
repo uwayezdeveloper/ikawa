@@ -35,9 +35,9 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">All Loan Applications</h4>
-                <a href="<?= APP_URL ?>/finance/loans/disbursement" class="btn btn-success">
-                    <i class="bx bx-money-withdraw me-1"></i>Loan Disbursement
-                </a>
+                <!-- <a href="<?= APP_URL ?>/finance/loans/disbursement" class="btn btn-success">
+                    <i class="bx bx-money-withdrqaw me-1"></i>Loan Disbursement
+                </a> -->
             </div>
             <div class="card-body">
                 <?php if (empty($loans)): ?>
@@ -68,10 +68,10 @@
                                 <td><?= $loan['l_id'] ?></td>
                                 <td>
                                     <div>
-                                        <strong><?= htmlspecialchars($loan['first_name'] . ' ' . $loan['last_name']) ?></strong>
+                                        <strong><?= htmlspecialchars(($loan['first_name'] ?? '') . ' ' . ($loan['last_name'] ?? '')) ?></strong>
                                     </div>
                                 </td>
-                                <td><?= htmlspecialchars($loan['email']) ?></td>
+                                <td><?= htmlspecialchars($loan['email'] ?? '') ?></td>
                                 <td>
                                     <strong class="text-primary">RWF <?= number_format($loan['request_amount']) ?></strong>
                                 </td>
@@ -80,8 +80,8 @@
                                 </td>
                                 <td>
                                     <div class="text-truncate" style="max-width: 200px;" 
-                                         title="<?= htmlspecialchars($loan['description']) ?>">
-                                        <?= htmlspecialchars(substr($loan['description'], 0, 50)) ?><?= strlen($loan['description']) > 50 ? '...' : '' ?>
+                                         title="<?= htmlspecialchars($loan['description'] ?? '') ?>">
+                                        <?= htmlspecialchars(substr($loan['description'] ?? '', 0, 50)) ?><?= strlen($loan['description'] ?? '') > 50 ? '...' : '' ?>
                                     </div>
                                 </td>
                                 <td>

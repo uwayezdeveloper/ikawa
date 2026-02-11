@@ -214,26 +214,36 @@ class WorkerLoanController extends Controller
             // Process payment accounts and amounts
             $paymentAccounts = [];
             $totalAmount = 0;
-            $charges = (int)($data['charges'] ?? 0);
+            $totalCharges = 0;
 
             // Process multiple accounts
-            if (isset($data['account_ids']) && isset($data['amounts'])) {
+            if (isset($data['account_ids']) && isset($data['amounts']) && isset($data['charges'])) {
                 for ($i = 0; $i < count($data['account_ids']); $i++) {
                     $accountId = $data['account_ids'][$i];
                     $amount = (int)$data['amounts'][$i];
+                    $accountCharges = (int)($data['charges'][$i] ?? 0);
                     
                     if ($accountId && $amount > 0) {
                         // Get account details
                         $account = $this->accountModel->findById($accountId);
-                        if ($account && $account['balance'] >= $amount) {
-                            $paymentAccounts[] = [
-                                'account_id' => $accountId,
-                                'account_name' => $account['account_name'],
-                                'amount' => $amount
-                            ];
-                            $totalAmount += $amount;
+                        if ($account) {
+                            $totalRequired = $amount + $accountCharges;
+                            
+                            if ($account['balance'] >= $totalRequired) {
+                                $paymentAccounts[] = [
+                                    'account_id' => $accountId,
+                                    'account_name' => $account['account_name'],
+                                    'amount' => $amount,
+                                    'charges' => $accountCharges
+                                ];
+                                $totalAmount += $amount;
+                                $totalCharges += $accountCharges;
+                            } else {
+                                $_SESSION['error'] = "Insufficient balance in account: {$account['account_name']}. Required: RWF " . number_format($totalRequired) . " (Payment: RWF " . number_format($amount) . " + Charges: RWF " . number_format($accountCharges) . "), Available: RWF " . number_format($account['balance']);
+                                return $response->redirect(APP_URL . '/finance/loans/disbursement/' . $loanId);
+                            }
                         } else {
-                            $_SESSION['error'] = "Insufficient balance in account: {$account['account_name']}";
+                            $_SESSION['error'] = "Account not found.";
                             return $response->redirect(APP_URL . '/finance/loans/disbursement/' . $loanId);
                         }
                     }
@@ -257,14 +267,28 @@ class WorkerLoanController extends Controller
                 'l_id' => $loanId,
                 'pay_accounts' => $paymentAccounts,
                 'amount' => $totalAmount,
-                'charges' => $charges,
+                'charges' => $totalCharges,
                 'worker_account' => trim($data['worker_account'])
             ];
 
             if ($this->loanDisbursementModel->createDisbursement($disbursementData)) {
-                // Deduct amounts from accounts
+                // Deduct payment amounts and individual charges from accounts
                 foreach ($paymentAccounts as $payAccount) {
-                    $newBalance = $this->accountModel->findById($payAccount['account_id'])['balance'] - $payAccount['amount'];
+                    $account = $this->accountModel->findById($payAccount['account_id']);
+                    $paymentAmount = $payAccount['amount'];
+                    $accountCharges = $payAccount['charges'];
+                    
+                    // Total deduction = payment amount + individual account charges
+                    $totalDeduction = $paymentAmount + $accountCharges;
+                    
+                    // Verify sufficient balance one more time (safety check)
+                    if ($account['balance'] < $totalDeduction) {
+                        $_SESSION['error'] = "Insufficient balance in account {$account['account_name']} for payment ({$paymentAmount}) plus charges ({$accountCharges}). Required: {$totalDeduction}, Available: {$account['balance']}";
+                        return $response->redirect(APP_URL . '/finance/loans/disbursement/' . $loanId);
+                    }
+                    
+                    // Deduct total amount from account
+                    $newBalance = $account['balance'] - $totalDeduction;
                     $this->accountModel->setBalance($payAccount['account_id'], $newBalance);
                 }
 
