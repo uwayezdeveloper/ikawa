@@ -27,6 +27,7 @@ use App\Controllers\ExpenseTypeController;
 use App\Controllers\ExpenseConsumerController;
 use App\Controllers\ExpenseTransactionController;
 use App\Controllers\WorkerLoanController;
+use App\Controllers\WorkerLoanPaymentController;
 
 $app = Application::getInstance();
 $router = $app->getRouter();
@@ -206,9 +207,26 @@ $router->get('/finance/loans/disbursement', [WorkerLoanController::class, 'disbu
 $router->get('/finance/loans/disbursement/{id}', [WorkerLoanController::class, 'disbursementForm'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/finance/loans/disbursement/process', [WorkerLoanController::class, 'processDisbursement'], ['AuthMiddleware', 'AdminMiddleware']);
 
+// Loan Statement routes (must come before {id} route)
+$router->get('/finance/loans/statement', [WorkerLoanController::class, 'statementIndex'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/loans/statement/generate', [WorkerLoanController::class, 'generateStatement'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/loans/statement/{userId}', [WorkerLoanController::class, 'showStatement'], ['AuthMiddleware', 'AdminMiddleware']);
+
 // Individual loan routes (must come after specific routes)
 $router->get('/finance/loans/{id}', [WorkerLoanController::class, 'show'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/finance/loans/status', [WorkerLoanController::class, 'updateStatus'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
+// WORKER LOAN PAYMENT ROUTES (Admin only)
+// ============================================
+$router->get('/finance/loan-payments', [WorkerLoanPaymentController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/loan-payments/create', [WorkerLoanPaymentController::class, 'create'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/loan-payments/store', [WorkerLoanPaymentController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/loan-payments/{id}', [WorkerLoanPaymentController::class, 'show'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// AJAX routes for loan payment functionality
+$router->get('/api/loans/{id}/details', [WorkerLoanPaymentController::class, 'getLoanDetails'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/loans/{id}/payments', [WorkerLoanPaymentController::class, 'getPaymentsByLoan'], ['AuthMiddleware', 'AdminMiddleware']);
 
 
 

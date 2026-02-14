@@ -35,9 +35,14 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">All Loan Applications</h4>
-                <!-- <a href="<?= APP_URL ?>/finance/loans/disbursement" class="btn btn-success">
-                    <i class="bx bx-money-withdrqaw me-1"></i>Loan Disbursement
-                </a> -->
+                <div>
+                    <a href="<?= APP_URL ?>/finance/loans/statement" class="btn btn-info me-2">
+                        <i class="bx bx-receipt me-1"></i>Loan Statements
+                    </a>
+                    <a href="<?= APP_URL ?>/finance/loans/disbursement" class="btn btn-success">
+                        <i class="bx bx-money-withdraw me-1"></i>Loan Disbursement
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <?php if (empty($loans)): ?>

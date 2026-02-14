@@ -293,4 +293,13 @@ class Account extends Model
         Database::query($sql, ['balance' => $balance, 'id' => $id]);
         return true;
     }
+
+    /**
+     * Get account by ID (simple method without joins)
+     */
+    public function getById(int $id): ?array
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
+        return Database::fetch($sql, ['id' => $id]);
+    }
 }

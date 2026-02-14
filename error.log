@@ -68,3 +68,120 @@ Stack trace:
 #3 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
 #4 {main}
   thrown in C:\xampp\htdocs\gihanga\app\controllers\WorkerLoanController.php on line 157
+[11-Feb-2026 15:04:01 Africa/Kigali] PHP Fatal error:  Uncaught Error: Using $this when not in object context in C:\xampp\htdocs\gihanga\app\Views\finance\loan-payments\index.php:1
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\Core\View.php(32): include()
+#1 C:\xampp\htdocs\gihanga\app\Core\Controller.php(23): App\Core\View::render('finance/loan-pa...', Array, NULL)
+#2 C:\xampp\htdocs\gihanga\app\controllers\WorkerLoanPaymentController.php(34): App\Core\Controller->view('finance/loan-pa...', Array)
+#3 [internal function]: App\Controllers\WorkerLoanPaymentController->index(Object(App\Core\Request), Object(App\Core\Response), Array)
+#4 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#5 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#6 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#7 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Views\finance\loan-payments\index.php on line 1
+[11-Feb-2026 15:19:04 Africa/Kigali] WorkerLoanPaymentController::create() - START
+[11-Feb-2026 15:19:04 Africa/Kigali] WorkerLoanPaymentController::create() - Loans count: 2
+[11-Feb-2026 15:19:04 Africa/Kigali] WorkerLoanPaymentController::create() - Loans data: Array
+(
+    [0] => Array
+        (
+            [l_id] => 6
+            [user_id] => 3
+            [request_amount] => 5
+            [payed_amount] => 0
+            [description] => 555555555
+            [status] => disbursed
+            [created_at] => 
+            [first_name] => UWAYEZU
+            [last_name] => Jean Felix
+            [email] => uwayezujean2001@gmail.com
+            [remaining_balance] => 5
+        )
+
+    [1] => Array
+        (
+            [l_id] => 4
+            [user_id] => 3
+            [request_amount] => 7
+            [payed_amount] => 0
+            [description] => f
+            [status] => disbursed
+            [created_at] => 
+            [first_name] => UWAYEZU
+            [last_name] => Jean Felix
+            [email] => uwayezujean2001@gmail.com
+            [remaining_balance] => 7
+        )
+
+)
+
+[11-Feb-2026 15:19:04 Africa/Kigali] WorkerLoanPaymentController::create() - Accounts count: 4
+[11-Feb-2026 15:28:56 Africa/Kigali] WorkerLoanPaymentController::create() - START
+[11-Feb-2026 15:28:56 Africa/Kigali] WorkerLoanPaymentController::create() - Loans count: 2
+[11-Feb-2026 15:28:56 Africa/Kigali] WorkerLoanPaymentController::create() - Loans data: Array
+(
+    [0] => Array
+        (
+            [l_id] => 6
+            [user_id] => 3
+            [request_amount] => 5
+            [payed_amount] => 0
+            [description] => 555555555
+            [status] => disbursed
+            [created_at] => 
+            [first_name] => UWAYEZU
+            [last_name] => Jean Felix
+            [email] => uwayezujean2001@gmail.com
+            [remaining_balance] => 5
+        )
+
+    [1] => Array
+        (
+            [l_id] => 4
+            [user_id] => 3
+            [request_amount] => 7
+            [payed_amount] => 0
+            [description] => f
+            [status] => disbursed
+            [created_at] => 
+            [first_name] => UWAYEZU
+            [last_name] => Jean Felix
+            [email] => uwayezujean2001@gmail.com
+            [remaining_balance] => 7
+        )
+
+)
+
+[11-Feb-2026 15:28:56 Africa/Kigali] WorkerLoanPaymentController::create() - Accounts count: 4
+[11-Feb-2026 15:36:27 Africa/Kigali] PHP Fatal error:  Uncaught Error: Call to undefined method App\Core\Request::post() in C:\xampp\htdocs\gihanga\app\controllers\WorkerLoanPaymentController.php:62
+Stack trace:
+#0 [internal function]: App\Controllers\WorkerLoanPaymentController->store(Object(App\Core\Request), Object(App\Core\Response), Array)
+#1 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#3 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#4 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\controllers\WorkerLoanPaymentController.php on line 62
+[11-Feb-2026 15:37:38 Africa/Kigali] PHP Fatal error:  Uncaught Error: Object of class App\Core\Request could not be converted to string in C:\xampp\htdocs\gihanga\app\Core\Database.php:51
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\Core\Database.php(51): PDOStatement->execute(Array)
+#1 C:\xampp\htdocs\gihanga\app\Core\Database.php(68): App\Core\Database::query('SELECT p.*, \r\n ...', Array)
+#2 C:\xampp\htdocs\gihanga\app\Models\WorkerLoanPayment.php(90): App\Core\Database::fetch('SELECT p.*, \r\n ...', Array)
+#3 C:\xampp\htdocs\gihanga\app\controllers\WorkerLoanPaymentController.php(137): App\Models\WorkerLoanPayment->getByIdWithDetails(Object(App\Core\Request))
+#4 [internal function]: App\Controllers\WorkerLoanPaymentController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#5 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#6 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#7 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#8 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Core\Database.php on line 51
+[11-Feb-2026 15:37:42 Africa/Kigali] PHP Fatal error:  Uncaught Error: Object of class App\Core\Request could not be converted to string in C:\xampp\htdocs\gihanga\app\Core\Database.php:51
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\Core\Database.php(51): PDOStatement->execute(Array)
+#1 C:\xampp\htdocs\gihanga\app\Core\Database.php(68): App\Core\Database::query('SELECT p.*, \r\n ...', Array)
+#2 C:\xampp\htdocs\gihanga\app\Models\WorkerLoanPayment.php(90): App\Core\Database::fetch('SELECT p.*, \r\n ...', Array)
+#3 C:\xampp\htdocs\gihanga\app\controllers\WorkerLoanPaymentController.php(137): App\Models\WorkerLoanPayment->getByIdWithDetails(Object(App\Core\Request))
+#4 [internal function]: App\Controllers\WorkerLoanPaymentController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#5 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#6 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#7 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#8 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Core\Database.php on line 51

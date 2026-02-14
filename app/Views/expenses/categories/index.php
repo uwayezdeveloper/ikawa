@@ -8,7 +8,7 @@
                 <h4 class="mb-sm-0"><?= htmlspecialchars($title ?? 'Expense Categories') ?></h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="<?= APP_URL ?>/dashboard">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="#">Expense Management</a></li>
                         <li class="breadcrumb-item active">Expense Categories</li>
                     </ol>
@@ -51,7 +51,7 @@
                     <!-- Search Form -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <form method="GET" action="/expenses/categories" class="d-flex">
+                            <form method="GET" action="<?= APP_URL ?>/expenses/categories" class="d-flex">
                                 <input type="text" class="form-control me-2" name="search" 
                                        placeholder="Search categories..." 
                                        value="<?= htmlspecialchars($search ?? '') ?>">
@@ -59,7 +59,7 @@
                                     <i class="bx bx-search"></i>
                                 </button>
                                 <?php if (!empty($search)): ?>
-                                    <a href="/expenses/categories" class="btn btn-outline-secondary ms-2">
+                                    <a href="<?= APP_URL ?>/expenses/categories" class="btn btn-outline-secondary ms-2">
                                         <i class="bx bx-x"></i>
                                     </a>
                                 <?php endif; ?>
@@ -108,7 +108,7 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="/expenses/categories/<?= $category['categ_id'] ?>/edit" 
+                                                    <a href="<?= APP_URL ?>/expenses/categories/<?= $category['categ_id'] ?>/edit" 
                                                        class="btn btn-sm btn-outline-primary" title="Edit">
                                                         <i class="bx bx-edit"></i>
                                                     </a>
@@ -129,7 +129,7 @@
                                             <i class="bx bx-folder-open display-4 text-muted"></i>
                                             <p class="text-muted mt-2">No expense categories found</p>
                                             <?php if (empty($search)): ?>
-                                                <a href="/expenses/categories/create" class="btn btn-primary">
+                                                <a href="<?= APP_URL ?>/expenses/categories/create" class="btn btn-primary">
                                                     Add First Category
                                                 </a>
                                             <?php endif; ?>

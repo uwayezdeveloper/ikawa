@@ -307,4 +307,108 @@ class WorkerLoanController extends Controller
             return $response->redirect(APP_URL . '/finance/loans/disbursement');
         }
     }
+
+    /**
+     * Show worker loan statement selection page
+     */
+    public function statementIndex($request, $response)
+    {
+        $workers = $this->workerLoanModel->getAllWorkersWithLoans();
+        
+        return $this->view('finance/loans/statement-index', [
+            'workers' => $workers,
+            'user' => $_SESSION['user'] ?? []
+        ]);
+    }
+
+    /**
+     * Generate and display worker loan statement
+     */
+    public function generateStatement($request, $response)
+    {
+        try {
+            $data = $request->getBody();
+            $userId = $data['user_id'] ?? null;
+            $startDate = $data['start_date'] ?? null;
+            $endDate = $data['end_date'] ?? null;
+            
+            if (empty($userId)) {
+                $_SESSION['error'] = 'Please select a worker to view their loan statement.';
+                return $response->redirect(APP_URL . '/finance/loans/statement');
+            }
+
+            // Validate date range if provided
+            if ($startDate && $endDate) {
+                if (strtotime($startDate) > strtotime($endDate)) {
+                    $_SESSION['error'] = 'Start date must be before end date.';
+                    return $response->redirect(APP_URL . '/finance/loans/statement');
+                }
+            }
+
+            // Get worker information
+            $worker = $this->workerLoanModel->getUserLoans($userId);
+            if (empty($worker)) {
+                $_SESSION['error'] = 'No loan records found for the selected worker.';
+                return $response->redirect(APP_URL . '/finance/loans/statement');
+            }
+
+            // Get worker details from first loan record (contains user info)
+            $workerDetails = $this->workerLoanModel->getLoanById($worker[0]['l_id']);
+            
+            // Get statement transactions with running balance
+            $transactions = $this->workerLoanModel->calculateStatementBalance($userId, $startDate, $endDate);
+            
+            return $this->view('finance/loans/statement', [
+                'worker' => $workerDetails,
+                'transactions' => $transactions,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'user' => $_SESSION['user'] ?? []
+            ]);
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'An error occurred: ' . $e->getMessage();
+            return $response->redirect(APP_URL . '/finance/loans/statement');
+        }
+    }
+
+    /**
+     * Show worker loan statement directly by user ID (for direct access)
+     */
+    public function showStatement($request, $response, $params)
+    {
+        try {
+            $userId = $params['userId'] ?? null;
+            
+            if (!$userId) {
+                $_SESSION['error'] = 'Invalid worker ID.';
+                return $response->redirect(APP_URL . '/finance/loans/statement');
+            }
+
+            // Get worker loans to verify they exist
+            $worker = $this->workerLoanModel->getUserLoans($userId);
+            if (empty($worker)) {
+                $_SESSION['error'] = 'No loan records found for this worker.';
+                return $response->redirect(APP_URL . '/finance/loans/statement');
+            }
+
+            // Get worker details from first loan record
+            $workerDetails = $this->workerLoanModel->getLoanById($worker[0]['l_id']);
+            
+            // Get statement transactions with running balance (all transactions, no date filter)
+            $transactions = $this->workerLoanModel->calculateStatementBalance($userId);
+            
+            return $this->view('finance/loans/statement', [
+                'worker' => $workerDetails,
+                'transactions' => $transactions,
+                'startDate' => null,
+                'endDate' => null,
+                'user' => $_SESSION['user'] ?? []
+            ]);
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'An error occurred: ' . $e->getMessage();
+            return $response->redirect(APP_URL . '/finance/loans/statement');
+        }
+    }
 }

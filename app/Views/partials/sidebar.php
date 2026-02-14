@@ -292,7 +292,7 @@
                                 </a>
                             </li>
 
-                            
+
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/loans/create" class="side-nav-link">
                                     <span class="menu-text">Request Loan</span>
@@ -306,6 +306,21 @@
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/loans/disbursement" class="side-nav-link">
                                     <span class="menu-text">Loan Disbursement</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans/statement" class="side-nav-link">
+                                    <span class="menu-text">Loan Statements</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loan-payments/create" class="side-nav-link">
+                                    <span class="menu-text">Pay Worker Loan</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loan-payments" class="side-nav-link">
+                                    <span class="menu-text">Loan Payment History</span>
                                 </a>
                             </li>
                             <?php endif; ?>
