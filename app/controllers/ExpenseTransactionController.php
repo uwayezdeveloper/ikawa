@@ -36,10 +36,12 @@ class ExpenseTransactionController extends Controller
         $search = $_GET['search'] ?? '';
         $perPage = 20;
         $userId = $_SESSION['user']['id'] ?? null;
-        
-        $result = $this->expenseTransaction->getPaginatedTransactions($page, $perPage, $search, $userId);
-        $stats = $this->expenseTransaction->getTransactionStats($userId);
-        
+        $dateFrom = $_GET['date_from'] ?? null;
+        $dateTo = $_GET['date_to'] ?? null;
+
+        $result = $this->expenseTransaction->getPaginatedTransactions($page, $perPage, $search, $userId, $dateFrom, $dateTo);
+        $stats = $this->expenseTransaction->getTransactionStats($userId, $dateFrom, $dateTo);
+
         $data = [
             'transactions' => $result['data'],
             'pagination' => [
@@ -53,7 +55,7 @@ class ExpenseTransactionController extends Controller
             'title' => 'Expense Transactions',
             'user' => $_SESSION['user'] ?? []
         ];
-        
+
         return View::render('finance/expenses/transactions/index', $data, 'main');
     }
 
@@ -106,17 +108,25 @@ class ExpenseTransactionController extends Controller
 
         // Parse payment data - check if multi-payment is used
         $payMode = null;
+        $perAccountCharges = [];
         if (isset($_POST['use_multi_payment']) && $_POST['use_multi_payment'] === '1') {
             // Multi-payment mode
             $payments = [];
             if (isset($_POST['payment_accounts']) && is_array($_POST['payment_accounts'])) {
                 foreach ($_POST['payment_accounts'] as $index => $accountId) {
                     $amount = (float) ($_POST['payment_amounts'][$index] ?? 0);
+                    $charge = isset($_POST['payment_charges'][$index]) ? (float)$_POST['payment_charges'][$index] : 0;
                     if ($accountId > 0 && $amount > 0) {
                         $payments[] = [
                             'account_id' => (int) $accountId,
                             'amount' => $amount
                         ];
+                        if ($charge > 0) {
+                            $perAccountCharges[] = [
+                                'account_id' => (int)$accountId,
+                                'charges' => $charge
+                            ];
+                        }
                     }
                 }
             }
@@ -135,7 +145,8 @@ class ExpenseTransactionController extends Controller
             'payer_name' => !empty($_POST['payer_name']) ? (int) $_POST['payer_name'] : null,
             'receipt_type' => !empty($_POST['receipt_type']) ? (int) $_POST['receipt_type'] : null,
             'description' => trim($_POST['description'] ?? ''),
-            'recorded_date' => $_POST['recorded_date'] ?? date('Y-m-d')
+            'recorded_date' => $_POST['recorded_date'] ?? date('Y-m-d'),
+            'per_account_charges' => $perAccountCharges
         ];
 
         // Validation

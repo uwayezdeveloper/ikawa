@@ -287,9 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const row = document.createElement('div');
         row.className = 'row payment-row mb-2';
         row.setAttribute('data-row', paymentRowCounter);
-        
+
         row.innerHTML = `
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <select class="form-control payment-account" name="payment_accounts[]" required>
                     <option value="">Select Account</option>
                     ${accounts.map(account => 
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ).join('')}
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="input-group">
                     <span class="input-group-text">$</span>
                     <input type="number" class="form-control payment-amount" 
@@ -307,30 +307,43 @@ document.addEventListener('DOMContentLoaded', function() {
                            min="0" step="0.01" required>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control payment-charges" 
+                           name="payment_charges[]" placeholder="Charges" 
+                           min="0" step="0.01">
+                </div>
+            </div>
+            <div class="col-md-1 d-flex align-items-center">
                 <button type="button" class="btn btn-outline-danger btn-sm remove-payment-row">
                     <i class="ti ti-trash"></i>
                 </button>
             </div>
         `;
-        
+
         paymentRows.appendChild(row);
-        
+
         // Add event listeners
         const accountSelect = row.querySelector('.payment-account');
         const amountInput = row.querySelector('.payment-amount');
+        const chargesInput = row.querySelector('.payment-charges');
         const removeBtn = row.querySelector('.remove-payment-row');
-        
+
         accountSelect.addEventListener('change', function() {
             updatePaymentBalance();
             validateAccountBalance(this, amountInput);
         });
-        
+
         amountInput.addEventListener('input', function() {
             updatePaymentBalance();
             validateAccountBalance(accountSelect, this);
         });
-        
+
+        chargesInput.addEventListener('input', function() {
+            updatePaymentBalance();
+        });
+
         removeBtn.addEventListener('click', function() {
             if (document.querySelectorAll('.payment-row').length > 1) {
                 row.remove();
@@ -359,19 +372,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isMultiPaymentMode) return;
         
         let totalPayments = 0;
+        let totalCharges = 0;
         const paymentAmounts = document.querySelectorAll('.payment-amount');
-        
+        const paymentCharges = document.querySelectorAll('.payment-charges');
+
         paymentAmounts.forEach(input => {
             totalPayments += parseFloat(input.value) || 0;
         });
-        
+        paymentCharges.forEach(input => {
+            totalCharges += parseFloat(input.value) || 0;
+        });
+
         const transactionAmount = parseFloat(amountInput.value) || 0;
         const charges = parseFloat(chargesInput.value) || 0;
         const totalRequired = transactionAmount + charges;
         const difference = totalRequired - totalPayments;
-        
+
         document.getElementById('totalPayments').textContent = '$' + totalPayments.toFixed(2);
-        
+
+        // Optionally, you can show total charges for multi-payment mode
+        // document.getElementById('totalCharges').textContent = '$' + totalCharges.toFixed(2);
+
         const balanceElement = document.getElementById('paymentBalance');
         if (Math.abs(difference) < 0.01) {
             balanceElement.innerHTML = '<span class="text-success"><i class="ti ti-check"></i> Balanced</span>';

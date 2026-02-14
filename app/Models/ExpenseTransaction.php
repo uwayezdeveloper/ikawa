@@ -18,7 +18,7 @@ class ExpenseTransaction extends Model
     /**
      * Get paginated expense transactions with related data
      */
-    public function getPaginatedTransactions($page = 1, $perPage = 20, $search = '', $userId = null): array
+    public function getPaginatedTransactions($page = 1, $perPage = 20, $search = '', $userId = null, $dateFrom = null, $dateTo = null): array
     {
         $offset = ($page - 1) * $perPage;
         
@@ -46,13 +46,22 @@ class ExpenseTransaction extends Model
             // $sql .= " AND l.created_by = :user_id";
             // $params['user_id'] = $userId;
         }
-        
+
         if (!empty($search)) {
             $sql .= " AND (et.expense_name LIKE :search 
                       OR ecr.cons_name LIKE :search 
                       OR ec.trans_id LIKE :search 
                       OR ec.description LIKE :search)";
             $params['search'] = '%' . $search . '%';
+        }
+
+        if (!empty($dateFrom)) {
+            $sql .= " AND ec.recorded_date >= :date_from";
+            $params['date_from'] = $dateFrom;
+        }
+        if (!empty($dateTo)) {
+            $sql .= " AND ec.recorded_date <= :date_to";
+            $params['date_to'] = $dateTo;
         }
         
         // Get total count
@@ -66,7 +75,68 @@ class ExpenseTransaction extends Model
         $params['offset'] = $offset;
         
         $transactions = Database::fetchAll($sql, $params);
-        
+
+        // Gather all account IDs from pay_mode JSONs
+        $allAccountIds = [];
+        foreach ($transactions as $tr) {
+            if (!empty($tr['pay_mode'])) {
+                $pmArr = json_decode($tr['pay_mode'], true);
+                if (is_array($pmArr)) {
+                    foreach ($pmArr as $pm) {
+                        if (isset($pm['account_id'])) {
+                            $allAccountIds[] = (int)$pm['account_id'];
+                        }
+                    }
+                }
+            }
+        }
+        $allAccountIds = array_unique($allAccountIds);
+
+        // Fetch all account names in one query
+        $accountMap = [];
+        if (!empty($allAccountIds)) {
+            $in = implode(',', array_fill(0, count($allAccountIds), '?'));
+            $accRows = Database::fetchAll("SELECT id, account_name FROM accounts WHERE id IN ($in)", $allAccountIds);
+            foreach ($accRows as $acc) {
+                $accountMap[$acc['id']] = $acc['account_name'];
+            }
+        }
+
+        // Fetch charges for each transaction from details table and map account names
+        foreach ($transactions as &$transaction) {
+            // Fetch all details for this transaction
+            $detailsSql = "SELECT * FROM {$this->detailsTable} WHERE trans_code = :trans_code";
+            $detailsResult = Database::fetchAll($detailsSql, ['trans_code' => $transaction['trans_id']]);
+            $transaction['charges'] = 0;
+            $transaction['account_charges'] = [];
+            $chargesTotal = 0;
+            // Map account_id to charges for CHARGES rows
+            foreach ($detailsResult as $detail) {
+                if ($detail['action'] === 'CHARGES' && isset($detail['account_id'])) {
+                    $transaction['account_charges'][$detail['account_id']] = (float)$detail['charges'];
+                    $chargesTotal += (float)$detail['charges'];
+                }
+            }
+            $transaction['charges'] = $chargesTotal;
+
+            // Map account names for pay_mode
+            $transaction['account_names'] = [];
+            $transaction['account_ids'] = [];
+            if (!empty($transaction['pay_mode'])) {
+                $pmArr = json_decode($transaction['pay_mode'], true);
+                if (is_array($pmArr)) {
+                    foreach ($pmArr as $pm) {
+                        if (isset($pm['account_id'])) {
+                            $aid = (int)$pm['account_id'];
+                            $transaction['account_names'][] = $accountMap[$aid] ?? $aid;
+                            $transaction['account_ids'][] = $aid;
+                        }
+                    }
+                }
+            }
+        }
+        unset($transaction);
+
         return [
             'data' => $transactions,
             'total' => $total,
@@ -83,10 +153,10 @@ class ExpenseTransaction extends Model
     {
         try {
             Database::getInstance()->beginTransaction();
-            
+
             // Generate unique transaction ID
             $transId = $this->generateTransactionId();
-            
+
             // Handle multi-payment data
             $payModeData = $data['pay_mode'];
             if (is_array($payModeData)) {
@@ -98,7 +168,7 @@ class ExpenseTransaction extends Model
                 $payModeJson = json_encode([['account_id' => $payModeData, 'amount' => $data['amount'] + ($data['charges'] ?? 0)]]);
                 $this->deductFromAccount($payModeData, $data['amount'] + ($data['charges'] ?? 0));
             }
-            
+
             // Insert main transaction
             $mainSql = "INSERT INTO {$this->table} 
                        (expense_id, station_id, amount, pay_mode, trans_id, payer_name, 
@@ -106,11 +176,11 @@ class ExpenseTransaction extends Model
                        VALUES 
                        (:expense_id, :station_id, :amount, :pay_mode, :trans_id, :payer_name, 
                         :description, :pay_date, :recorded_date, :receipt_type, :status)";
-            
+
             $mainParams = [
                 'expense_id' => $data['expense_id'],
                 'station_id' => $data['station_id'],
-                'amount' => $data['amount'] + ($data['charges'] ?? 0), // Total amount
+                'amount' => $data['amount'], // Only amount, not charges
                 'pay_mode' => $payModeJson,
                 'trans_id' => $transId,
                 'payer_name' => $data['payer_name'],
@@ -120,36 +190,54 @@ class ExpenseTransaction extends Model
                 'receipt_type' => $data['receipt_type'] ?? null,
                 'status' => $data['status'] ?? 1
             ];
-            
+
             Database::query($mainSql, $mainParams);
-            
+
             // Insert details - Amount row
             $detailsSql = "INSERT INTO {$this->detailsTable} 
-                          (trans_code, amount, charges, created_by, action) 
-                          VALUES (:trans_code, :amount, :charges, :created_by, :action)";
-            
+                          (trans_code, amount, charges, created_by, action, account_id) 
+                          VALUES (:trans_code, :amount, :charges, :created_by, :action, :account_id)";
+
             Database::query($detailsSql, [
                 'trans_code' => $transId,
                 'amount' => $data['amount'],
                 'charges' => 0,
                 'created_by' => $createdBy,
-                'action' => 'AMOUNT'
+                'action' => 'AMOUNT',
+                'account_id' => null
             ]);
-            
-            // Insert details - Charges row (if charges exist)
-            if (!empty($data['charges']) && $data['charges'] > 0) {
+
+            // Insert details - Charges row (if charges exist, single payment mode)
+            if (!empty($data['charges']) && $data['charges'] > 0 && empty($data['per_account_charges'])) {
                 Database::query($detailsSql, [
                     'trans_code' => $transId,
                     'amount' => 0,
                     'charges' => $data['charges'],
                     'created_by' => $createdBy,
-                    'action' => 'CHARGES'
+                    'action' => 'CHARGES',
+                    'account_id' => null
                 ]);
             }
-            
+
+            // Insert per-account charges if present (multi-payment mode)
+            if (!empty($data['per_account_charges']) && is_array($data['per_account_charges'])) {
+                foreach ($data['per_account_charges'] as $chargeRow) {
+                    if (!empty($chargeRow['charges']) && !empty($chargeRow['account_id'])) {
+                        Database::query($detailsSql, [
+                            'trans_code' => $transId,
+                            'amount' => 0,
+                            'charges' => $chargeRow['charges'],
+                            'created_by' => $createdBy,
+                            'action' => 'CHARGES',
+                            'account_id' => $chargeRow['account_id']
+                        ]);
+                    }
+                }
+            }
+
             Database::getInstance()->commit();
             return true;
-            
+
         } catch (\Exception $e) {
             Database::getInstance()->rollback();
             throw $e;

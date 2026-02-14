@@ -16,6 +16,17 @@
 
 <!-- Stats Cards -->
 <div class="row mb-3">
+                    <?php if (!empty($_GET['date_from']) || !empty($_GET['date_to'])): ?>
+                    <div class="alert alert-info mb-2">
+                        <strong>Date Filter:</strong>
+                        <?php if (!empty($_GET['date_from'])): ?>
+                            From <b><?= htmlspecialchars($_GET['date_from']) ?></b>
+                        <?php endif; ?>
+                        <?php if (!empty($_GET['date_to'])): ?>
+                            To <b><?= htmlspecialchars($_GET['date_to']) ?></b>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
@@ -102,9 +113,15 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Expense Transactions</h5>
                     <div class="d-flex gap-2">
+                        <?php if (!empty($_GET['statement'])): ?>
+                        <button id="export-pdf-btn" class="btn btn-outline-danger">
+                            <i class="ti ti-file-download me-1"></i>Export PDF
+                        </button>
+                        <?php else: ?>
                         <a href="<?= APP_URL ?>/finance/expense-transactions/export" class="btn btn-outline-success">
-                            <i class="ti ti-download me-1"></i>Export
+                            <i class="ti ti-download me-1"></i>Export CSV
                         </a>
+                        <?php endif; ?>
                         <a href="<?= APP_URL ?>/finance/expense-transactions/create" class="btn btn-primary">
                             <i class="ti ti-plus me-1"></i>New Transaction
                         </a>
@@ -132,22 +149,34 @@
 
                 <!-- Search Form -->
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <form method="GET" action="<?= APP_URL ?>/finance/expense-transactions" class="d-flex">
-                            <input type="text" class="form-control me-2" name="search" 
-                                   placeholder="Search transactions..." 
-                                   value="<?= htmlspecialchars($search ?? '') ?>">
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="ti ti-search"></i> Search
-                            </button>
-                            <?php if (!empty($search)): ?>
-                                <a href="<?= APP_URL ?>/finance/expense-transactions" class="btn btn-outline-secondary ms-2">
-                                    <i class="ti ti-x"></i>
-                                </a>
-                            <?php endif; ?>
+                    <div class="col-md-8">
+                        <form method="GET" action="<?= APP_URL ?>/finance/expense-transactions" class="row g-2 align-items-end">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="search" 
+                                       placeholder="Search transactions..." 
+                                       value="<?= htmlspecialchars($search ?? '') ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="date_from" class="form-label mb-0">From</label>
+                                <input type="date" class="form-control" name="date_from" id="date_from" value="<?= htmlspecialchars($_GET['date_from'] ?? '') ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="date_to" class="form-label mb-0">To</label>
+                                <input type="date" class="form-control" name="date_to" id="date_to" value="<?= htmlspecialchars($_GET['date_to'] ?? '') ?>">
+                            </div>
+                            <div class="col-md-2 d-flex gap-2">
+                                <button class="btn btn-outline-primary w-100" type="submit">
+                                    <i class="ti ti-search"></i> Filter
+                                </button>
+                                <?php if (!empty($search) || !empty($_GET['date_from']) || !empty($_GET['date_to'])): ?>
+                                    <a href="<?= APP_URL ?>/finance/expense-transactions" class="btn btn-outline-secondary">
+                                        <i class="ti ti-x"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </form>
                     </div>
-                    <div class="col-md-6 text-end">
+                    <div class="col-md-4 text-end">
                         <span class="text-muted">Total: <?= $pagination['total'] ?? 0 ?> transactions</span>
                     </div>
                 </div>
@@ -155,7 +184,15 @@
                 <!-- Transactions Table -->
                 <?php if (!empty($transactions)): ?>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="expense-transactions-table">
+                            </div>
+                            <?php if (!empty($_GET['statement'])): ?>
+                                <!-- jsPDF CDN -->
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+                                <!-- jsPDF AutoTable CDN -->
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+                                <script src="<?= APP_URL ?>/assets/js/pages/expense-transactions-pdf.js"></script>
+                            <?php endif; ?>
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -164,13 +201,20 @@
                                     <th>Expense Type</th>
                                     <th>Consumer</th>
                                     <th>Amount</th>
+                                    <th>Charges</th>
                                     <th>Account</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <?php if (empty($_GET['statement'])): ?>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    <?php endif; ?>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $counter = (($pagination['current_page'] - 1) * $pagination['per_page']) + 1; ?>
+                                <?php 
+                                    $counter = (($pagination['current_page'] - 1) * $pagination['per_page']) + 1;
+                                    $totalAmount = 0;
+                                    $totalCharges = 0;
+                                ?>
                                 <?php foreach ($transactions as $transaction): ?>
                                     <tr>
                                         <td><?= $counter++ ?></td>
@@ -195,16 +239,51 @@
                                         </td>
                                         <td>
                                             <strong class="text-success"><?= number_format($transaction['amount'] ?? 0) ?></strong>
+                                            <?php $totalAmount += (float)($transaction['amount'] ?? 0); ?>
                                         </td>
                                         <td>
-                                            <span class="badge bg-secondary"><?= htmlspecialchars($transaction['account_name'] ?? 'N/A') ?></span>
+                                            <?php 
+                                                // Try to get charges from details if available, else fallback to 0
+                                                $charges = 0;
+                                                if (isset($transaction['charges'])) {
+                                                    $charges = (float)$transaction['charges'];
+                                                } elseif (isset($transaction['details']) && is_array($transaction['details'])) {
+                                                    foreach ($transaction['details'] as $detail) {
+                                                        if (isset($detail['action']) && $detail['action'] === 'CHARGES') {
+                                                            $charges = (float)$detail['charges'];
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                $totalCharges += $charges;
+                                            ?>
+                                            <span><?= number_format($charges, 2) ?></span>
                                         </td>
+                                        <td>
+                                            <?php if (!empty($transaction['account_names'])): ?>
+                                                <?php foreach ($transaction['account_names'] as $idx => $accName): ?>
+                                                    <span class="badge bg-secondary mb-1">
+                                                        <?= htmlspecialchars($accName) ?>
+                                                        <?php 
+                                                            $aid = $transaction['account_ids'][$idx] ?? null;
+                                                            $charge = ($aid && isset($transaction['account_charges'][$aid])) ? $transaction['account_charges'][$aid] : 0;
+                                                        ?>
+                                                        <?php if ($charge > 0): ?>
+                                                            <span class="small" style="color:#fff;">(Charge: <?= number_format($charge, 2) ?>)</span>
+                                                        <?php endif; ?>
+                                                    </span><br>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">N/A</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php if (empty($_GET['statement'])): ?>
                                         <td>
                                             <div class="form-check form-switch">
                                                 <input class="form-check-input status-toggle" 
                                                        type="checkbox" 
                                                        data-id="<?= $transaction['con_id'] ?>"
-                                                       <?= $transaction['status'] == 1 ? 'checked' : '' ?>>
+                                                       <?= $transaction['status'] == 1 ? 'checked' : '' ?> >
                                                 <label class="form-check-label">
                                                     <span class="badge bg-<?= $transaction['status'] == 1 ? 'success' : 'danger' ?>">
                                                         <?= $transaction['status'] == 1 ? 'Active' : 'Inactive' ?>
@@ -220,8 +299,17 @@
                                                 </a>
                                             </div>
                                         </td>
+                                        <?php endif; ?>
                                     </tr>
                                 <?php endforeach; ?>
+                                <?php if (!empty($_GET['statement'])): ?>
+                                    <tr style="font-weight:bold;background:#f8f9fa;">
+                                        <td colspan="5" class="text-end">Totals:</td>
+                                        <td><?= number_format($totalAmount, 2) ?></td>
+                                        <td><?= number_format($totalCharges, 2) ?></td>
+                                        <td></td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>

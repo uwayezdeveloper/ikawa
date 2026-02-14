@@ -360,6 +360,11 @@
                                     <span class="menu-text">Expense Transactions</span>
                                 </a>
                             </li>
+                                <li class="side-nav-item">
+                                    <a href="<?= APP_URL ?>/finance/expense-transactions?statement=1" class="side-nav-link">
+                                        <span class="menu-text">Expense Statement</span>
+                                    </a>
+                                </li>
                           
                         </ul>
                     </div>
