@@ -28,6 +28,7 @@ use App\Controllers\ExpenseConsumerController;
 use App\Controllers\ExpenseTransactionController;
 use App\Controllers\WorkerLoanController;
 use App\Controllers\WorkerLoanPaymentController;
+use App\Controllers\ProformaInvoiceController;
 
 $app = Application::getInstance();
 $router = $app->getRouter();
@@ -228,7 +229,14 @@ $router->get('/finance/loan-payments/{id}', [WorkerLoanPaymentController::class,
 $router->get('/api/loans/{id}/details', [WorkerLoanPaymentController::class, 'getLoanDetails'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/loans/{id}/payments', [WorkerLoanPaymentController::class, 'getPaymentsByLoan'], ['AuthMiddleware', 'AdminMiddleware']);
 
-
+// ============================================
+// PROFORMA INVOICE ROUTES
+// ============================================
+$router->get('/finance/proforma-invoice', [ProformaInvoiceController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/proforma-invoice/create', [ProformaInvoiceController::class, 'create'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/proforma-invoice/store', [ProformaInvoiceController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/proforma-invoice/{id}', [ProformaInvoiceController::class, 'show'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/proforma/type-units', [ProformaInvoiceController::class, 'getTypeUnits'], ['AuthMiddleware', 'AdminMiddleware']);
 
 // ============================================
 // API ROUTES

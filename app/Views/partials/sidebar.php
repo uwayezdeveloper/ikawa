@@ -263,6 +263,11 @@
                     </a>
                     <div class="collapse" id="financeMenu">
                         <ul class="sub-menu">
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/proforma-invoice" class="side-nav-link">
+                                    <span class="menu-text">Proforma Invoice</span>
+                                </a>
+                            </li>
                             <?php if (in_array('view-payment-modes', $permissions)): ?>
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/payment-modes" class="side-nav-link">
