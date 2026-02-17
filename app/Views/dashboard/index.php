@@ -37,9 +37,72 @@
             </div>
         </div>
     </div>
+
+                    <!-- Charts JS -->
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const expenseLabels = <?= json_encode($charts['expense']['labels'] ?? []) ?>;
+                        const expenseData = <?= json_encode($charts['expense']['data'] ?? []) ?>;
+
+                        const invLabels = <?= json_encode($charts['invoices']['labels'] ?? []) ?>;
+                        const invCounts = <?= json_encode($charts['invoices']['counts'] ?? []) ?>;
+
+                        // Expense line chart
+                        const el = document.getElementById('expenseChart');
+                        if (el) {
+                            const ctxE = el.getContext('2d');
+                            new Chart(ctxE, {
+                                type: 'line',
+                                data: {
+                                    labels: expenseLabels,
+                                    datasets: [{
+                                        label: 'Expenses',
+                                        data: expenseData,
+                                        borderColor: 'rgba(220,53,69,0.9)',
+                                        backgroundColor: 'rgba(220,53,69,0.2)',
+                                        fill: true,
+                                        tension: 0.3
+                                    }]
+                                },
+                                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                            });
+                        }
+
+                        // Invoices bar chart
+                        const il = document.getElementById('invoicesChart');
+                        if (il) {
+                            const ctxI = il.getContext('2d');
+                            new Chart(ctxI, {
+                                type: 'bar',
+                                data: { labels: invLabels, datasets: [{ label: 'Invoices', data: invCounts, backgroundColor: 'rgba(54,162,235,0.7)' }] },
+                                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, precision: 0 } } }
+                            });
+                        }
+
+                        // Accounts doughnut chart
+                        const al = document.getElementById('accountsChart');
+                        if (al) {
+                            const accLabels = <?= json_encode($charts['accounts']['labels'] ?? []) ?>;
+                            const accData = <?= json_encode($charts['accounts']['data'] ?? []) ?>;
+                            const ctxA = al.getContext('2d');
+                            new Chart(ctxA, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: accLabels,
+                                    datasets: [{ data: accData, backgroundColor: [
+                                        '#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#858796','#6f42c1','#20c997'
+                                    ] }]
+                                },
+                                options: { responsive: true, plugins: { legend: { position: 'right' } } }
+                            });
+                        }
+                    });
+                    </script>
 </div>
 
 <!-- Stats Cards -->
+<?php $stats = $stats ?? []; $charts = $charts ?? []; ?>
 <div class="row">
     <div class="col-md-6 col-xl-3">
         <div class="card">
@@ -53,10 +116,7 @@
                     <div class="flex-grow-1 ms-3">
                         <h5 class="mb-1">Total Users</h5>
                         <p class="mb-0 text-muted">
-                            <span class="badge bg-success-subtle text-success me-1">
-                                <i class="ti ti-trending-up"></i> 8.5%
-                            </span>
-                            <span>from last month</span>
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalUsers'] ?? 0) ?></span>
                         </p>
                     </div>
                 </div>
@@ -73,12 +133,9 @@
                         </span>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-1">Total Orders</h5>
+                        <h5 class="mb-1">Total Invoices</h5>
                         <p class="mb-0 text-muted">
-                            <span class="badge bg-success-subtle text-success me-1">
-                                <i class="ti ti-trending-up"></i> 12.3%
-                            </span>
-                            <span>from last month</span>
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalInvoices'] ?? 0) ?></span>
                         </p>
                     </div>
                 </div>
@@ -97,10 +154,7 @@
                     <div class="flex-grow-1 ms-3">
                         <h5 class="mb-1">Revenue</h5>
                         <p class="mb-0 text-muted">
-                            <span class="badge bg-danger-subtle text-danger me-1">
-                                <i class="ti ti-trending-down"></i> 2.1%
-                            </span>
-                            <span>from last month</span>
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalInvoiceAmount'] ?? 0, 2) ?></span>
                         </p>
                     </div>
                 </div>
@@ -117,13 +171,96 @@
                         </span>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-1">Products</h5>
+                        <h5 class="mb-1">Categories</h5>
                         <p class="mb-0 text-muted">
-                            <span class="badge bg-success-subtle text-success me-1">
-                                <i class="ti ti-trending-up"></i> 5.2%
-                            </span>
-                            <span>from last month</span>
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalCategories'] ?? 0) ?></span>
                         </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Stats: Farmers & Suppliers -->
+<div class="row mb-3">
+    <div class="col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <span class="avatar-md bg-tertiary-subtle rounded">
+                            <i class="ti ti-plant fs-28 text-success"></i>
+                        </span>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-1">Suppliers</h5>
+                        <p class="mb-0 text-muted">
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalFarmers'] ?? 0) ?></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <span class="avatar-md bg-secondary-subtle rounded">
+                            <i class="ti ti-truck fs-28 text-primary"></i>
+                        </span>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-1">farmers</h5>
+                        <p class="mb-0 text-muted">
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalSuppliers'] ?? 0) ?></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Expenses — Last 7 days</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="expenseChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Invoices — Last 6 months</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="invoicesChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bank Accounts Summary -->
+<div class="row mt-3">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Company Cash (Bank Accounts)</h6>
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h3 class="mb-0"><?= number_format($stats['totalAccounts'] ?? 0, 2) ?></h3>
+                        <p class="text-muted mb-0">Total across all active accounts</p>
+                    </div>
+                    <div class="flex-shrink-0" style="width:120px;">
+                        <canvas id="accountsChart" height="120"></canvas>
                     </div>
                 </div>
             </div>

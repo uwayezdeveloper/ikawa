@@ -100,12 +100,12 @@
                         </div>
                     </form>
 
-                    <p class="text-muted text-center mt-4 mb-0">
+                    <!-- <p class="text-muted text-center mt-4 mb-0">
                         New here?
                         <a href="<?= APP_URL ?>/register" class="text-decoration-underline link-offset-3 fw-semibold">
                             Create an account
                         </a>
-                    </p>
+                    </p> -->
                 </div>
 
                 <p class="text-center text-muted mt-4 mb-0">
