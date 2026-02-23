@@ -85,6 +85,23 @@ unset($_SESSION['flash_error'], $_SESSION['old']);
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label for="location_id" class="form-label">Location <?= !empty($locations) ? '<span class="text-danger">*</span>' : '<span class="text-muted">(Optional - no locations available)</span>' ?></label>
+                                <select class="form-select" id="location_id" name="location_id" <?= !empty($locations) ? 'required' : '' ?>>
+                                    <option value="">Select Location</option>
+                                    <?php if (!empty($locations)): ?>
+                                        <?php foreach ($locations as $location): ?>
+                                        <option value="<?= $location['id'] ?>" <?= ($old['location_id'] ?? '') == $location['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($location['name']) ?> (<?= htmlspecialchars($location['type_name'] ?? '') ?>)
+                                        </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="" disabled>No locations available</option>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
                                     <option value="active" <?= ($old['status'] ?? 'active') == 'active' ? 'selected' : '' ?>>Active</option>

@@ -113,15 +113,9 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Expense Transactions</h5>
                     <div class="d-flex gap-2">
-                        <?php if (!empty($_GET['statement'])): ?>
-                        <button id="export-pdf-btn" class="btn btn-outline-danger">
-                            <i class="ti ti-file-download me-1"></i>Export PDF
-                        </button>
-                        <?php else: ?>
                         <a href="<?= APP_URL ?>/finance/expense-transactions/export" class="btn btn-outline-success">
                             <i class="ti ti-download me-1"></i>Export CSV
                         </a>
-                        <?php endif; ?>
                         <a href="<?= APP_URL ?>/finance/expense-transactions/create" class="btn btn-primary">
                             <i class="ti ti-plus me-1"></i>New Transaction
                         </a>
@@ -185,14 +179,6 @@
                 <?php if (!empty($transactions)): ?>
                     <div class="table-responsive">
                         <table class="table table-striped table-hover" id="expense-transactions-table">
-                            </div>
-                            <?php if (!empty($_GET['statement'])): ?>
-                                <!-- jsPDF CDN -->
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-                                <!-- jsPDF AutoTable CDN -->
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-                                <script src="<?= APP_URL ?>/assets/js/pages/expense-transactions-pdf.js"></script>
-                            <?php endif; ?>
                             <thead>
                                 <tr>
                                     <th>#</th>

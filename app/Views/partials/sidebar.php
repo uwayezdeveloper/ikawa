@@ -251,7 +251,31 @@
                     </div>
                 </li>
                 <?php endif; ?>
-
+     <!-- Clients -->
+                <?php if (in_array('view-suppliers', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#clientsMenu" aria-expanded="false" aria-controls="clientsMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-users-group"></i></span>
+                        <span class="menu-text">Clients</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="clientsMenu">
+                        <ul class="sub-menu">
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/clients" class="side-nav-link">
+                                    <span class="menu-text">All Clients</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/client-types" class="side-nav-link">
+                                    <span class="menu-text">Client Types</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
                 <!-- Finance -->
                 <?php if (in_array('view-payment-modes', $permissions) || in_array('view-accounts', $permissions)): ?>
                 <li class="side-nav-item">
@@ -294,6 +318,12 @@
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/account-recharge/history" class="side-nav-link">
                                     <span class="menu-text">Transaction History</span>
+                                </a>
+                            </li>
+
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/account-activity" class="side-nav-link">
+                                    <span class="menu-text">Account Activity</span>
                                 </a>
                             </li>
 
@@ -371,6 +401,84 @@
                                     </a>
                                 </li>
                           
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+
+                <!-- Non-Exploitable Management -->
+                <?php if (in_array('view-accounts', $permissions) || in_array('view-payment-modes', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#nonExploitableMenu" aria-expanded="false" aria-controls="nonExploitableMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-box-off"></i></span>
+                        <span class="menu-text">Non-Exploitable Mgmt</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="nonExploitableMenu">
+                        <ul class="sub-menu">
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/non-exploitable/categories" class="side-nav-link">
+                                    <span class="menu-text">Non-Exploitable Categories</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/non-exploitable/transactions" class="side-nav-link">
+                                    <span class="menu-text">Non-Exploitable Transactions</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+
+                <!-- Certification Management -->
+                <?php if (in_array('view-accounts', $permissions) || in_array('view-payment-modes', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#certificationMenu" aria-expanded="false" aria-controls="certificationMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-certificate"></i></span>
+                        <span class="menu-text">Certification</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="certificationMenu">
+                        <ul class="sub-menu">
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/certification/categories" class="side-nav-link">
+                                    <span class="menu-text">Record Certification Categories</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/certification/transactions" class="side-nav-link">
+                                    <span class="menu-text">Record Certification Transactions</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+
+                <!-- Property Management -->
+                <?php if (in_array('view-accounts', $permissions) || in_array('view-payment-modes', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#propertyMenu" aria-expanded="false" aria-controls="propertyMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-home"></i></span>
+                        <span class="menu-text">Property Management</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="propertyMenu">
+                        <ul class="sub-menu">
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/properties/types" class="side-nav-link">
+                                    <span class="menu-text">Property Types</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/properties" class="side-nav-link">
+                                    <span class="menu-text">Record Properties</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>

@@ -1,0 +1,228 @@
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 4
+)
+
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 4
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 4
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EX260218113100636
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EX260218113100636
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Result count: 1
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - Details count: 1
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 1
+[18-Feb-2026 11:31:54 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => export
+)
+
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 0
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 0
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 0
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransactionController::show - Transaction result: not found
+[18-Feb-2026 13:53:09 Africa/Kigali] ExpenseTransactionController::show - Transaction not found, redirecting
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 5
+)
+
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 5
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 5
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EX260218113129624
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EX260218113129624
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Result count: 1
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - Details count: 1
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 2
+[18-Feb-2026 13:53:12 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 6
+)
+
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 6
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 6
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EX260218141551724
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EX260218141551724
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Result count: 4
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - Details count: 4
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 4
+[18-Feb-2026 14:16:21 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - Starting with params: Array
+(
+    [id] => 1
+)
+
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - ID parsed: 1
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Finding transaction with ID: 1
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - SQL: SELECT 
+                        ec.*, 
+                        et.expense_name,
+                        ecr.cons_name as consumer_name,
+                        ecr.phone as consumer_phone,
+                        l.name as location_name,
+                        a.account_name,
+                        rt.rec_name as receipt_type_name
+                    FROM tbl_expenseconsume ec
+                    LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
+                    LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
+                    LEFT JOIN locations l ON ec.station_id = l.id
+                    LEFT JOIN accounts a ON ec.pay_mode = a.id
+                    LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
+                    WHERE ec.con_id = :id
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransaction::findByIdWithDetails - Result count: 1
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - Transaction result: found
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - Getting transaction details for trans_id: EX260214110122401
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Getting details for trans_code: EX260214110122401
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransaction::getTransactionDetails - SQL: SELECT d.*, u.first_name, u.last_name 
+                    FROM tbl_expense_conume_details d
+                    LEFT JOIN users u ON d.created_by = u.id
+                    WHERE d.trans_code = :trans_code
+                    ORDER BY d.action ASC
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransaction::getTransactionDetails - Result count: 3
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - Details count: 3
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - Payment details count: 2
+[18-Feb-2026 16:13:10 Africa/Kigali] ExpenseTransactionController::show - About to render view
+[20-Feb-2026 14:03:02 Africa/Kigali] PHP Warning:  Undefined array key 0 in C:\xampp\htdocs\gihanga\app\Models\NonExploitableTransaction.php on line 45
+[20-Feb-2026 14:03:03 Africa/Kigali] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\gihanga\app\Models\NonExploitableTransaction.php on line 45
+[20-Feb-2026 14:09:05 Africa/Kigali] PHP Warning:  Undefined array key "done_by" in C:\xampp\htdocs\gihanga\app\Views\non-exploitable\transactions\index.php on line 114
+[20-Feb-2026 14:09:21 Africa/Kigali] PHP Warning:  Undefined array key "created_at" in C:\xampp\htdocs\gihanga\app\Views\non-exploitable\transactions\show.php on line 76
+[20-Feb-2026 14:09:21 Africa/Kigali] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\gihanga\app\Views\non-exploitable\transactions\show.php on line 76
+[20-Feb-2026 14:16:41 Africa/Kigali] PHP Warning:  Undefined array key "done_by" in C:\xampp\htdocs\gihanga\app\Views\non-exploitable\transactions\index.php on line 114
+[20-Feb-2026 14:17:36 Africa/Kigali] PHP Warning:  Undefined array key "done_by" in C:\xampp\htdocs\gihanga\app\Views\non-exploitable\transactions\index.php on line 114
+[20-Feb-2026 14:17:50 Africa/Kigali] PHP Fatal error:  Uncaught TypeError: App\Models\Account::findById(): Argument #1 ($id) must be of type int, array given, called in C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php on line 227 and defined in C:\xampp\htdocs\gihanga\app\Models\Account.php:50
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php(227): App\Models\Account->findById(Array)
+#1 [internal function]: App\Controllers\NonExploitableTransactionController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#3 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#4 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#5 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Models\Account.php on line 50
+[20-Feb-2026 14:19:59 Africa/Kigali] PHP Fatal error:  Uncaught TypeError: App\Models\Account::findById(): Argument #1 ($id) must be of type int, array given, called in C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php on line 227 and defined in C:\xampp\htdocs\gihanga\app\Models\Account.php:50
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php(227): App\Models\Account->findById(Array)
+#1 [internal function]: App\Controllers\NonExploitableTransactionController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#3 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#4 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#5 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Models\Account.php on line 50
+[20-Feb-2026 14:52:47 Africa/Kigali] PHP Fatal error:  Uncaught TypeError: App\Models\Account::findById(): Argument #1 ($id) must be of type int, array given, called in C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php on line 227 and defined in C:\xampp\htdocs\gihanga\app\Models\Account.php:50
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php(227): App\Models\Account->findById(Array)
+#1 [internal function]: App\Controllers\NonExploitableTransactionController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#3 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#4 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#5 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Models\Account.php on line 50
+[20-Feb-2026 14:52:49 Africa/Kigali] PHP Fatal error:  Uncaught TypeError: App\Models\Account::findById(): Argument #1 ($id) must be of type int, array given, called in C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php on line 227 and defined in C:\xampp\htdocs\gihanga\app\Models\Account.php:50
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php(227): App\Models\Account->findById(Array)
+#1 [internal function]: App\Controllers\NonExploitableTransactionController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#3 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#4 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#5 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Models\Account.php on line 50
+[20-Feb-2026 14:52:51 Africa/Kigali] PHP Fatal error:  Uncaught TypeError: App\Models\Account::findById(): Argument #1 ($id) must be of type int, array given, called in C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php on line 227 and defined in C:\xampp\htdocs\gihanga\app\Models\Account.php:50
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php(227): App\Models\Account->findById(Array)
+#1 [internal function]: App\Controllers\NonExploitableTransactionController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#3 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#4 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#5 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Models\Account.php on line 50
+[20-Feb-2026 14:54:42 Africa/Kigali] PHP Fatal error:  Uncaught TypeError: App\Models\Account::findById(): Argument #1 ($id) must be of type int, array given, called in C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php on line 227 and defined in C:\xampp\htdocs\gihanga\app\Models\Account.php:50
+Stack trace:
+#0 C:\xampp\htdocs\gihanga\app\controllers\NonExploitableTransactionController.php(227): App\Models\Account->findById(Array)
+#1 [internal function]: App\Controllers\NonExploitableTransactionController->show(Object(App\Core\Request), Object(App\Core\Response), Array)
+#2 C:\xampp\htdocs\gihanga\app\Core\Router.php(126): call_user_func(Array, Object(App\Core\Request), Object(App\Core\Response), Array)
+#3 C:\xampp\htdocs\gihanga\app\Core\Application.php(61): App\Core\Router->resolve()
+#4 C:\xampp\htdocs\gihanga\index.php(33): App\Core\Application->run()
+#5 {main}
+  thrown in C:\xampp\htdocs\gihanga\app\Models\Account.php on line 50
+[20-Feb-2026 17:03:56 Africa/Kigali] PHP Warning:  Undefined variable $propertyTypes in C:\xampp\htdocs\gihanga\app\controllers\PropertyController.php on line 82
+[20-Feb-2026 17:03:57 Africa/Kigali] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\gihanga\app\Views\properties\create.php on line 98

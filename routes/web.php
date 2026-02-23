@@ -20,7 +20,6 @@ use App\Controllers\SupplierTypeController;
 use App\Controllers\SupplierController;
 use App\Controllers\PaymentModeController;
 use App\Controllers\AccountController;
-
 use App\Controllers\AccountRechargeController;
 use App\Controllers\ExpenseCategoryController;
 use App\Controllers\ExpenseTypeController;
@@ -29,7 +28,14 @@ use App\Controllers\ExpenseTransactionController;
 use App\Controllers\WorkerLoanController;
 use App\Controllers\WorkerLoanPaymentController;
 use App\Controllers\ProformaInvoiceController;
-
+use App\Controllers\ClientController;
+use App\Controllers\ClientTypeController;
+use App\Controllers\NonExploitableCategoryController;
+use App\Controllers\NonExploitableTransactionController;
+use App\Controllers\PropertyController;
+use App\Controllers\PropertyTypeController;
+use App\Controllers\CertificationController;
+use App\Controllers\CertificationTransactionController;
 $app = Application::getInstance();
 $router = $app->getRouter();
 
@@ -75,6 +81,14 @@ $router->get('/users/{id}', [UserController::class, 'show'], ['AuthMiddleware', 
 $router->get('/users/{id}/edit', [UserController::class, 'edit'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/users/{id}', [UserController::class, 'update'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/users/{id}/delete', [UserController::class, 'delete'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Clients management
+$router->get('/clients', [ClientController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/clients/action', [ClientController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Client Types management
+$router->get('/client-types', [ClientTypeController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/client-types/action', [ClientTypeController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
 
 // Roles management
 $router->get('/roles', [RoleController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
@@ -148,6 +162,8 @@ $router->post('/finance/account-transfer', [AccountRechargeController::class, 'r
 $router->get('/finance/account-recharge/history', [AccountRechargeController::class, 'history'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/accounts/{id}/details', [AccountRechargeController::class, 'getAccountDetails'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/accounts/transfer-enabled', [AccountRechargeController::class, 'getTransferEnabledAccounts'], ['AuthMiddleware', 'AdminMiddleware']);
+// Account activity report
+$router->get('/finance/account-activity', [AccountRechargeController::class, 'activityReport'], ['AuthMiddleware', 'AdminMiddleware']);
 
 // ============================================
 // EXPENSE MANAGEMENT ROUTES (Under Finance)
@@ -237,6 +253,54 @@ $router->get('/finance/proforma-invoice/create', [ProformaInvoiceController::cla
 $router->post('/finance/proforma-invoice/store', [ProformaInvoiceController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/finance/proforma-invoice/{id}', [ProformaInvoiceController::class, 'show'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/proforma/type-units', [ProformaInvoiceController::class, 'getTypeUnits'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
+// NON-EXPLOITABLE MANAGEMENT ROUTES
+// ============================================
+
+// Non-Exploitable Categories
+$router->get('/non-exploitable/categories', [NonExploitableCategoryController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/non-exploitable/categories/create', [NonExploitableCategoryController::class, 'create'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/non-exploitable/categories/store', [NonExploitableCategoryController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/non-exploitable/categories/{id}/edit', [NonExploitableCategoryController::class, 'edit'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/non-exploitable/categories/{id}/update', [NonExploitableCategoryController::class, 'update'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/non-exploitable/categories/{id}/delete', [NonExploitableCategoryController::class, 'delete'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/non-exploitable/categories/{id}/toggle-status', [NonExploitableCategoryController::class, 'toggleStatus'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/non-exploitable/categories/active', [NonExploitableCategoryController::class, 'getActive'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Non-Exploitable Transactions
+$router->get('/non-exploitable/transactions', [NonExploitableTransactionController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/non-exploitable/transactions/create', [NonExploitableTransactionController::class, 'create'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/non-exploitable/transactions/store', [NonExploitableTransactionController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/non-exploitable/transactions/{id}', [NonExploitableTransactionController::class, 'show'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/non-exploitable/transactions/{id}/delete', [NonExploitableTransactionController::class, 'delete'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// API route for getting accounts by location
+$router->get('/api/non-exploitable/accounts-by-location/{locationId}', [NonExploitableTransactionController::class, 'getAccountsByLocation'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
+// PROPERTY MANAGEMENT ROUTES
+// ============================================
+
+// Property Types
+$router->get('/properties/types', [PropertyTypeController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/properties/types', [PropertyTypeController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/properties/types/active', [PropertyTypeController::class, 'getActive'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Properties
+$router->get('/properties', [PropertyController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/properties/create', [PropertyController::class, 'create'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/properties', [PropertyController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/properties/{id}', [PropertyController::class, 'getProperty'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
+// CERTIFICATION MANAGEMENT ROUTES
+// ============================================
+
+$router->get('/certification/categories', [CertificationController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/certification/categories', [CertificationController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/certification/transactions', [CertificationTransactionController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/certification/transactions', [CertificationTransactionController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
 
 // ============================================
 // API ROUTES

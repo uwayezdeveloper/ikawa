@@ -21,6 +21,7 @@ class User extends Model
         'phone',
         'avatar',
         'role_id',
+        'location_id',
         'status',
         'email_verified_at'
     ];

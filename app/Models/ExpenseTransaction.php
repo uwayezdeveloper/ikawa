@@ -28,13 +28,11 @@ class ExpenseTransaction extends Model
                     ecr.cons_name as consumer_name,
                     ecr.phone as consumer_phone,
                     l.name as location_name,
-                    a.account_name,
                     rt.rec_name as receipt_type_name
                 FROM {$this->table} ec
                 LEFT JOIN tbl_expenses et ON ec.expense_id = et.expense_id
                 LEFT JOIN tbl_expenseconsumer ecr ON ec.payer_name = ecr.cons_id
                 LEFT JOIN locations l ON ec.station_id = l.id
-                LEFT JOIN accounts a ON ec.pay_mode = a.id
                 LEFT JOIN tbl_receipttype rt ON ec.receipt_type = rt.rec_id
                 WHERE 1=1";
         
@@ -65,7 +63,7 @@ class ExpenseTransaction extends Model
         }
         
         // Get total count
-        $countSql = str_replace('SELECT ec.*, et.expense_name, ecr.cons_name as consumer_name, ecr.phone as consumer_phone, l.name as location_name, a.account_name, rt.rec_name as receipt_type_name', 'SELECT COUNT(*) as total', $sql);
+        $countSql = str_replace('SELECT ec.*, et.expense_name, ecr.cons_name as consumer_name, ecr.phone as consumer_phone, l.name as location_name, rt.rec_name as receipt_type_name', 'SELECT COUNT(*) as total', $sql);
         $result = Database::fetchAll($countSql, $params);
         $total = $result[0]['total'] ?? 0;
         
@@ -90,13 +88,13 @@ class ExpenseTransaction extends Model
                 }
             }
         }
-        $allAccountIds = array_unique($allAccountIds);
+        $allAccountIds = array_values(array_unique($allAccountIds));
 
         // Fetch all account names in one query
         $accountMap = [];
         if (!empty($allAccountIds)) {
             $in = implode(',', array_fill(0, count($allAccountIds), '?'));
-            $accRows = Database::fetchAll("SELECT id, account_name FROM accounts WHERE id IN ($in)", $allAccountIds);
+            $accRows = Database::fetchAll("SELECT id, account_name FROM accounts WHERE id IN ($in)", array_values($allAccountIds));
             foreach ($accRows as $acc) {
                 $accountMap[$acc['id']] = $acc['account_name'];
             }
@@ -291,7 +289,7 @@ class ExpenseTransaction extends Model
             
             $sql = "SELECT d.*, u.first_name, u.last_name 
                     FROM {$this->detailsTable} d
-                    LEFT JOIN users u ON d.created_by = u.user_id
+                    LEFT JOIN users u ON d.created_by = u.id
                     WHERE d.trans_code = :trans_code
                     ORDER BY d.action ASC";
             
@@ -493,4 +491,5 @@ class ExpenseTransaction extends Model
         }
         
         return $paymentDetails;
-    }}
+    }
+}

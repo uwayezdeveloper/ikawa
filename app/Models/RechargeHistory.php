@@ -232,4 +232,54 @@ class RechargeHistory extends Model
             'totalPages' => ceil($total / $perPage)
         ];
     }
+
+    /**
+     * Get total recharge amount between dates for an account
+     */
+    public function getTotalRechargeAmountBetween(int $accountId, ?string $from = null, ?string $to = null): float
+    {
+        $sql = "SELECT COALESCE(SUM(amount),0) as total_amount FROM {$this->table} WHERE acc_id = :acc_id";
+        $params = ['acc_id' => $accountId];
+        if ($from) {
+            $sql .= " AND due_date >= :from";
+            $params['from'] = $from;
+        }
+        if ($to) {
+            $sql .= " AND due_date <= :to";
+            $params['to'] = $to;
+        }
+
+        $result = Database::fetch($sql, $params);
+        return (float) ($result['total_amount'] ?? 0);
+    }
+
+    /**
+     * Get total transfers in/out for an account between dates
+     * Returns [ 'out' => float, 'in' => float ]
+     */
+    public function getTransferSumsBetween(int $accountId, ?string $from = null, ?string $to = null): array
+    {
+        $outSql = "SELECT COALESCE(SUM(amount),0) as total_out FROM {$this->table} WHERE acc_id = :acc_id AND to_account IS NOT NULL";
+        $inSql = "SELECT COALESCE(SUM(amount),0) as total_in FROM {$this->table} WHERE to_account = :acc_id";
+        $params = ['acc_id' => $accountId];
+
+        if ($from) {
+            $outSql .= " AND due_date >= :from";
+            $inSql .= " AND due_date >= :from";
+            $params['from'] = $from;
+        }
+        if ($to) {
+            $outSql .= " AND due_date <= :to";
+            $inSql .= " AND due_date <= :to";
+            $params['to'] = $to;
+        }
+
+        $out = Database::fetch($outSql, $params);
+        $in = Database::fetch($inSql, $params);
+
+        return [
+            'out' => (float) ($out['total_out'] ?? 0),
+            'in' => (float) ($in['total_in'] ?? 0)
+        ];
+    }
 }

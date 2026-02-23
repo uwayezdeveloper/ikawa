@@ -6,6 +6,8 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Location;
+use Exception;
 
 /**
  * User Controller
@@ -21,6 +23,20 @@ class UserController extends Controller
         parent::__construct();
         $this->userModel = new User();
         $this->roleModel = new Role();
+    }
+
+    /**
+     * Get locations safely
+     */
+    protected function getLocations(): array
+    {
+        try {
+            $locationModel = new Location();
+            return $locationModel->getActive();
+        } catch (Exception $e) {
+            error_log("Location model error: " . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -80,9 +96,11 @@ class UserController extends Controller
         }
         
         $roles = $this->roleModel->getActive();
+        $locations = $this->getLocations();
         
         $this->view('users/create', [
             'roles' => $roles,
+            'locations' => $locations,
             'pageTitle' => 'Add User'
         ], 'main');
     }
@@ -133,6 +151,7 @@ class UserController extends Controller
             'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => HASH_COST]),
             'phone' => trim($data['phone'] ?? ''),
             'role_id' => (int) $data['role_id'],
+            'location_id' => !empty($data['location_id']) ? (int) $data['location_id'] : null,
             'status' => $data['status'] ?? 'active'
         ];
         
@@ -168,10 +187,12 @@ class UserController extends Controller
         }
         
         $roles = $this->roleModel->getActive();
+        $locations = $this->getLocations();
         
         $this->view('users/edit', [
             'viewUser' => $viewUser,
             'roles' => $roles,
+            'locations' => $locations,
             'pageTitle' => 'Edit User'
         ], 'main');
     }
@@ -227,6 +248,7 @@ class UserController extends Controller
             'email' => trim($data['email']),
             'phone' => trim($data['phone'] ?? ''),
             'role_id' => (int) $data['role_id'],
+            'location_id' => !empty($data['location_id']) ? (int) $data['location_id'] : null,
             'status' => $data['status'] ?? 'active'
         ];
         

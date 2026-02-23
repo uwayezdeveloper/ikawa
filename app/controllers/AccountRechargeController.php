@@ -7,6 +7,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Models\Account;
 use App\Models\RechargeHistory;
+use App\Models\ExpenseTransaction;
 
 class AccountRechargeController extends Controller
 {
@@ -301,6 +302,75 @@ class AccountRechargeController extends Controller
             ], 'main');
         } catch (\Exception $e) {
             $this->handleError($e, 'Failed to load recharge history');
+        }
+    }
+
+    /**
+     * Account activity report - shows per-account expenses, recharges and transfers
+     */
+    public function activityReport(Request $request, Response $response): void
+    {
+        try {
+            $accounts = $this->accountModel->getAll();
+            $expenseModel = new ExpenseTransaction();
+
+            $selected = $request->query('account_ids');
+            if (!$selected) {
+                // support single account param
+                $single = $request->query('account_id');
+                if ($single) {
+                    $selected = [$single];
+                }
+            }
+
+            $dateFrom = $request->query('date_from');
+            $dateTo = $request->query('date_to');
+
+            $report = [];
+
+            if (!empty($selected) && is_array($selected)) {
+                foreach ($selected as $aid) {
+                    $accountId = (int) $aid;
+                    $acct = $this->accountModel->findById($accountId);
+                    if (!$acct) continue;
+
+                    // Expenses where account was used
+                    $txs = $expenseModel->getTransactionsForAccount($accountId, $dateFrom, $dateTo);
+                    $expenseCount = count($txs);
+                    $expenseSum = 0.0;
+                    $expenseCharges = 0.0;
+                    foreach ($txs as $t) {
+                        $expenseSum += (float) ($t['allocated_amount'] ?? 0);
+                        $expenseCharges += (float) ($t['account_charges'] ?? 0);
+                    }
+
+                    // Recharges and transfers
+                    $totalRecharges = $this->rechargeHistoryModel->getTotalRechargeAmountBetween($accountId, $dateFrom, $dateTo);
+                    $transfers = $this->rechargeHistoryModel->getTransferSumsBetween($accountId, $dateFrom, $dateTo);
+
+                    $report[] = [
+                        'account' => $acct,
+                        'expense_count' => $expenseCount,
+                        'expense_total' => $expenseSum,
+                        'expense_charges' => $expenseCharges,
+                        'recharges_total' => $totalRecharges,
+                        'transfer_out' => $transfers['out'],
+                        'transfer_in' => $transfers['in']
+                    ];
+                }
+            }
+
+            $this->view('finance/reports/account_activity', [
+                'accounts' => $accounts,
+                'report' => $report,
+                'selected' => $selected,
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+                'pageTitle' => 'Account Activity Report'
+            ], 'main');
+
+        } catch (\Exception $e) {
+            $this->handleError($e, 'Failed to generate activity report');
         }
     }
 

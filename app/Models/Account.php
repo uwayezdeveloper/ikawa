@@ -62,6 +62,24 @@ class Account extends Model
     }
 
     /**
+     * Get active accounts by location ID
+     */
+    public function getActiveByLocation(int $locationId): array
+    {
+        $sql = "SELECT a.*, 
+                lt.name as location_type_name,
+                l.name as location_name,
+                pm.name as payment_mode_name
+                FROM {$this->table} a
+                LEFT JOIN location_types lt ON a.location_type_id = lt.id
+                LEFT JOIN locations l ON a.location_id = l.id
+                LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                WHERE a.status = 'active' AND a.location_id = :location_id
+                ORDER BY a.account_name ASC";
+        return Database::fetchAll($sql, ['location_id' => $locationId]);
+    }
+
+    /**
      * Check if account exists for location and payment mode
      */
     public function accountExists(int $locationId, int $paymentModeId, ?string $accountNumber = null, ?int $excludeId = null): bool
@@ -260,7 +278,7 @@ class Account extends Model
     /**
      * Get accounts suitable for receiving transfers
      */
-    public function getReceivingAccounts(int $excludeAccountId = null): array
+    public function getReceivingAccounts(?int $excludeAccountId = null): array
     {
         $sql = "SELECT a.*, 
                 lt.name as location_type_name,
