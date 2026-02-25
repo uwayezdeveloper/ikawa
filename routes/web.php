@@ -36,6 +36,7 @@ use App\Controllers\PropertyController;
 use App\Controllers\PropertyTypeController;
 use App\Controllers\CertificationController;
 use App\Controllers\CertificationTransactionController;
+use App\Controllers\SourceOfIncomeController;
 $app = Application::getInstance();
 $router = $app->getRouter();
 
@@ -210,6 +211,16 @@ $router->post('/finance/expense-transactions/{id}/status', [ExpenseTransactionCo
 $router->get('/finance/expense-transactions/export', [ExpenseTransactionController::class, 'export'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/finance/expense-types/by-category', [ExpenseTransactionController::class, 'getExpenseTypesByCategory'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/finance/consumers/search', [ExpenseTransactionController::class, 'searchConsumers'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Source of Income
+$router->get('/finance/source-of-income', [SourceOfIncomeController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/source-of-income/create', [SourceOfIncomeController::class, 'create'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/source-of-income/store', [SourceOfIncomeController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/source-of-income/{id}/edit', [SourceOfIncomeController::class, 'edit'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/source-of-income/{id}/update', [SourceOfIncomeController::class, 'update'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/source-of-income/{id}/delete', [SourceOfIncomeController::class, 'delete'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/source-of-income/{id}/toggle-status', [SourceOfIncomeController::class, 'toggleStatus'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/finance/source-of-income/active', [SourceOfIncomeController::class, 'getActive'], ['AuthMiddleware', 'AdminMiddleware']);
 
 // Worker Loan Requests
 $router->get('/finance/loans/create', [WorkerLoanController::class, 'create'], ['AuthMiddleware']);

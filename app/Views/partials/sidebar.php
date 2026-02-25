@@ -292,6 +292,11 @@
                                     <span class="menu-text">Proforma Invoice</span>
                                 </a>
                             </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/source-of-income" class="side-nav-link">
+                                    <span class="menu-text">Register Source of Income</span>
+                                </a>
+                            </li>
                             <?php if (in_array('view-payment-modes', $permissions)): ?>
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/payment-modes" class="side-nav-link">

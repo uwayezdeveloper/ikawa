@@ -6,7 +6,6 @@ use App\Core\Controller;
 use App\Core\Request;
 use App\Core\Response;
 use App\Models\PropertyType;
-
 /**
  * Property Type Controller
  * Handles property type management
