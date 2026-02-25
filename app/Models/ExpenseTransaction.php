@@ -395,6 +395,96 @@ class ExpenseTransaction extends Model
             'active_transactions' => 0
         ];
     }
+
+    /**
+     * Get transactions where a specific account was used, with allocated amount and charges.
+     */
+    public function getTransactionsForAccount(int $accountId, ?string $dateFrom = null, ?string $dateTo = null): array
+    {
+        $sql = "SELECT trans_id, pay_mode, recorded_date, pay_date
+                FROM {$this->table}
+                WHERE status = 1";
+
+        $params = [];
+
+        if (!empty($dateFrom)) {
+            $sql .= " AND recorded_date >= :date_from";
+            $params['date_from'] = $dateFrom;
+        }
+
+        if (!empty($dateTo)) {
+            $sql .= " AND recorded_date <= :date_to";
+            $params['date_to'] = $dateTo;
+        }
+
+        $sql .= " ORDER BY pay_date DESC";
+
+        $transactions = Database::fetchAll($sql, $params);
+        $result = [];
+
+        foreach ($transactions as $transaction) {
+            $payments = json_decode($transaction['pay_mode'] ?? '[]', true);
+            if (!is_array($payments) || empty($payments)) {
+                continue;
+            }
+
+            $allocatedAmount = 0.0;
+            foreach ($payments as $payment) {
+                if ((int) ($payment['account_id'] ?? 0) === $accountId) {
+                    $allocatedAmount += (float) ($payment['amount'] ?? 0);
+                }
+            }
+
+            if ($allocatedAmount <= 0) {
+                continue;
+            }
+
+            $detailsSql = "SELECT account_id, charges
+                           FROM {$this->detailsTable}
+                           WHERE trans_code = :trans_code AND action = 'CHARGES'";
+            $details = Database::fetchAll($detailsSql, ['trans_code' => $transaction['trans_id']]);
+
+            $accountCharges = 0.0;
+            $genericCharges = 0.0;
+
+            foreach ($details as $detail) {
+                $detailAccountId = $detail['account_id'] ?? null;
+                $charge = (float) ($detail['charges'] ?? 0);
+
+                if ($detailAccountId === null || $detailAccountId === '' || (int) $detailAccountId === 0) {
+                    $genericCharges += $charge;
+                    continue;
+                }
+
+                if ((int) $detailAccountId === $accountId) {
+                    $accountCharges += $charge;
+                }
+            }
+
+            if ($genericCharges > 0) {
+                $accountsInPayment = array_values(array_filter(array_map(
+                    static fn ($row) => (int) ($row['account_id'] ?? 0),
+                    $payments
+                )));
+
+                $uniqueAccounts = array_values(array_unique(array_filter($accountsInPayment)));
+                if (count($uniqueAccounts) === 1 && (int) $uniqueAccounts[0] === $accountId) {
+                    $accountCharges += $genericCharges;
+                }
+            }
+
+            $result[] = [
+                'trans_id' => $transaction['trans_id'],
+                'recorded_date' => $transaction['recorded_date'],
+                'pay_date' => $transaction['pay_date'],
+                'allocated_amount' => $allocatedAmount,
+                'account_charges' => $accountCharges
+            ];
+        }
+
+        return $result;
+    }
+
     /**
      * Deduct amount from single account
      */

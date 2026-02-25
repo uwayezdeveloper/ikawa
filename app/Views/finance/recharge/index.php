@@ -87,6 +87,30 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="in_id" class="form-label">Source of Income</label>
+                                <select class="form-select" id="in_id" name="in_id">
+                                    <option value="">Select source of income (Optional)</option>
+                                    <?php foreach ($sourcesOfIncome ?? [] as $source): ?>
+                                        <option value="<?= $source['in_id'] ?>" 
+                                                <?= (($_SESSION['old']['in_id'] ?? '') == $source['in_id']) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($source['in_name']) ?>
+                                            <?php if (!empty($source['in_descr'])): ?>
+                                                - <?= htmlspecialchars($source['in_descr']) ?>
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small class="text-muted">Select the source of this income (optional)</small>
+                                <?php if (isset($_SESSION['errors']['in_id'])): ?>
+                                    <div class="text-danger small mt-1"><?= htmlspecialchars($_SESSION['errors']['in_id']) ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Account Details Display -->
                     <div id="accountDetails" class="mb-3" style="display: none;">
                         <div class="card border border-primary">

@@ -103,6 +103,7 @@
                                     <th>Transaction Details</th>
                                     <th>Location</th>
                                     <th>Type</th>
+                                    <th>Source of Income</th>
                                     <th class="text-end">Amount</th>
                                     <th class="text-end">Current Balance</th>
                                     <th>Due Date</th>
@@ -171,6 +172,15 @@
                                                 <span class="badge bg-info-subtle text-info">
                                                     <?= htmlspecialchars($recharge['payment_mode_name'] ?? 'N/A') ?>
                                                 </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($recharge['source_of_income_name'])): ?>
+                                                <span class="badge bg-success-subtle text-success">
+                                                    <i class="ti ti-cash me-1"></i><?= htmlspecialchars($recharge['source_of_income_name']) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-end">

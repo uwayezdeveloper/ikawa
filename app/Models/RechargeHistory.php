@@ -13,6 +13,7 @@ class RechargeHistory extends Model
     protected array $fillable = [
         'acc_id',
         'amount',
+        'in_id',
         'to_account',
         'due_date'
     ];
@@ -20,16 +21,17 @@ class RechargeHistory extends Model
     /**
      * Record a new recharge transaction
      */
-    public function recordRecharge(int $accountId, float $amount, ?int $toAccount = null, ?string $dueDate = null): int
+    public function recordRecharge(int $accountId, float $amount, ?int $incomeSourceId = null, ?int $toAccount = null, ?string $dueDate = null): int
     {
         $dueDate = $dueDate ?? date('Y-m-d H:i:s', strtotime('+30 days'));
         
-        $sql = "INSERT INTO {$this->table} (acc_id, amount, to_account, due_date) 
-                VALUES (:acc_id, :amount, :to_account, :due_date)";
+        $sql = "INSERT INTO {$this->table} (acc_id, amount, in_id, to_account, due_date) 
+                VALUES (:acc_id, :amount, :in_id, :to_account, :due_date)";
         
         Database::query($sql, [
             'acc_id' => $accountId,
             'amount' => $amount,
+            'in_id' => $incomeSourceId,
             'to_account' => $toAccount,
             'due_date' => $dueDate
         ]);
@@ -40,16 +42,17 @@ class RechargeHistory extends Model
     /**
      * Record account transfer transaction
      */
-    public function recordTransfer(int $fromAccountId, int $toAccountId, float $amount): int
+    public function recordTransfer(int $fromAccountId, int $toAccountId, float $amount, ?int $incomeSourceId = null): int
     {
         $dueDate = date('Y-m-d H:i:s');
         
-        $sql = "INSERT INTO {$this->table} (acc_id, amount, to_account, due_date) 
-                VALUES (:acc_id, :amount, :to_account, :due_date)";
+        $sql = "INSERT INTO {$this->table} (acc_id, amount, in_id, to_account, due_date) 
+                VALUES (:acc_id, :amount, :in_id, :to_account, :due_date)";
         
         Database::query($sql, [
             'acc_id' => $fromAccountId,
             'amount' => $amount,
+            'in_id' => $incomeSourceId,
             'to_account' => $toAccountId,
             'due_date' => $dueDate
         ]);
@@ -82,13 +85,15 @@ class RechargeHistory extends Model
                 ta.account_name as to_account_name,
                 ta.account_number as to_account_number,
                 ta.balance as to_current_balance,
-                tl.name as to_location_name
+                tl.name as to_location_name,
+                soi.in_name as source_of_income_name
                 FROM {$this->table} rh
                 INNER JOIN accounts a ON rh.acc_id = a.id
                 LEFT JOIN locations l ON a.location_id = l.id
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
                 LEFT JOIN accounts ta ON rh.to_account = ta.id
                 LEFT JOIN locations tl ON ta.location_id = tl.id
+                LEFT JOIN tbl_source_of_income soi ON rh.in_id = soi.in_id
                 ORDER BY rh.rech_id DESC
                 LIMIT :limit OFFSET :offset";
         

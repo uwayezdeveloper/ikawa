@@ -8,17 +8,20 @@ use App\Core\Response;
 use App\Models\Account;
 use App\Models\RechargeHistory;
 use App\Models\ExpenseTransaction;
+use App\Models\SourceOfIncome;
 
 class AccountRechargeController extends Controller
 {
     protected Account $accountModel;
     protected RechargeHistory $rechargeHistoryModel;
+    protected SourceOfIncome $sourceOfIncomeModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->accountModel = new Account();
         $this->rechargeHistoryModel = new RechargeHistory();
+        $this->sourceOfIncomeModel = new SourceOfIncome();
     }
 
     /**
@@ -30,8 +33,12 @@ class AccountRechargeController extends Controller
             // Get all active accounts for recharge
             $receivingAccounts = $this->accountModel->getReceivingAccounts();
             
+            // Get all active source of income
+            $sourcesOfIncome = $this->sourceOfIncomeModel->getActiveSources();
+            
             $this->view('finance/recharge/index', [
                 'receivingAccounts' => $receivingAccounts,
+                'sourcesOfIncome' => $sourcesOfIncome,
                 'user' => $_SESSION['user'] ?? [],
                 'pageTitle' => 'Account Recharge'
             ], 'main');
@@ -52,9 +59,13 @@ class AccountRechargeController extends Controller
             // Get all active accounts for receiving transfers
             $receivingAccounts = $this->accountModel->getReceivingAccounts();
             
+            // Get all active source of income
+            $sourcesOfIncome = $this->sourceOfIncomeModel->getActiveSources();
+            
             $this->view('finance/transfer/index', [
                 'transferAccounts' => $transferAccounts,
                 'receivingAccounts' => $receivingAccounts,
+                'sourcesOfIncome' => $sourcesOfIncome,
                 'user' => $_SESSION['user'] ?? [],
                 'pageTitle' => 'Account Transfer'
             ], 'main');
@@ -110,6 +121,7 @@ class AccountRechargeController extends Controller
         $fromAccountId = (int) $data['from_account_id'];
         $toAccountId = (int) $data['to_account_id'];
         $amount = (float) $data['amount'];
+        $incomeSourceId = !empty($data['in_id']) ? (int) $data['in_id'] : null;
         
         // Check if source account can transfer
         if (!$this->accountModel->canTransfer($fromAccountId)) {
@@ -153,7 +165,7 @@ class AccountRechargeController extends Controller
         }
 
         // Process the transfer
-        $success = $this->processAccountTransfer($fromAccountId, $toAccountId, $amount);
+        $success = $this->processAccountTransfer($fromAccountId, $toAccountId, $amount, $incomeSourceId);
 
         if ($success) {
             $successMsg = "Transfer successful! $" . number_format($amount, 2) . 
@@ -191,6 +203,7 @@ class AccountRechargeController extends Controller
     {
         $accountId = (int) $data['account_id'];
         $amount = (float) $data['amount'];
+        $incomeSourceId = !empty($data['in_id']) ? (int) $data['in_id'] : null;
         
         // Check if account exists and is active
         $account = $this->accountModel->findById($accountId);
@@ -217,7 +230,7 @@ class AccountRechargeController extends Controller
         }
 
         // Process the recharge
-        $success = $this->processRecharge($accountId, $amount);
+        $success = $this->processRecharge($accountId, $amount, $incomeSourceId);
 
         if ($success) {
             if ($request->isAjax()) {
@@ -377,7 +390,7 @@ class AccountRechargeController extends Controller
     /**
      * Process the actual recharge transaction
      */
-    private function processRecharge(int $accountId, float $amount): bool
+    private function processRecharge(int $accountId, float $amount, ?int $incomeSourceId = null): bool
     {
         try {
             // Start transaction
@@ -392,7 +405,7 @@ class AccountRechargeController extends Controller
             }
 
             // Record recharge history (simple recharge, no to_account)
-            $historyId = $this->rechargeHistoryModel->recordRecharge($accountId, $amount);
+            $historyId = $this->rechargeHistoryModel->recordRecharge($accountId, $amount, $incomeSourceId);
             
             if (!$historyId) {
                 \App\Core\Database::getInstance()->rollBack();
@@ -413,7 +426,7 @@ class AccountRechargeController extends Controller
     /**
      * Process account transfer
      */
-    private function processAccountTransfer(int $fromAccountId, int $toAccountId, float $amount): bool
+    private function processAccountTransfer(int $fromAccountId, int $toAccountId, float $amount, ?int $incomeSourceId = null): bool
     {
         try {
             // Start transaction
@@ -428,7 +441,7 @@ class AccountRechargeController extends Controller
             }
 
             // Record transfer history
-            $historyId = $this->rechargeHistoryModel->recordTransfer($fromAccountId, $toAccountId, $amount);
+            $historyId = $this->rechargeHistoryModel->recordTransfer($fromAccountId, $toAccountId, $amount, $incomeSourceId);
             
             if (!$historyId) {
                 \App\Core\Database::getInstance()->rollBack();
