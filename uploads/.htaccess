@@ -1,0 +1,14 @@
+# Allow direct access to uploaded files
+<IfModule mod_rewrite.c>
+    RewriteEngine Off
+</IfModule>
+
+# Prevent execution of PHP files
+<Files *.php>
+    deny from all
+</Files>
+
+# Allow only image files
+<FilesMatch "\.(jpg|jpeg|png|gif)$">
+    Allow from all
+</FilesMatch>
