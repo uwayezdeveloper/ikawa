@@ -31,10 +31,13 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <a href="<?= APP_URL ?>/profile" class="link-reset">
-                        <img src="<?= \App\Core\View::asset('images/users/user-1.jpg') ?>" alt="user-image"
-                            class="rounded-circle mb-2 avatar-md" />
-                        <span class="sidenav-user-name fw-bold"><?= $user['full_name'] ?? 'User' ?></span>
-                        <span class="fs-12 fw-semibold"><?= ucfirst($user['role'] ?? 'Guest') ?></span>
+                        <?php
+                        $avatarUrl = !empty($user['avatar']) ? APP_URL . '/' . $user['avatar'] : \App\Core\View::asset('images/users/user-1.jpg');
+                        ?>
+                        <img src="<?= $avatarUrl ?>" alt="user-image"
+                            class="rounded-circle mb-2 avatar-md" style="object-fit: cover; width: 48px; height: 48px;" />
+                        <span class="sidenav-user-name fw-bold"><?= ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? 'User') ?></span>
+                        <span class="fs-12 fw-semibold"><?= $user['role_name'] ?? 'Guest' ?></span>
                     </a>
                 </div>
                 <div>
@@ -173,6 +176,13 @@
                                 </a>
                             </li>
                             <?php endif; ?>
+                            <?php if (in_array('manage-settings', $permissions) || in_array('view-settings', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/settings/processing-steps" class="side-nav-link">
+                                    <span class="menu-text">Processing Steps</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </li>
@@ -247,11 +257,26 @@
                                 </a>
                             </li>
                             <?php endif; ?>
+                            <?php if (in_array('view-supplier-advances', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/suppliers/advances" class="side-nav-link">
+                                    <span class="menu-text">Advances</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-supplier-records', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/suppliers/records" class="side-nav-link">
+                                    <span class="menu-text">Supplier Records</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </li>
                 <?php endif; ?>
-     <!-- Clients -->
+                
+                <!-- Clients -->
                 <?php if (in_array('view-suppliers', $permissions)): ?>
                 <li class="side-nav-item">
                     <a data-bs-toggle="collapse" href="#clientsMenu" aria-expanded="false" aria-controls="clientsMenu"
@@ -276,6 +301,7 @@
                     </div>
                 </li>
                 <?php endif; ?>
+
                 <!-- Finance -->
                 <?php if (in_array('view-payment-modes', $permissions) || in_array('view-accounts', $permissions)): ?>
                 <li class="side-nav-item">
@@ -287,20 +313,24 @@
                     </a>
                     <div class="collapse" id="financeMenu">
                         <ul class="sub-menu">
-                            <li class="side-nav-item">
-                                <a href="<?= APP_URL ?>/finance/proforma-invoice" class="side-nav-link">
-                                    <span class="menu-text">Proforma Invoice</span>
-                                </a>
-                            </li>
-                            <li class="side-nav-item">
-                                <a href="<?= APP_URL ?>/finance/source-of-income" class="side-nav-link">
-                                    <span class="menu-text">Register Source of Income</span>
-                                </a>
-                            </li>
                             <?php if (in_array('view-payment-modes', $permissions)): ?>
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/payment-modes" class="side-nav-link">
                                     <span class="menu-text">Payment Modes</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-account-transactions', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/transactions" class="side-nav-link">
+                                    <span class="menu-text">Transactions</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-station-finances', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/station-finances" class="side-nav-link">
+                                    <span class="menu-text">Station Finances</span>
                                 </a>
                             </li>
                             <?php endif; ?>
@@ -310,7 +340,7 @@
                                     <span class="menu-text">Accounts</span>
                                 </a>
                             </li>
-                            <li class="side-nav-item">
+                              <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/account-recharge" class="side-nav-link">
                                     <span class="menu-text">Account Recharge</span>
                                 </a>
@@ -325,15 +355,7 @@
                                     <span class="menu-text">Transaction History</span>
                                 </a>
                             </li>
-
-                            <li class="side-nav-item">
-                                <a href="<?= APP_URL ?>/finance/account-activity" class="side-nav-link">
-                                    <span class="menu-text">Account Activity</span>
-                                </a>
-                            </li>
-
-
-                            <li class="side-nav-item">
+                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/loans/create" class="side-nav-link">
                                     <span class="menu-text">Request Loan</span>
                                 </a>
@@ -348,11 +370,7 @@
                                     <span class="menu-text">Loan Disbursement</span>
                                 </a>
                             </li>
-                            <li class="side-nav-item">
-                                <a href="<?= APP_URL ?>/finance/loans/statement" class="side-nav-link">
-                                    <span class="menu-text">Loan Statements</span>
-                                </a>
-                            </li>
+                                    
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/loan-payments/create" class="side-nav-link">
                                     <span class="menu-text">Pay Worker Loan</span>
@@ -363,12 +381,128 @@
                                     <span class="menu-text">Loan Payment History</span>
                                 </a>
                             </li>
+                             <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans/statement" class="side-nav-link">
+                                    <span class="menu-text">Loan Statements</span>
+                                </a>
+                            </li>
+                                                        <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/proforma-invoice" class="side-nav-link">
+                                    <span class="menu-text">Proforma Invoice</span>
+                                </a>
+                            </li>
+                              <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/source-of-income" class="side-nav-link">
+                                    <span class="menu-text">Register Source of Income</span>
+                                </a>
+                            </li>
                             <?php endif; ?>
+                            
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+                
+                <!-- Stock Management -->
+                <?php if (in_array('view-stock-receives', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#stockMenu" aria-expanded="false" aria-controls="stockMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-packages"></i></span>
+                        <span class="menu-text">Stock</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="stockMenu">
+                        <ul class="sub-menu">
+                            <?php if (in_array('create-stock-receives', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/stock/receives" class="side-nav-link">
+                                    <span class="menu-text">Receive Stock</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-stock-transfers', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/stock/transfers" class="side-nav-link">
+                                    <span class="menu-text">Transfer to Warehouse</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/stock/summary" class="side-nav-link">
+                                    <span class="menu-text">Stock Summary</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
                 <?php endif; ?>
 
+                <!-- Warehouse -->
+                <?php if (in_array('view-warehouse-stock', $permissions) || in_array('view-warehouse-incoming', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#warehouseMenu" aria-expanded="false"
+                        aria-controls="warehouseMenu" class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-building-warehouse"></i></span>
+                        <span class="menu-text">Warehouse</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="warehouseMenu">
+                        <ul class="sub-menu">
+                            <?php if (in_array('view-warehouse-stock', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/warehouse/stock" class="side-nav-link">
+                                    <span class="menu-text">Warehouse Stock</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-warehouse-incoming', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/warehouse/incoming" class="side-nav-link">
+                                    <span class="menu-text">Incoming Transfers</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-stock-transfers', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/warehouse/processing" class="side-nav-link">
+                                    <span class="menu-text">Processing Steps</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('create-stock-transfers', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/warehouse/receive" class="side-nav-link">
+                                    <span class="menu-text">Receive Stock</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (in_array('view-warehouse-stock', $permissions)): ?>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/warehouse/sales" class="side-nav-link">
+                                    <span class="menu-text">Sales</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/warehouse/sales/history" class="side-nav-link">
+                                    <span class="menu-text">Sales History</span>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+                
+                <!-- Production -->
+                <?php if (in_array('view-production', $permissions)): ?>
+                <li class="side-nav-item">
+                    <a href="<?= APP_URL ?>/production" class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-tools"></i></span>
+                        <span class="menu-text">Production</span>
+                    </a>
+                </li>
+                <?php endif; ?>
                 <!-- Expense Management -->
                 <?php if (in_array('view-accounts', $permissions) || in_array('view-payment-modes', $permissions)): ?>
                 <li class="side-nav-item">
@@ -400,17 +534,16 @@
                                     <span class="menu-text">Expense Transactions</span>
                                 </a>
                             </li>
-                                <li class="side-nav-item">
+                              <li class="side-nav-item">
                                     <a href="<?= APP_URL ?>/finance/expense-transactions?statement=1" class="side-nav-link">
                                         <span class="menu-text">Expense Statement</span>
                                     </a>
                                 </li>
-                          
                         </ul>
                     </div>
                 </li>
                 <?php endif; ?>
-
+                
                 <!-- Non-Exploitable Management -->
                 <?php if (in_array('view-accounts', $permissions) || in_array('view-payment-modes', $permissions)): ?>
                 <li class="side-nav-item">
@@ -489,6 +622,8 @@
                 </li>
                 <?php endif; ?>
 
+                <?php endif; ?>
+
                 <li class="side-nav-title mt-2">Account</li>
 
                 <!-- Profile -->
@@ -506,7 +641,6 @@
                         <span class="menu-text">Logout</span>
                     </a>
                 </li>
-                <?php endif; ?>
             </ul>
         </div>
     </div>
