@@ -21,6 +21,15 @@ class AccountController extends Controller
     }
 
     /**
+     * Get currency types
+     */
+    private function getCurrencyTypes(): array
+    {
+        $sql = "SELECT currency_id, curre_name, sign FROM tbl_currency_type ORDER BY curre_name ASC";
+        return Database::fetchAll($sql);
+    }
+
+    /**
      * Check if user has permission
      */
     protected function hasPermission(string $permission): bool
@@ -46,6 +55,7 @@ class AccountController extends Controller
         $accounts = $this->accountModel->getAll();
         $locationTypes = $this->getLocationTypes();
         $paymentModes = $this->paymentModeModel->getActive();
+        $currencyTypes = $this->getCurrencyTypes();
 
         return View::render('finance/accounts/index', [
             'title' => 'Accounts',
@@ -53,6 +63,7 @@ class AccountController extends Controller
             'accounts' => $accounts,
             'locationTypes' => $locationTypes,
             'paymentModes' => $paymentModes,
+            'currencyTypes' => $currencyTypes,
             'scripts' => ['js/pages/custom-table.js']
         ], 'main');
     }
@@ -138,6 +149,8 @@ class AccountController extends Controller
         $paymentModeId = $_POST['payment_mode_id'] ?? null;
         $accountName = trim($_POST['account_name'] ?? '');
         $accountNumber = trim($_POST['account_number'] ?? '');
+        $bankName = trim($_POST['bank_name'] ?? '');
+        $currencyType = $_POST['currency_type'] ?? null;
         $balance = floatval($_POST['balance'] ?? 0);
         $status = $_POST['status'] ?? 'active';
 
@@ -162,12 +175,19 @@ class AccountController extends Controller
             return $response->redirect(APP_URL . '/finance/accounts');
         }
 
+        if (empty($currencyType)) {
+            $_SESSION['flash_error'] = 'Currency type is required';
+            return $response->redirect(APP_URL . '/finance/accounts');
+        }
+
         $result = $this->accountModel->createAccount([
             'location_type_id' => $locationTypeId,
             'location_id' => $locationId,
             'payment_mode_id' => $paymentModeId,
             'account_name' => $accountName,
             'account_number' => $accountNumber,
+            'bank_name' => $bankName,
+            'currency_type' => $currencyType,
             'balance' => $balance,
             'status' => $status
         ]);
@@ -192,6 +212,8 @@ class AccountController extends Controller
         $paymentModeId = $_POST['payment_mode_id'] ?? null;
         $accountName = trim($_POST['account_name'] ?? '');
         $accountNumber = trim($_POST['account_number'] ?? '');
+        $bankName = trim($_POST['bank_name'] ?? '');
+        $currencyType = $_POST['currency_type'] ?? null;
         $balance = floatval($_POST['balance'] ?? 0);
         $status = $_POST['status'] ?? 'active';
 
@@ -221,12 +243,19 @@ class AccountController extends Controller
             return $response->redirect(APP_URL . '/finance/accounts');
         }
 
+        if (empty($currencyType)) {
+            $_SESSION['flash_error'] = 'Currency type is required';
+            return $response->redirect(APP_URL . '/finance/accounts');
+        }
+
         $result = $this->accountModel->updateAccount((int)$id, [
             'location_type_id' => $locationTypeId,
             'location_id' => $locationId,
             'payment_mode_id' => $paymentModeId,
             'account_name' => $accountName,
             'account_number' => $accountNumber,
+            'bank_name' => $bankName,
+            'currency_type' => $currencyType,
             'balance' => $balance,
             'status' => $status
         ]);

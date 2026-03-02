@@ -236,6 +236,8 @@ $router->get('/finance/account-recharge', [AccountRechargeController::class, 'in
 $router->post('/finance/account-recharge/process', [AccountRechargeController::class, 'recharge'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/finance/account-transfer', [AccountRechargeController::class, 'transfer'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/finance/account-transfer', [AccountRechargeController::class, 'recharge'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/finance/transfer-to-account', [AccountRechargeController::class, 'transferToAccount'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/transfer-to-account', [AccountRechargeController::class, 'processTransferToAccount'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/finance/account-recharge/history', [AccountRechargeController::class, 'history'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/accounts/{id}/details', [AccountRechargeController::class, 'getAccountDetails'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/accounts/transfer-enabled', [AccountRechargeController::class, 'getTransferEnabledAccounts'], ['AuthMiddleware', 'AdminMiddleware']);

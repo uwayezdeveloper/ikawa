@@ -98,7 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <th data-table-sort>Account Name</th>
                     <th data-table-sort>Location</th>
                     <th data-table-sort>Payment Mode</th>
+                    <th data-table-sort>Currency Type</th>
                     <th data-table-sort>Account Number</th>
+                    <th data-table-sort>Bank Name</th>
                     <th data-table-sort>Balance</th>
                     <th data-table-sort data-column="status">Status</th>
                     <?php if ($canEdit || $canDelete): ?>
@@ -109,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <tbody>
                 <?php if (empty($accounts)): ?>
                 <tr>
-                    <td colspan="<?= ($canEdit || $canDelete) ? 8 : 7 ?>" class="text-center py-4">
+                    <td colspan="<?= ($canEdit || $canDelete) ? 10 : 9 ?>" class="text-center py-4">
                         <i class="ti ti-wallet fs-1 text-muted"></i>
                         <p class="text-muted mb-0">No accounts found</p>
                     </td>
@@ -134,11 +136,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             class="badge bg-primary-subtle text-primary"><?= htmlspecialchars($account['payment_mode_name'] ?? '-') ?></span>
                     </td>
                     <td>
+                        <span class="badge bg-success-subtle text-success">
+                            <?= htmlspecialchars($account['currency_name'] ?? '-') ?>
+                            <?php if (!empty($account['currency_sign'])): ?>
+                                (<?= htmlspecialchars($account['currency_sign']) ?>)
+                            <?php endif; ?>
+                        </span>
+                    </td>
+                    <td>
                         <span class="text-muted"><?= htmlspecialchars($account['account_number'] ?? '-') ?></span>
                     </td>
                     <td>
+                        <span class="text-muted"><?= htmlspecialchars($account['bank_name'] ?? '-') ?></span>
+                    </td>
+                    <td>
                         <span class="fw-semibold <?= $account['balance'] >= 0 ? 'text-success' : 'text-danger' ?>">
-                            <?= number_format($account['balance'], 2) ?> RWF
+                            <?= number_format($account['balance'], 2) ?> <?= htmlspecialchars($account['currency_sign'] ?? $account['currency_name'] ?? 'N/A') ?>
                         </span>
                     </td>
                     <td data-column="status">
@@ -159,6 +172,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 data-payment-mode-id="<?= $account['payment_mode_id'] ?>"
                                 data-account-name="<?= htmlspecialchars($account['account_name']) ?>"
                                 data-account-number="<?= htmlspecialchars($account['account_number'] ?? '') ?>"
+                                data-bank-name="<?= htmlspecialchars($account['bank_name'] ?? '') ?>"
+                                data-currency-type="<?= $account['currency_type'] ?>"
+                                data-currency-sign="<?= htmlspecialchars($account['currency_sign'] ?? '') ?>"
                                 data-balance="<?= $account['balance'] ?>" data-status="<?= $account['status'] ?>"
                                 data-bs-toggle="modal" data-bs-target="#editAccountModal">
                                 <i class="ti ti-edit fs-lg"></i>
@@ -239,9 +255,26 @@ document.addEventListener('DOMContentLoaded', function() {
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label for="currencyType" class="form-label">Currency Type <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="currencyType" name="currency_type" required>
+                                <option value="">Select Currency</option>
+                                <?php foreach ($currencyTypes as $currency): ?>
+                                <option value="<?= $currency['currency_id'] ?>"><?= htmlspecialchars($currency['curre_name']) ?> (<?= htmlspecialchars($currency['sign']) ?>)</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="accountNumber" class="form-label">Account Number</label>
                             <input type="text" class="form-control" id="accountNumber" name="account_number"
                                 placeholder="e.g., 1234567890">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="bankName" class="form-label">Bank Name</label>
+                            <input type="text" class="form-control" id="bankName" name="bank_name"
+                                placeholder="e.g., Bank of Kigali">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -256,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="input-group">
                                 <input type="number" step="0.01" class="form-control" id="balance" name="balance"
                                     value="0.00">
-                                <span class="input-group-text">RWF</span>
+                                <span class="input-group-text" id="balanceCurrency">Select Currency</span>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -322,8 +355,24 @@ document.addEventListener('DOMContentLoaded', function() {
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label for="editCurrencyType" class="form-label">Currency Type <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="editCurrencyType" name="currency_type" required>
+                                <option value="">Select Currency</option>
+                                <?php foreach ($currencyTypes as $currency): ?>
+                                <option value="<?= $currency['currency_id'] ?>"><?= htmlspecialchars($currency['curre_name']) ?> (<?= htmlspecialchars($currency['sign']) ?>)</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="editAccountNumber" class="form-label">Account Number</label>
                             <input type="text" class="form-control" id="editAccountNumber" name="account_number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editBankName" class="form-label">Bank Name</label>
+                            <input type="text" class="form-control" id="editBankName" name="bank_name">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -336,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <label for="editBalance" class="form-label">Balance</label>
                             <div class="input-group">
                                 <input type="number" step="0.01" class="form-control" id="editBalance" name="balance">
-                                <span class="input-group-text">RWF</span>
+                                <span class="input-group-text" id="editBalanceCurrency">Select Currency</span>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -373,6 +422,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const APP_URL = '<?= APP_URL ?>';
+
+    // Function to update currency display in balance field
+    function updateBalanceCurrencyDisplay(elementId, currencySign) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = currencySign || 'Select Currency';
+        }
+    }
+
+    // Function to get currency sign by currency type ID
+    function getCurrencySign(currencyTypeId) {
+        const currencyTypes = <?= json_encode($currencyTypes) ?>;
+        const currency = currencyTypes.find(c => c.currency_id == currencyTypeId);
+        return currency ? currency.sign : 'N/A';
+    }
 
     // Function to load locations by type
     function loadLocations(typeId, selectElement, selectedLocationId = null) {
@@ -421,9 +485,21 @@ document.addEventListener('DOMContentLoaded', function() {
         loadLocations(this.value, document.getElementById('locationId'));
     });
 
+    // Add Modal: Currency Type change
+    document.getElementById('currencyType').addEventListener('change', function() {
+        const currencySign = getCurrencySign(this.value);
+        updateBalanceCurrencyDisplay('balanceCurrency', currencySign);
+    });
+
     // Edit Modal: Location Type change
     document.getElementById('editLocationTypeId').addEventListener('change', function() {
         loadLocations(this.value, document.getElementById('editLocationId'));
+    });
+
+    // Edit Modal: Currency Type change
+    document.getElementById('editCurrencyType').addEventListener('change', function() {
+        const currencySign = getCurrencySign(this.value);
+        updateBalanceCurrencyDisplay('editBalanceCurrency', currencySign);
     });
 
     // Edit button handler
@@ -434,8 +510,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editPaymentModeId').value = this.dataset.paymentModeId;
             document.getElementById('editAccountName').value = this.dataset.accountName;
             document.getElementById('editAccountNumber').value = this.dataset.accountNumber;
+            document.getElementById('editBankName').value = this.dataset.bankName;
+            document.getElementById('editCurrencyType').value = this.dataset.currencyType;
             document.getElementById('editBalance').value = this.dataset.balance;
             document.getElementById('editStatus').value = this.dataset.status;
+
+            // Update currency display in balance field
+            updateBalanceCurrencyDisplay('editBalanceCurrency', this.dataset.currencySign);
 
             // Load locations for the selected type and pre-select the location
             loadLocations(this.dataset.locationTypeId, document.getElementById(

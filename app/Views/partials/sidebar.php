@@ -101,6 +101,7 @@
                     $hasMenu('clients') ||
                     $hasMenu('finance') ||
                     $hasMenu('stock') ||
+                    $hasMenu('station-finance') ||
                     $hasMenu('warehouse') ||
                     $hasMenu('production') ||
                     $hasMenu('expenses') ||
@@ -301,6 +302,7 @@
                         <span class="menu-text">Finance</span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse" id="financeMenu">
                         <ul class="sub-menu">
                             <li class="side-nav-item">
@@ -325,12 +327,17 @@
                             </li>
                               <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/account-recharge" class="side-nav-link">
-                                    <span class="menu-text">Account Recharge</span>
+                                    <span class="menu-text">Cash Replenishment</span>
                                 </a>
                             </li>
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/account-transfer" class="side-nav-link">
                                     <span class="menu-text">Account Transfer</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/transfer-to-account" class="side-nav-link">
+                                    <span class="menu-text">Transfer to Another Account</span>
                                 </a>
                             </li>
                             <li class="side-nav-item">
@@ -411,6 +418,103 @@
                                     <span class="menu-text">Stock Summary</span>
                                 </a>
                             </li>
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+
+
+                <!-- Station Finance -->
+                <?php if ($hasMenu('station-finance')): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#stationFinanceMenu" aria-expanded="false" aria-controls="stationFinanceMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-building-bank"></i></span>
+                        <span class="menu-text">Station Finance</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="stationFinanceMenu">
+                        <ul class="sub-menu">
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/payment-modes" class="side-nav-link">
+                                    <span class="menu-text">Payment Modes</span>
+                                </a>
+                            </li> -->
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/transactions" class="side-nav-link">
+                                    <span class="menu-text">Transactions</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/station-finances" class="side-nav-link">
+                                    <span class="menu-text">Station Finances</span>
+                                </a>
+                            </li>
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/accounts" class="side-nav-link">
+                                    <span class="menu-text">Accounts</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/account-recharge" class="side-nav-link">
+                                    <span class="menu-text">Account Recharge</span>
+                                </a>
+                            </li> -->
+                            <li class="side-nav-item">
+                                <!-- <a href="<?= APP_URL ?>/finance/account-transfer" class="side-nav-link">
+                                    <span class="menu-text">Account Transfer</span>
+                                </a>
+                            </li> -->
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/transfer-to-account" class="side-nav-link">
+                                    <span class="menu-text">Transfer to Another Account</span>
+                                </a>
+                            </li>
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/account-recharge/history" class="side-nav-link">
+                                    <span class="menu-text">Transaction History</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans/create" class="side-nav-link">
+                                    <span class="menu-text">Request Loan</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans" class="side-nav-link">
+                                    <span class="menu-text">Manage Loans</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans/disbursement" class="side-nav-link">
+                                    <span class="menu-text">Loan Disbursement</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loan-payments/create" class="side-nav-link">
+                                    <span class="menu-text">Pay Worker Loan</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loan-payments" class="side-nav-link">
+                                    <span class="menu-text">Loan Payment History</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/loans/statement" class="side-nav-link">
+                                    <span class="menu-text">Loan Statements</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/proforma-invoice" class="side-nav-link">
+                                    <span class="menu-text">Proforma Invoice</span>
+                                </a>
+                            </li> -->
+                            <!-- <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/source-of-income" class="side-nav-link">
+                                    <span class="menu-text">Register Source of Income</span>
+                                </a>
+                            </li> -->
                         </ul>
                     </div>
                 </li>

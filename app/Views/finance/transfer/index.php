@@ -41,7 +41,7 @@
                 <h4 class="card-title mb-0">
                     <i class="ti ti-transfer me-2"></i>Transfer Between Accounts
                 </h4>
-                <p class="text-muted mb-0">Transfer money from one account to another</p>
+                <p class="text-muted mb-0">Transfer money from location type 3 accounts to any other account</p>
             </div>
             <div class="card-body">
                 <?php if (empty($transferAccounts ?? [])): ?>
@@ -122,27 +122,6 @@
                                 <small class="text-muted">Available balance will be shown after selecting source account</small>
                                 <?php if (isset($_SESSION['errors']['amount'])): ?>
                                     <div class="text-danger small mt-1"><?= htmlspecialchars($_SESSION['errors']['amount']) ?></div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                             <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="in_id" class="form-label">Source of Income</label>
-                                <select class="form-select" id="in_id" name="in_id">
-                                    <option value="">Select source of income (Optional)</option>
-                                    <?php foreach ($sourcesOfIncome ?? [] as $source): ?>
-                                        <option value="<?= $source['in_id'] ?>" 
-                                                <?= (($_SESSION['old']['in_id'] ?? '') == $source['in_id']) ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($source['in_name']) ?>
-                                            <?php if (!empty($source['in_descr'])): ?>
-                                                - <?= htmlspecialchars($source['in_descr']) ?>
-                                            <?php endif; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <small class="text-muted">Select the source of this income (optional)</small>
-                                <?php if (isset($_SESSION['errors']['in_id'])): ?>
-                                    <div class="text-danger small mt-1"><?= htmlspecialchars($_SESSION['errors']['in_id']) ?></div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -232,7 +211,7 @@
                             <i class="ti ti-transfer fs-20 text-primary"></i>
                         </span>
                         <h4 class="mt-2 mb-1"><?= count($transferAccounts ?? []) ?></h4>
-                        <p class="text-muted mb-0 small">Can Transfer</p>
+                        <p class="text-muted mb-0 small">Location Type 3</p>
                     </div>
                     <div class="col-6">
                         <span class="avatar-md bg-success-subtle rounded-circle d-inline-flex align-items-center justify-content-center">
@@ -251,7 +230,7 @@
                 <hr>
                 <div class="text-center">
                     <h5 class="text-primary mb-1">$<?= number_format($totalTransferBalance, 2) ?></h5>
-                    <p class="text-muted mb-2 small">Available for Transfer</p>
+                    <p class="text-muted mb-2 small">From Location Type 3 Accounts</p>
                     <h6 class="text-success mb-1">$<?= number_format($totalBalance, 2) ?></h6>
                     <p class="text-muted mb-0 small">Total System Balance</p>
                 </div>
@@ -290,7 +269,7 @@
                     <div class="text-center">
                         <i class="ti ti-info-circle fs-2 text-muted mb-2 d-block"></i>
                         <p class="text-muted mb-1">No transfer-enabled accounts</p>
-                        <small class="text-muted">Accounts need location type and positive balance</small>
+                        <small class="text-muted">Accounts with location type 3 and positive balance</small>
                     </div>
                 <?php endif; ?>
             </div>

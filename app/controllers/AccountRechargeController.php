@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Database;
 use App\Models\Account;
 use App\Models\RechargeHistory;
 use App\Models\ExpenseTransaction;
@@ -53,21 +54,17 @@ class AccountRechargeController extends Controller
     public function transfer(Request $request, Response $response): void
     {
         try {
-            // Get accounts that can transfer money (with location_type_id and positive balance)
+            // Get accounts that can transfer money (with location_type_id = 3 and positive balance)
             $transferAccounts = $this->accountModel->getTransferEnabledAccounts();
             
             // Get all active accounts for receiving transfers
             $receivingAccounts = $this->accountModel->getReceivingAccounts();
             
-            // Get all active source of income
-            $sourcesOfIncome = $this->sourceOfIncomeModel->getActiveSources();
-            
             $this->view('finance/transfer/index', [
                 'transferAccounts' => $transferAccounts,
                 'receivingAccounts' => $receivingAccounts,
-                'sourcesOfIncome' => $sourcesOfIncome,
                 'user' => $_SESSION['user'] ?? [],
-                'pageTitle' => 'Account Transfer'
+                'pageTitleb' => 'Account Transfer'
             ], 'main');
         } catch (\Exception $e) {
             $this->handleError($e, 'Failed to load transfer page');
@@ -541,5 +538,196 @@ class AccountRechargeController extends Controller
         
         $_SESSION['errors'] = ['general' => $userMessage];
         (new Response())->redirect(APP_URL . '/finance/account-recharge');
+    }
+
+    /**
+     * Display transfer to another account page
+     */
+    public function transferToAccount(Request $request, Response $response): void
+    {
+        try {
+
+            $user = $_SESSION['user'] ?? [];
+            $userLocationId = (int)($user['location_id'] ?? 0);
+            
+            // Get all accounts from user's location (source accounts)
+            $sourceAccounts = [];
+            if ($userLocationId > 0) {
+                $sourceAccounts = $this->accountModel->getByLocation($userLocationId);
+            }
+            
+            // Get all other accounts in the system (destination accounts)
+            $destinationAccounts = $this->accountModel->getAll();
+            
+            // Remove user's location accounts from destination list
+            if ($userLocationId > 0) {
+                $destinationAccounts = array_filter($destinationAccounts, function($account) use ($userLocationId) {
+                    return (int)($account['location_id'] ?? 0) !== $userLocationId;
+                });
+            }
+            
+            $this->view('finance/transfer-to-account/index', [
+                'sourceAccounts' => $sourceAccounts,
+                'destinationAccounts' => $destinationAccounts,
+                'user' => $user,
+                'pageTitle' => 'Transfer to Another Account'
+            ], 'main');
+        } catch (\Exception $e) {
+            $this->handleError($e, 'Failed to load transfer page');
+        }
+    }
+
+    /**
+     * Process transfer to another account
+     */
+    public function processTransferToAccount(Request $request, Response $response): void
+    {
+        try {
+            $data = $request->getBody();
+            
+            // Validate transfer data
+            $errors = $this->validateTransferToAccountData($data);
+
+            if (!empty($errors)) {
+                if ($request->isAjax()) {
+                    $response->error('Validation failed', 422, $errors);
+                    return;
+                }
+                
+                $_SESSION['errors'] = $errors;
+                $_SESSION['old'] = $data;
+                $response->redirect(APP_URL . '/finance/transfer-to-account');
+                return;
+            }
+
+            // Process the transfer
+            $this->processUserLocationTransfer($data, $request, $response);
+
+        } catch (\Exception $e) {
+            $this->handleError($e, 'Failed to process transfer');
+        }
+    }
+
+    /**
+     * Validate transfer to account data
+     */
+    protected function validateTransferToAccountData(array $data): array
+    {
+        $errors = [];
+
+        if (empty($data['from_account_id'])) {
+            $errors['from_account_id'] = 'Source account is required';
+        }
+
+        if (empty($data['to_account_id'])) {
+            $errors['to_account_id'] = 'Destination account is required';
+        }
+
+        if (empty($data['amount']) || !is_numeric($data['amount']) || floatval($data['amount']) <= 0) {
+            $errors['amount'] = 'Valid transfer amount is required';
+        }
+
+        if (empty($data['description'])) {
+            $errors['description'] = 'Transfer description is required';
+        }
+
+        if (!empty($data['from_account_id']) && !empty($data['to_account_id'])) {
+            if ($data['from_account_id'] === $data['to_account_id']) {
+                $errors['to_account_id'] = 'Source and destination accounts cannot be the same';
+            }
+        }
+
+        // Validate source account belongs to user's location
+        if (!empty($data['from_account_id'])) {
+            $user = $_SESSION['user'] ?? [];
+            $userLocationId = (int)($user['location_id'] ?? 0);
+            
+            if ($userLocationId > 0) {
+                $sourceAccount = $this->accountModel->findById((int)$data['from_account_id']);
+                if (!$sourceAccount || (int)($sourceAccount['location_id'] ?? 0) !== $userLocationId) {
+                    $errors['from_account_id'] = 'You can only transfer from accounts in your location';
+                }
+            }
+        }
+
+        // Check if source account has sufficient balance
+        if (!empty($data['from_account_id']) && !empty($data['amount'])) {
+            $sourceAccount = $this->accountModel->findById((int)$data['from_account_id']);
+            if ($sourceAccount && floatval($sourceAccount['balance']) < floatval($data['amount'])) {
+                $errors['amount'] = 'Insufficient balance in source account';
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Process user location transfer
+     */
+    protected function processUserLocationTransfer(array $data, Request $request, Response $response): void
+    {
+        $db = Database::getInstance();
+        
+        try {
+            $db->beginTransaction();
+            
+            $fromAccountId = (int) $data['from_account_id'];
+            $toAccountId = (int) $data['to_account_id'];
+            $amount = (float) $data['amount'];
+            $description = $data['description'];
+            $user = $_SESSION['user'] ?? [];
+            $userId = (int) ($user['id'] ?? 0);
+            
+            // Get account details
+            $fromAccount = $this->accountModel->findById($fromAccountId);
+            $toAccount = $this->accountModel->findById($toAccountId);
+            
+            if (!$fromAccount || !$toAccount) {
+                throw new \Exception('Invalid account specified');
+            }
+            
+            // Update balances
+            $this->accountModel->updateBalance($fromAccountId, -$amount);
+            $this->accountModel->updateBalance($toAccountId, $amount);
+            
+            // Record transaction for source account (outgoing)
+            $this->rechargeHistoryModel->create([
+                'account_id' => $fromAccountId,
+                'user_id' => $userId,
+                'amount' => -$amount,
+                'transaction_type' => 'transfer_out',
+                'description' => "Transfer to {$toAccount['name']}: {$description}",
+                'reference_account_id' => $toAccountId,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            
+            // Record transaction for destination account (incoming)
+            $this->rechargeHistoryModel->create([
+                'account_id' => $toAccountId,
+                'user_id' => $userId,
+                'amount' => $amount,
+                'transaction_type' => 'transfer_in',
+                'description' => "Transfer from {$fromAccount['name']}: {$description}",
+                'reference_account_id' => $fromAccountId,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            
+            $db->commit();
+            
+            if ($request->isAjax()) {
+                $response->success([
+                    'from_account' => $fromAccount['name'],
+                    'to_account' => $toAccount['name'],
+                    'amount' => number_format($amount, 2)
+                ], 'Transfer completed successfully');
+            } else {
+                $_SESSION['flash_success'] = 'Transfer completed successfully';
+                $response->redirect(APP_URL . '/finance/transfer-to-account');
+            }
+            
+        } catch (\Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
     }
 }

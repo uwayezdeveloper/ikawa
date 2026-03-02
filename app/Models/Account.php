@@ -17,11 +17,14 @@ class Account extends Model
         $sql = "SELECT a.*, 
                 lt.name as location_type_name,
                 l.name as location_name,
-                pm.name as payment_mode_name
+                pm.name as payment_mode_name,
+                ct.curre_name as currency_name,
+                ct.sign as currency_sign
                 FROM {$this->table} a
                 LEFT JOIN location_types lt ON a.location_type_id = lt.id
                 LEFT JOIN locations l ON a.location_id = l.id
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                 ORDER BY a.account_name ASC";
         return Database::fetchAll($sql);
     }
@@ -34,11 +37,14 @@ class Account extends Model
         $sql = "SELECT a.*, 
                 lt.name as location_type_name,
                 l.name as location_name,
-                pm.name as payment_mode_name
+                pm.name as payment_mode_name,
+                ct.curre_name as currency_name,
+                ct.sign as currency_sign
                 FROM {$this->table} a
                 LEFT JOIN location_types lt ON a.location_type_id = lt.id
                 LEFT JOIN locations l ON a.location_id = l.id
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                 WHERE a.status = 'active'
                 ORDER BY a.account_name ASC";
         return Database::fetchAll($sql);
@@ -52,11 +58,14 @@ class Account extends Model
         $sql = "SELECT a.*, 
                 lt.name as location_type_name,
                 l.name as location_name,
-                pm.name as payment_mode_name
+                pm.name as payment_mode_name,
+                ct.curre_name as currency_name,
+                ct.sign as currency_sign
                 FROM {$this->table} a
                 LEFT JOIN location_types lt ON a.location_type_id = lt.id
                 LEFT JOIN locations l ON a.location_id = l.id
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                 WHERE a.id = :id";
         return Database::fetch($sql, ['id' => $id]);
     }
@@ -92,8 +101,8 @@ class Account extends Model
      */
     public function createAccount(array $data): int
     {
-        $sql = "INSERT INTO {$this->table} (location_type_id, location_id, payment_mode_id, account_name, account_number, balance, status) 
-                VALUES (:location_type_id, :location_id, :payment_mode_id, :account_name, :account_number, :balance, :status)";
+        $sql = "INSERT INTO {$this->table} (location_type_id, location_id, payment_mode_id, account_name, account_number, bank_name, currency_type, balance, status) 
+                VALUES (:location_type_id, :location_id, :payment_mode_id, :account_name, :account_number, :bank_name, :currency_type, :balance, :status)";
         
         Database::query($sql, [
             'location_type_id' => $data['location_type_id'],
@@ -101,6 +110,8 @@ class Account extends Model
             'payment_mode_id' => $data['payment_mode_id'],
             'account_name' => $data['account_name'],
             'account_number' => $data['account_number'] ?: null,
+            'bank_name' => $data['bank_name'] ?: null,
+            'currency_type' => $data['currency_type'],
             'balance' => $data['balance'] ?? 0.00,
             'status' => $data['status'] ?? 'active'
         ]);
@@ -119,6 +130,8 @@ class Account extends Model
                 payment_mode_id = :payment_mode_id,
                 account_name = :account_name,
                 account_number = :account_number,
+                bank_name = :bank_name,
+                currency_type = :currency_type,
                 balance = :balance,
                 status = :status
                 WHERE id = :id";
@@ -130,6 +143,8 @@ class Account extends Model
             'payment_mode_id' => $data['payment_mode_id'],
             'account_name' => $data['account_name'],
             'account_number' => $data['account_number'] ?: null,
+            'bank_name' => $data['bank_name'] ?: null,
+            'currency_type' => $data['currency_type'],
             'balance' => $data['balance'] ?? 0.00,
             'status' => $data['status'] ?? 'active'
         ]);
