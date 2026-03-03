@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </tr>
             </thead>
             <tbody>
+                
                 <?php if (empty($accounts)): ?>
                 <tr>
                     <td colspan="<?= ($canEdit || $canDelete) ? 10 : 9 ?>" class="text-center py-4">

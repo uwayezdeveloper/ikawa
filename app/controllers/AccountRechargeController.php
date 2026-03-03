@@ -10,6 +10,8 @@ use App\Models\Account;
 use App\Models\RechargeHistory;
 use App\Models\ExpenseTransaction;
 use App\Models\SourceOfIncome;
+use App\Models\CurrencyExchangeRate;
+use App\Models\CurrencyType;
 
 class AccountRechargeController extends Controller
 {
@@ -692,22 +694,24 @@ class AccountRechargeController extends Controller
             
             // Record transaction for source account (outgoing)
             $this->rechargeHistoryModel->create([
+                'acc_id' => $fromAccountId,
                 'account_id' => $fromAccountId,
                 'user_id' => $userId,
                 'amount' => -$amount,
                 'transaction_type' => 'transfer_out',
-                'description' => "Transfer to {$toAccount['name']}: {$description}",
+                'description' => "Transfer to {$toAccount['account_name']}: {$description}",
                 'reference_account_id' => $toAccountId,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
             
             // Record transaction for destination account (incoming)
             $this->rechargeHistoryModel->create([
+                'acc_id' => $toAccountId,
                 'account_id' => $toAccountId,
                 'user_id' => $userId,
                 'amount' => $amount,
                 'transaction_type' => 'transfer_in',
-                'description' => "Transfer from {$fromAccount['name']}: {$description}",
+                'description' => "Transfer from {$fromAccount['account_name']}: {$description}",
                 'reference_account_id' => $fromAccountId,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
@@ -716,8 +720,8 @@ class AccountRechargeController extends Controller
             
             if ($request->isAjax()) {
                 $response->success([
-                    'from_account' => $fromAccount['name'],
-                    'to_account' => $toAccount['name'],
+                    'from_account' => $fromAccount['account_name'],
+                    'to_account' => $toAccount['account_name'],
                     'amount' => number_format($amount, 2)
                 ], 'Transfer completed successfully');
             } else {
@@ -728,6 +732,428 @@ class AccountRechargeController extends Controller
         } catch (\Exception $e) {
             $db->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Display global transfer page (any account to any account)
+     */
+    public function globalTransfer(Request $request, Response $response): void
+    {
+        try {
+            $user = $_SESSION['user'] ?? [];
+            
+            // Get all active accounts for both source and destination
+            $allAccounts = $this->accountModel->getActive();
+            
+            // Get available currencies
+            $currencyTypeModel = new CurrencyType();
+            $currencies = $currencyTypeModel->getAll();
+            
+            // Get CurrencyExchangeRate model for later use
+            $currencyModel = new CurrencyExchangeRate();
+            
+            $this->view('finance/global-transfer/index', [
+                'accounts' => $allAccounts,
+                'currencies' => $currencies,
+                'user' => $user,
+                'pageTitle' => 'Global Transfer'
+            ], 'main');
+        } catch (\Exception $e) {
+            error_log("Global Transfer Page Error: " . $e->getMessage());
+            $_SESSION['errors'] = ['general' => 'Failed to load global transfer page'];
+            $response->redirect(APP_URL . '/finance/global-transfer');
+        }
+    }
+
+    /**
+     * Process global transfer (any account to any account)
+     */
+    public function processGlobalTransfer(Request $request, Response $response): void
+    {
+        try {
+            $data = $request->getBody();
+            
+            // Validate global transfer data
+            $errors = $this->validateGlobalTransferData($data);
+
+            if (!empty($errors)) {
+                if ($request->isAjax()) {
+                    $response->error('Validation failed', 422, $errors);
+                    return;
+                }
+                
+                $_SESSION['errors'] = $errors;
+                $_SESSION['old'] = $data;
+                $response->redirect(APP_URL . '/finance/global-transfer');
+                return;
+            }
+
+            // Process the global transfer
+            $this->processGlobalTransferTransaction($data, $request, $response);
+
+        } catch (\Exception $e) {
+            // Log the detailed error for debugging
+            error_log("Global Transfer Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            
+            if ($request->isAjax()) {
+                $response->error('Failed to process global transfer: ' . $e->getMessage(), 500);
+                return;
+            }
+            
+            $_SESSION['errors'] = ['general' => 'Failed to process global transfer: ' . $e->getMessage()];
+            $_SESSION['old'] = $data;
+            $response->redirect(APP_URL . '/finance/global-transfer');
+        }
+    }
+
+    /**
+     * Validate global transfer data
+     */
+    protected function validateGlobalTransferData(array $data): array
+    {
+        $errors = [];
+
+        if (empty($data['from_account_id'])) {
+            $errors['from_account_id'] = 'Source account is required';
+        }
+
+        if (empty($data['to_account_id'])) {
+            $errors['to_account_id'] = 'Destination account is required';
+        }
+
+        if (empty($data['amount']) || !is_numeric($data['amount']) || floatval($data['amount']) <= 0) {
+            $errors['amount'] = 'Valid transfer amount is required';
+        }
+
+        if (empty($data['description'])) {
+            $errors['description'] = 'Transfer description is required';
+        }
+
+        if (!empty($data['from_account_id']) && !empty($data['to_account_id'])) {
+            if ($data['from_account_id'] === $data['to_account_id']) {
+                $errors['to_account_id'] = 'Source and destination accounts cannot be the same';
+            }
+        }
+
+        // Check if source account exists and has sufficient balance
+        if (!empty($data['from_account_id']) && !empty($data['amount'])) {
+            $sourceAccount = $this->accountModel->findById((int)$data['from_account_id']);
+            if (!$sourceAccount) {
+                $errors['from_account_id'] = 'Source account not found';
+            } elseif (floatval($sourceAccount['balance']) < floatval($data['amount'])) {
+                $errors['amount'] = 'Insufficient balance in source account';
+            }
+        }
+
+        // Check if destination account exists
+        if (!empty($data['to_account_id'])) {
+            $destAccount = $this->accountModel->findById((int)$data['to_account_id']);
+            if (!$destAccount) {
+                $errors['to_account_id'] = 'Destination account not found';
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Process global transfer transaction
+     */
+    protected function processGlobalTransferTransaction(array $data, Request $request, Response $response): void
+    {
+        $db = Database::getInstance();
+        
+        try {
+            // Debug logging
+            error_log("Starting global transfer - Data: " . json_encode($data));
+            
+            $db->beginTransaction();
+            
+            $fromAccountId = (int) $data['from_account_id'];
+            $toAccountId = (int) $data['to_account_id'];
+            $amount = (float) $data['amount'];
+            $description = $data['description'];
+            $user = $_SESSION['user'] ?? [];
+            $userId = (int) ($user['id'] ?? 0);
+            
+            error_log("Transfer details - From: $fromAccountId, To: $toAccountId, Amount: $amount, User: $userId");
+            
+            // Get account details with currency information
+            $fromAccount = $this->accountModel->findById($fromAccountId);
+            $toAccount = $this->accountModel->findById($toAccountId);
+            
+            error_log("From Account: " . ($fromAccount ? json_encode($fromAccount) : 'NOT FOUND'));
+            error_log("To Account: " . ($toAccount ? json_encode($toAccount) : 'NOT FOUND'));
+            
+            if (!$fromAccount || !$toAccount) {
+                throw new \Exception('Invalid account specified');
+            }
+            
+            // Check if source account has sufficient balance
+            if ($fromAccount['balance'] < $amount) {
+                throw new \Exception('Insufficient balance in source account. Available: ' . number_format($fromAccount['balance'], 2) . ', Required: ' . number_format($amount, 2));
+            }
+            
+            error_log("Balance check passed");
+            
+            // Get CurrencyExchangeRate model
+            $currencyModel = new CurrencyExchangeRate();
+            
+            // Check if currency conversion is needed
+            $fromCurrencyId = $fromAccount['currency_type_id'] ?? 1;
+            $toCurrencyId = $toAccount['currency_type_id'] ?? 1;
+            
+            $convertedAmount = $amount;
+            $exchangeRate = 1.0;
+            $conversionNote = '';
+            
+            // Check if user provided exchange rate - if so, always use it for conversion
+            if (!empty($data['exchange_rate'])) {
+                $exchangeRate = (float) $data['exchange_rate'];
+                $convertedAmount = $amount * $exchangeRate;
+                $conversionNote = " (Rate: 1 {$fromAccount['currency_sign']} = {$exchangeRate} {$toAccount['currency_sign']})";
+                
+                // Save the exchange rate to database for future use
+                $currencyModel->setExchangeRate($fromCurrencyId, $toCurrencyId, $exchangeRate);
+            } elseif ($fromCurrencyId != $toCurrencyId) {
+                // Different currencies - need conversion
+                $exchangeRate = null;
+                
+                // Try to get from database
+                $exchangeRate = $currencyModel->getExchangeRate($fromCurrencyId, $toCurrencyId);
+                
+                if ($exchangeRate === null) {
+                    // Ask user for exchange rate
+                    $db->rollBack();
+                    
+                    $responseData = [
+                        'needs_exchange_rate' => true,
+                        'from_currency' => [
+                            'id' => $fromCurrencyId,
+                            'name' => $fromAccount['currency_name'] ?? 'Unknown',
+                            'sign' => $fromAccount['currency_sign'] ?? ''
+                        ],
+                        'to_currency' => [
+                            'id' => $toCurrencyId,
+                            'name' => $toAccount['currency_name'] ?? 'Unknown', 
+                            'sign' => $toAccount['currency_sign'] ?? ''
+                        ],
+                        'transfer_data' => $data
+                    ];
+                    
+                    if ($request->isAjax()) {
+                        $response->success($responseData, 'Exchange rate required for currency conversion');
+                    } else {
+                        $_SESSION['exchange_rate_request'] = $responseData;
+                        $_SESSION['old'] = $data;
+                        $response->redirect(APP_URL . '/finance/global-transfer');
+                    }
+                    return;
+                }
+                
+                $convertedAmount = $amount * $exchangeRate;
+                $conversionNote = " (Rate: 1 {$fromAccount['currency_sign']} = {$exchangeRate} {$toAccount['currency_sign']})";
+                
+                // Save the exchange rate to database for future use
+                $currencyModel->setExchangeRate($fromCurrencyId, $toCurrencyId, $exchangeRate);
+            }
+            
+            error_log("Currency conversion completed - Rate: $exchangeRate, Converted Amount: $convertedAmount");
+            
+            // Update balances
+            error_log("Starting balance updates");
+            $deductResult = $this->accountModel->updateBalance($fromAccountId, -$amount); // Deduct original amount
+            if (!$deductResult) {
+                throw new \Exception('Failed to deduct amount from source account');
+            }
+            error_log("Deducted $amount from account $fromAccountId");
+            
+            $addResult = $this->accountModel->updateBalance($toAccountId, $convertedAmount); // Add converted amount
+            if (!$addResult) {
+                throw new \Exception('Failed to add converted amount to destination account');
+            }
+            error_log("Added $convertedAmount to account $toAccountId");
+            
+            // Record transaction for source account (outgoing)
+            $outgoingRecord = $this->rechargeHistoryModel->create([
+                'acc_id' => $fromAccountId,
+                'account_id' => $fromAccountId,
+                'user_id' => $userId,
+                'amount' => -$amount,
+                'transaction_type' => 'global_transfer_out',
+                'description' => "Global transfer to {$toAccount['account_name']}: {$description}" . ($exchangeRate != 1.0 ? " - Sent: {$amount} {$fromAccount['currency_sign']}, Received: {$convertedAmount} {$toAccount['currency_sign']}{$conversionNote}" : ""),
+                'reference_account_id' => $toAccountId,
+                'exchange_rate' => $exchangeRate != 1.0 ? $exchangeRate : null,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            
+            if (!$outgoingRecord) {
+                throw new \Exception('Failed to record outgoing transaction history');
+            }
+            
+            // Record transaction for destination account (incoming)
+            $incomingRecord = $this->rechargeHistoryModel->create([
+                'acc_id' => $toAccountId,
+                'account_id' => $toAccountId,
+                'user_id' => $userId,
+                'amount' => $convertedAmount,
+                'transaction_type' => 'global_transfer_in',
+                'description' => "Global transfer from {$fromAccount['account_name']}: {$description}" . ($exchangeRate != 1.0 ? " - Sent: {$amount} {$fromAccount['currency_sign']}, Received: {$convertedAmount} {$toAccount['currency_sign']}{$conversionNote}" : ""),
+                'reference_account_id' => $fromAccountId,
+                'exchange_rate' => $exchangeRate != 1.0 ? $exchangeRate : null,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            
+            if (!$incomingRecord) {
+                throw new \Exception('Failed to record incoming transaction history');
+            }
+            
+            error_log("All operations completed successfully, committing transaction");
+            
+            $db->commit();
+            
+            if ($request->isAjax()) {
+                $responseData = [
+                    'from_account' => $fromAccount['account_name'],
+                    'to_account' => $toAccount['account_name'],
+                    'amount' => number_format($amount, 2),
+                    'from_currency' => $fromAccount['currency_sign'],
+                    'converted_amount' => number_format($convertedAmount, 2),
+                    'to_currency' => $toAccount['currency_sign'],
+                    'exchange_rate' => $exchangeRate,
+                    'currency_conversion' => $exchangeRate != 1.0
+                ];
+                
+                $message = $exchangeRate != 1.0 ? 
+                    "Global transfer completed with currency conversion: {$amount} {$fromAccount['currency_sign']} → {$convertedAmount} {$toAccount['currency_sign']}" :
+                    'Global transfer completed successfully';
+                    
+                $response->success($responseData, $message);
+            } else {
+                $message = $exchangeRate != 1.0 ? 
+                    "Global transfer completed with currency conversion: {$amount} {$fromAccount['currency_sign']} converted to {$convertedAmount} {$toAccount['currency_sign']}" :
+                    'Global transfer completed successfully';
+                    
+                $_SESSION['flash_success'] = $message;
+                $response->redirect(APP_URL . '/finance/global-transfer');
+            }
+            
+        } catch (\Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Get exchange rate between two currencies via AJAX
+     */
+    public function getExchangeRate(Request $request, Response $response): void
+    {
+        try {
+            $fromCurrencyId = $request->query('from_currency_id');
+            $toCurrencyId = $request->query('to_currency_id');
+
+            if (empty($fromCurrencyId) || empty($toCurrencyId)) {
+                $response->error('From and to currency IDs are required', 400);
+                return;
+            }
+
+            // Get models
+            $currencyModel = new CurrencyExchangeRate();
+            $currencyTypeModel = new CurrencyType();
+
+            if ($fromCurrencyId == $toCurrencyId) {
+                // Same currency, no conversion needed
+                $response->success([
+                    'exchange_rate' => 1.0,
+                    'needs_conversion' => false,
+                    'from_currency' => $currencyTypeModel->getById($fromCurrencyId),
+                    'to_currency' => $currencyTypeModel->getById($toCurrencyId)
+                ], 'Same currency selected');
+                return;
+            }
+
+            $exchangeRate = $currencyModel->getExchangeRate($fromCurrencyId, $toCurrencyId);
+            
+            if ($exchangeRate === null) {
+                $fromCurrency = $currencyTypeModel->getById($fromCurrencyId);
+                $toCurrency = $currencyTypeModel->getById($toCurrencyId);
+                
+                $response->error("Exchange rate not available for {$fromCurrency['curre_name']} to {$toCurrency['curre_name']}", 404, [
+                    'needs_setup' => true,
+                    'from_currency' => $fromCurrency,
+                    'to_currency' => $toCurrency
+                ]);
+                return;
+            }
+
+            
+            $response->success([
+                'exchange_rate' => $exchangeRate,
+                'needs_conversion' => true,
+                'from_currency' => $currencyTypeModel->getById($fromCurrencyId),
+                'to_currency' => $currencyTypeModel->getById($toCurrencyId)
+            ], 'Exchange rate retrieved successfully');
+
+        } catch (\Exception $e) {
+            error_log("Exchange Rate Error: " . $e->getMessage());
+            $response->error('Failed to get exchange rate: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Convert amount between currencies via AJAX
+     */
+    public function convertAmount(Request $request, Response $response): void
+    {
+        try {
+            $amount = (float) $request->query('amount');
+            $fromCurrencyId = $request->query('from_currency_id');
+            $toCurrencyId = $request->query('to_currency_id');
+
+            if ($amount <= 0 || empty($fromCurrencyId) || empty($toCurrencyId)) {
+                $response->error('Valid amount and currency IDs are required', 400);
+                return;
+            }
+
+            // Load models
+            $currencyModel = new CurrencyExchangeRate();
+            $currencyTypeModel = new CurrencyType();
+
+            if ($fromCurrencyId == $toCurrencyId) {
+                // Same currency, no conversion needed
+                $response->success([
+                    'original_amount' => $amount,
+                    'converted_amount' => $amount,
+                    'exchange_rate' => 1.0,
+                    'needs_conversion' => false
+                ], 'Same currency - no conversion needed');
+                return;
+            }
+
+            $exchangeRate = $currencyModel->getExchangeRate($fromCurrencyId, $toCurrencyId);
+            
+            if ($exchangeRate === null) {
+                $response->error('Exchange rate not available', 404);
+                return;
+            }
+
+            $convertedAmount = $amount * $exchangeRate;
+
+            $response->success([
+                'original_amount' => $amount,
+                'converted_amount' => $convertedAmount,
+                'exchange_rate' => $exchangeRate,
+                'needs_conversion' => true,
+                'from_currency' => $currencyTypeModel->getById($fromCurrencyId),
+                'to_currency' => $currencyTypeModel->getById($toCurrencyId)
+            ], 'Amount converted successfully');
+
+        } catch (\Exception $e) {
+            error_log("Amount Conversion Error: " . $e->getMessage());
+            $response->error('Failed to convert amount: ' . $e->getMessage(), 500);
         }
     }
 }

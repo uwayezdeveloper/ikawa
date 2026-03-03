@@ -341,6 +341,11 @@
                                 </a>
                             </li>
                             <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/global-transfer" class="side-nav-link">
+                                    <span class="menu-text">Global Transfer</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/account-recharge/history" class="side-nav-link">
                                     <span class="menu-text">Transaction History</span>
                                 </a>
@@ -468,6 +473,11 @@
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/transfer-to-account" class="side-nav-link">
                                     <span class="menu-text">Transfer to Another Account</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/global-transfer" class="side-nav-link">
+                                    <span class="menu-text">Global Transfer</span>
                                 </a>
                             </li>
                             <!-- <li class="side-nav-item">

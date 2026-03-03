@@ -2454,7 +2454,47 @@ CREATE TABLE `tbl_currency_type` (
 
 INSERT INTO `tbl_currency_type` (`currency_id`, `curre_name`, `sign`) VALUES
 (1, 'Rwandan Francs', 'Rwf'),
-(2, 'Dollar', '$');
+(2, 'Dollar', '$'),
+(7, 'Euro', '€');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `currency_exchange_rates`
+--
+
+CREATE TABLE `currency_exchange_rates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `from_currency_id` int(11) NOT NULL,
+  `to_currency_id` int(11) NOT NULL,
+  `exchange_rate` decimal(18,8) NOT NULL,
+  `effective_date` date NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_from_currency` (`from_currency_id`),
+  KEY `idx_to_currency` (`to_currency_id`),
+  KEY `idx_effective_date` (`effective_date`),
+  KEY `idx_active` (`is_active`),
+  UNIQUE KEY `unique_currency_pair_date` (`from_currency_id`, `to_currency_id`, `effective_date`),
+  FOREIGN KEY (`from_currency_id`) REFERENCES `tbl_currency_type` (`currency_id`),
+  FOREIGN KEY (`to_currency_id`) REFERENCES `tbl_currency_type` (`currency_id`),
+  FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `currency_exchange_rates`
+--
+
+INSERT INTO `currency_exchange_rates` (`id`, `from_currency_id`, `to_currency_id`, `exchange_rate`, `effective_date`, `is_active`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 0.00075000, '2026-02-26', 1, 1, '2026-02-26 08:00:00', '2026-02-26 08:00:00'),
+(2, 2, 1, 1333.33330000, '2026-02-26', 1, 1, '2026-02-26 08:00:00', '2026-02-26 08:00:00'),
+(3, 1, 7, 0.00060000, '2026-02-26', 1, 1, '2026-02-26 08:00:00', '2026-02-26 08:00:00'),
+(4, 7, 1, 1666.66670000, '2026-02-26', 1, 1, '2026-02-26 08:00:00', '2026-02-26 08:00:00'),
+(5, 2, 7, 0.80000000, '2026-02-26', 1, 1, '2026-02-26 08:00:00', '2026-02-26 08:00:00'),
+(6, 7, 2, 1.25000000, '2026-02-26', 1, 1, '2026-02-26 08:00:00', '2026-02-26 08:00:00');
 
 -- --------------------------------------------------------
 

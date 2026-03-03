@@ -241,6 +241,15 @@ $router->post('/finance/transfer-to-account', [AccountRechargeController::class,
 $router->get('/finance/account-recharge/history', [AccountRechargeController::class, 'history'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/accounts/{id}/details', [AccountRechargeController::class, 'getAccountDetails'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/accounts/transfer-enabled', [AccountRechargeController::class, 'getTransferEnabledAccounts'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Global Transfer (No Location Restrictions)
+$router->get('/finance/global-transfer', [AccountRechargeController::class, 'globalTransfer'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/global-transfer', [AccountRechargeController::class, 'processGlobalTransfer'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Currency Exchange API Endpoints
+$router->get('/api/currency/exchange-rate', [AccountRechargeController::class, 'getExchangeRate'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/api/currency/convert-amount', [AccountRechargeController::class, 'convertAmount'], ['AuthMiddleware', 'AdminMiddleware']);
+
 // ============================================
 // EXPENSE MANAGEMENT ROUTES (Under Finance)
 // ============================================
