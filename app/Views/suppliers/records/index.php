@@ -27,9 +27,9 @@ $payables = $summary['payables'] ?? [];
             <?php endforeach; ?>
         </select>
         <?php if ($selectedSupplierId): ?>
-        <a href="<?= APP_URL ?>/suppliers/records/download-pdf?supplier_id=<?= $selectedSupplierId ?>" class="btn btn-danger">
+        <button type="button" id="downloadPdfBtn" class="btn btn-danger">
             <i class="ti ti-file-type-pdf me-1"></i> Download PDF
-        </a>
+        </button>
         <?php endif; ?>
         <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
             <i class="ti ti-printer me-1"></i> Print
@@ -342,4 +342,13 @@ $payables = $summary['payables'] ?? [];
 
 <script>
 window.APP_URL = '<?= APP_URL ?>';
+<?php if ($supplierInfo): ?>
+window.supplierRecordsPayload = {
+    supplier: <?= json_encode($supplierInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
+    summary: <?= json_encode($summary, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
+    records: <?= json_encode($records, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
+    productSummary: <?= json_encode($productSummary, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>
+};
+<?php endif; ?>
 </script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>

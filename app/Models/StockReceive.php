@@ -432,13 +432,46 @@ class StockReceive extends Model
      */
     public function getCategoriesByLocationType(int $locationTypeId): array
     {
-        $sql = "SELECT pc.id, pc.name 
-                FROM product_categories pc
-                INNER JOIN location_type_categories ltc ON pc.id = ltc.product_category_id
-                WHERE ltc.location_type_id = :location_type_id
-                AND pc.status = 'active'
-                ORDER BY pc.name";
-        return Database::fetchAll($sql, ['location_type_id' => $locationTypeId]);
+        $params = ['location_type_id' => $locationTypeId];
+
+        $queries = [
+            "SELECT pc.id, pc.name 
+             FROM product_categories pc
+             INNER JOIN location_type_categories ltc ON pc.id = ltc.product_category_id
+             WHERE ltc.location_type_id = :location_type_id
+             AND (pc.status = 'active' OR pc.status = 1)
+             ORDER BY pc.name",
+
+            "SELECT pc.id, pc.name 
+             FROM product_categories pc
+             INNER JOIN location_type_categories ltc ON pc.id = ltc.product_category_id
+             WHERE ltc.location_type_id = :location_type_id
+             ORDER BY pc.name",
+
+            "SELECT pc.categ_id AS id, pc.categ_name AS name
+             FROM tbl_product_categories pc
+             INNER JOIN location_type_categories ltc ON pc.categ_id = ltc.product_category_id
+             WHERE ltc.location_type_id = :location_type_id
+             AND (pc.status = 1 OR pc.status = 'active')
+             ORDER BY pc.categ_name",
+
+            "SELECT pc.id, pc.name
+             FROM product_categories pc
+             WHERE (pc.status = 'active' OR pc.status = 1)
+             ORDER BY pc.name"
+        ];
+
+        foreach ($queries as $sql) {
+            try {
+                $rows = Database::fetchAll($sql, $params);
+                if (!empty($rows)) {
+                    return $rows;
+                }
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -446,12 +479,38 @@ class StockReceive extends Model
      */
     public function getCategoryTypes(int $categoryId): array
     {
-        $sql = "SELECT id, name 
-                FROM category_types 
-                WHERE category_id = :category_id 
-                AND status = 'active'
-                ORDER BY name";
-        return Database::fetchAll($sql, ['category_id' => $categoryId]);
+        $params = ['category_id' => $categoryId];
+
+        $queries = [
+            "SELECT id, name 
+             FROM category_types 
+             WHERE category_id = :category_id 
+             AND (status = 'active' OR status = 1)
+             ORDER BY name",
+
+            "SELECT id, name 
+             FROM category_types 
+             WHERE category_id = :category_id 
+             ORDER BY name",
+
+            "SELECT type_id AS id, type_name AS name
+             FROM tbl_category_types
+             WHERE categ_id = :category_id
+             AND (sts = 1 OR sts = 'active')
+             ORDER BY type_name"
+        ];
+
+        foreach ($queries as $sql) {
+            try {
+                $rows = Database::fetchAll($sql, $params);
+                if (!empty($rows)) {
+                    return $rows;
+                }
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return [];
     }
 
     /**

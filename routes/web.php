@@ -15,6 +15,7 @@ use App\Controllers\ProductCategoryController;
 use App\Controllers\CategoryTypeController;
 use App\Controllers\MeasurementUnitController;
 use App\Controllers\CategoryTypeUnitController;
+use App\Controllers\InnerCategoryTypeController;
 use App\Controllers\LocationTypeCategoryController;
 use App\Controllers\SupplierTypeController;
 use App\Controllers\SupplierController;
@@ -139,6 +140,11 @@ $router->post('/products/categories', [ProductCategoryController::class, 'handle
 // Products management - Category Types
 $router->get('/products/category-types', [CategoryTypeController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/products/category-types', [CategoryTypeController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Products management - Inner Category Types
+$router->get('/products/inner-category-types', [InnerCategoryTypeController::class, 'index'], ['AuthMiddleware']);
+$router->post('/products/inner-category-types', [InnerCategoryTypeController::class, 'handleAction'], ['AuthMiddleware']);
+$router->get('/products/inner-category-types/get-category-types', [InnerCategoryTypeController::class, 'getCategoryTypes'], ['AuthMiddleware']);
 
 // Products management - Measurement Units
 $router->get('/products/measurement-units', [MeasurementUnitController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);

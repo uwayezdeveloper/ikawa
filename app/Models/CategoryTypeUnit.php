@@ -14,6 +14,21 @@ class CategoryTypeUnit extends Model
     protected string $table = 'category_type_units';
 
     /**
+     * Execute first successful query from a list of SQL statements.
+     */
+    protected function fetchAllWithFallback(array $queries, array $params = []): array
+    {
+        foreach ($queries as $sql) {
+            try {
+                return Database::fetchAll($sql, $params);
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * Get all assignments with related data
      */
     public function getAll(): array
@@ -37,7 +52,8 @@ class CategoryTypeUnit extends Model
      */
     public function getGroupedByType(): array
     {
-        $sql = "SELECT ctu.*, 
+        $results = $this->fetchAllWithFallback([
+            "SELECT ctu.*, 
                     ct.name as type_name, 
                     ct.category_id,
                     pc.name as category_name,
@@ -47,9 +63,19 @@ class CategoryTypeUnit extends Model
                 JOIN category_types ct ON ctu.category_type_id = ct.id
                 JOIN product_categories pc ON ct.category_id = pc.id
                 JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
-                ORDER BY pc.name ASC, ct.name ASC, mu.name ASC";
-        
-        $results = Database::fetchAll($sql);
+                ORDER BY pc.name ASC, ct.name ASC, mu.name ASC",
+            "SELECT ctu.*, 
+                    ct.type_name as type_name, 
+                    ct.categ_id as category_id,
+                    pc.categ_name as category_name,
+                    mu.name as unit_name, 
+                    mu.symbol as unit_symbol
+                FROM {$this->table} ctu
+                JOIN tbl_category_types ct ON ctu.category_type_id = ct.type_id
+                JOIN tbl_product_categories pc ON ct.categ_id = pc.categ_id
+                JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
+                ORDER BY pc.categ_name ASC, ct.type_name ASC, mu.name ASC"
+        ]);
         $grouped = [];
         
         foreach ($results as $row) {
@@ -80,12 +106,18 @@ class CategoryTypeUnit extends Model
      */
     public function getUnitsByType(int $typeId): array
     {
-        $sql = "SELECT ctu.*, mu.name as unit_name, mu.symbol as unit_symbol
+        return $this->fetchAllWithFallback([
+            "SELECT ctu.*, mu.name as unit_name, mu.symbol as unit_symbol
                 FROM {$this->table} ctu
                 JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
                 WHERE ctu.category_type_id = :type_id
-                ORDER BY ctu.is_default DESC, mu.name ASC";
-        return Database::fetchAll($sql, ['type_id' => $typeId]);
+                ORDER BY ctu.is_default DESC, mu.name ASC",
+            "SELECT ctu.*, rt.rec_name as unit_name, '' as unit_symbol
+                FROM {$this->table} ctu
+                JOIN tbl_receipttype rt ON ctu.measurement_unit_id = rt.rec_id
+                WHERE ctu.category_type_id = :type_id
+                ORDER BY ctu.is_default DESC, rt.rec_name ASC"
+        ], ['type_id' => $typeId]);
     }
 
     /**
@@ -93,12 +125,20 @@ class CategoryTypeUnit extends Model
      */
     public function getDefaultUnit(int $typeId): ?array
     {
-        $sql = "SELECT ctu.*, mu.name as unit_name, mu.symbol as unit_symbol
+        $rows = $this->fetchAllWithFallback([
+            "SELECT ctu.*, mu.name as unit_name, mu.symbol as unit_symbol
                 FROM {$this->table} ctu
                 JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
                 WHERE ctu.category_type_id = :type_id AND ctu.is_default = 1
-                LIMIT 1";
-        return Database::fetch($sql, ['type_id' => $typeId]);
+                LIMIT 1",
+            "SELECT ctu.*, rt.rec_name as unit_name, '' as unit_symbol
+                FROM {$this->table} ctu
+                JOIN tbl_receipttype rt ON ctu.measurement_unit_id = rt.rec_id
+                WHERE ctu.category_type_id = :type_id AND ctu.is_default = 1
+                LIMIT 1"
+        ], ['type_id' => $typeId]);
+
+        return $rows[0] ?? null;
     }
 
     /**
@@ -106,6 +146,10 @@ class CategoryTypeUnit extends Model
      */
     public function assignUnit(int $typeId, int $unitId, bool $isDefault = false): int
     {
+        if ($typeId <= 0 || $unitId <= 0) {
+            return 0;
+        }
+
         // If setting as default, first remove any existing default
         if ($isDefault) {
             $this->clearDefault($typeId);
@@ -186,13 +230,17 @@ class CategoryTypeUnit extends Model
      */
     public function bulkAssign(int $typeId, array $unitIds, ?int $defaultUnitId = null): bool
     {
+        $unitIds = array_values(array_unique(array_filter(array_map('intval', $unitIds), static function (int $id): bool {
+            return $id > 0;
+        })));
+
         // First remove all existing assignments for this type
         $sql = "DELETE FROM {$this->table} WHERE category_type_id = :type_id";
         Database::query($sql, ['type_id' => $typeId]);
         
         // Then add new assignments
         foreach ($unitIds as $unitId) {
-            $isDefault = ($defaultUnitId !== null && (int)$unitId === $defaultUnitId);
+            $isDefault = ($defaultUnitId !== null && (int)$unitId === (int)$defaultUnitId);
             $this->assignUnit($typeId, (int)$unitId, $isDefault);
         }
         
@@ -204,12 +252,19 @@ class CategoryTypeUnit extends Model
      */
     public function getTypesWithoutUnits(): array
     {
-        $sql = "SELECT ct.*, pc.name as category_name
+        return $this->fetchAllWithFallback([
+            "SELECT ct.*, pc.name as category_name
                 FROM category_types ct
                 JOIN product_categories pc ON ct.category_id = pc.id
                 LEFT JOIN {$this->table} ctu ON ct.id = ctu.category_type_id
                 WHERE ctu.id IS NULL AND ct.status = 'active'
-                ORDER BY pc.name ASC, ct.name ASC";
-        return Database::fetchAll($sql);
+                ORDER BY pc.name ASC, ct.name ASC",
+            "SELECT ct.*, pc.categ_name as category_name
+                FROM tbl_category_types ct
+                JOIN tbl_product_categories pc ON ct.categ_id = pc.categ_id
+                LEFT JOIN {$this->table} ctu ON ct.type_id = ctu.category_type_id
+                WHERE ctu.id IS NULL AND ct.sts = 1
+                ORDER BY pc.categ_name ASC, ct.type_name ASC"
+        ]);
     }
 }

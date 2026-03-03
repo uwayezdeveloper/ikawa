@@ -218,6 +218,11 @@
                                 </a>
                             </li>
                             <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/products/inner-category-types" class="side-nav-link">
+                                    <span class="menu-text">Inner Category Types</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/products/measurement-units" class="side-nav-link">
                                     <span class="menu-text">Measurement Units</span>
                                 </a>

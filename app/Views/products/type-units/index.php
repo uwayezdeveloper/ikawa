@@ -1,6 +1,17 @@
 <?php
 $permissions = $user['permissions'] ?? [];
-$canManage = in_array('manage-type-unit-assignments', $permissions);
+if (is_string($permissions)) {
+    $decodedPermissions = json_decode($permissions, true);
+    if (is_array($decodedPermissions)) {
+        $permissions = $decodedPermissions;
+    } else {
+        $permissions = array_filter(array_map('trim', explode(',', $permissions)));
+    }
+}
+if (!is_array($permissions)) {
+    $permissions = [];
+}
+$canManage = in_array('manage-type-unit-assignments', $permissions, true);
 ?>
 
 <!-- Page Header -->
@@ -180,7 +191,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                     <td>
                         <?php 
-                        $defaultUnit = array_filter($assignment['units'], fn($u) => $u['is_default']);
+                        $defaultUnit = array_filter($assignment['units'], function ($u) {
+                            return !empty($u['is_default']);
+                        });
                         $defaultUnit = reset($defaultUnit);
                         ?>
                         <?php if ($defaultUnit): ?>

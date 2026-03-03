@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Database;
 use App\Models\CategoryTypeUnit;
 use App\Models\CategoryType;
 use App\Models\MeasurementUnit;
@@ -36,7 +37,21 @@ class CategoryTypeUnitController extends Controller
         if (!$user) return false;
         
         $permissions = $user['permissions'] ?? [];
-        return in_array($permission, $permissions);
+
+        if (is_string($permissions)) {
+            $decoded = json_decode($permissions, true);
+            if (is_array($decoded)) {
+                $permissions = $decoded;
+            } else {
+                $permissions = array_filter(array_map('trim', explode(',', $permissions)));
+            }
+        }
+
+        if (!is_array($permissions)) {
+            $permissions = [];
+        }
+
+        return in_array($permission, $permissions, true);
     }
 
     /**
@@ -49,21 +64,99 @@ class CategoryTypeUnitController extends Controller
             $response->redirect(APP_URL . '/dashboard');
             return;
         }
-        
-        $assignments = $this->assignmentModel->getGroupedByType();
-        $categoryTypes = $this->typeModel->getActive();
-        $measurementUnits = $this->unitModel->getActive();
-        $typesWithoutUnits = $this->assignmentModel->getTypesWithoutUnits();
-        
-        $this->view('products/type-units/index', [
-            'assignments' => $assignments,
-            'categoryTypes' => $categoryTypes,
-            'measurementUnits' => $measurementUnits,
-            'typesWithoutUnits' => $typesWithoutUnits,
-            'user' => $_SESSION['user'] ?? [],
-            'pageTitle' => 'Type Unit Assignments',
-            'scripts' => ['js/pages/custom-table.js']
-        ], 'main');
+
+        try {
+            $assignments = [];
+            $categoryTypes = [];
+            $measurementUnits = [];
+            $typesWithoutUnits = [];
+
+            try {
+                $assignments = $this->assignmentModel->getGroupedByType();
+            } catch (\Throwable $e) {
+                $assignments = [];
+            }
+
+            try {
+                $categoryTypes = $this->typeModel->getActive();
+            } catch (\Throwable $e) {
+                $categoryTypes = [];
+            }
+
+            if (empty($categoryTypes)) {
+                try {
+                    $categoryTypes = Database::fetchAll(
+                        "SELECT ct.type_id AS id, ct.type_name AS name, ct.categ_id AS category_id, pc.categ_name AS category_name
+                         FROM tbl_category_types ct
+                         JOIN tbl_product_categories pc ON ct.categ_id = pc.categ_id
+                         WHERE ct.sts = 1
+                         ORDER BY pc.categ_name ASC, ct.type_name ASC"
+                    );
+                } catch (\Throwable $e) {
+                    $categoryTypes = [];
+                }
+            }
+
+            $categoryTypes = array_map(static function (array $type): array {
+                return [
+                    'id' => (int) ($type['id'] ?? $type['type_id'] ?? 0),
+                    'name' => (string) ($type['name'] ?? $type['type_name'] ?? ''),
+                    'category_id' => (int) ($type['category_id'] ?? $type['categ_id'] ?? 0),
+                    'category_name' => (string) ($type['category_name'] ?? $type['categ_name'] ?? ''),
+                ];
+            }, is_array($categoryTypes) ? $categoryTypes : []);
+
+            try {
+                $measurementUnits = $this->unitModel->getActive();
+            } catch (\Throwable $e) {
+                $measurementUnits = [];
+            }
+
+            if (empty($measurementUnits)) {
+                try {
+                    $measurementUnits = Database::fetchAll(
+                        "SELECT rec_id AS id, rec_name AS name, '' AS symbol FROM tbl_receipttype WHERE sts = 1 ORDER BY rec_name ASC"
+                    );
+                } catch (\Throwable $e) {
+                    $measurementUnits = [];
+                }
+            }
+
+            $measurementUnits = array_map(static function (array $unit): array {
+                return [
+                    'id' => (int) ($unit['id'] ?? $unit['rec_id'] ?? 0),
+                    'name' => (string) ($unit['name'] ?? $unit['rec_name'] ?? ''),
+                    'symbol' => (string) ($unit['symbol'] ?? ''),
+                ];
+            }, is_array($measurementUnits) ? $measurementUnits : []);
+
+            try {
+                $typesWithoutUnits = $this->assignmentModel->getTypesWithoutUnits();
+            } catch (\Throwable $e) {
+                $typesWithoutUnits = [];
+            }
+
+            $typesWithoutUnits = array_map(static function (array $type): array {
+                return [
+                    'name' => (string) ($type['name'] ?? $type['type_name'] ?? ''),
+                    'category_name' => (string) ($type['category_name'] ?? $type['categ_name'] ?? ''),
+                ];
+            }, is_array($typesWithoutUnits) ? $typesWithoutUnits : []);
+            
+            $this->view('products/type-units/index', [
+                'assignments' => $assignments,
+                'categoryTypes' => $categoryTypes,
+                'measurementUnits' => $measurementUnits,
+                'typesWithoutUnits' => $typesWithoutUnits,
+                'user' => $_SESSION['user'] ?? [],
+                'pageTitle' => 'Type Unit Assignments',
+                'scripts' => ['js/pages/custom-table.js']
+            ], 'main');
+        } catch (\Throwable $e) {
+            error_log('CategoryTypeUnitController index error: ' . $e->getMessage());
+            $_SESSION['flash_error'] = 'Failed to load type-unit assignments';
+            $response->redirect(APP_URL . '/dashboard');
+        }
     }
 
     /**
@@ -105,7 +198,13 @@ class CategoryTypeUnitController extends Controller
     protected function assignUnits(array $data, Response $response): void
     {
         $typeId = (int)($data['category_type_id'] ?? 0);
-        $unitIds = $data['unit_ids'] ?? [];
+        $rawUnitIds = $data['unit_ids'] ?? [];
+        if (!is_array($rawUnitIds)) {
+            $rawUnitIds = [$rawUnitIds];
+        }
+        $unitIds = array_values(array_unique(array_filter(array_map('intval', $rawUnitIds), static function (int $id): bool {
+            return $id > 0;
+        })));
         $defaultUnitId = !empty($data['default_unit_id']) ? (int)$data['default_unit_id'] : null;
         
         if ($typeId <= 0) {
@@ -114,14 +213,16 @@ class CategoryTypeUnitController extends Controller
             return;
         }
         
+        // Clear-all action: valid type but no valid selected units
         if (empty($unitIds)) {
-            $_SESSION['flash_error'] = 'Please select at least one measurement unit';
+            $this->assignmentModel->bulkAssign($typeId, [], null);
+            $_SESSION['flash_success'] = 'All unit assignments cleared successfully';
             $response->redirect(APP_URL . '/products/type-units');
             return;
         }
         
         // Validate default unit is in the selected units
-        if ($defaultUnitId && !in_array($defaultUnitId, $unitIds)) {
+        if ($defaultUnitId && !in_array($defaultUnitId, $unitIds, true)) {
             $defaultUnitId = (int)$unitIds[0]; // Use first unit as default
         }
         
@@ -184,7 +285,13 @@ class CategoryTypeUnitController extends Controller
         header('Content-Type: application/json');
         
         $typeId = (int)($data['category_type_id'] ?? 0);
-        $unitIds = $data['unit_ids'] ?? [];
+        $rawUnitIds = $data['unit_ids'] ?? [];
+        if (!is_array($rawUnitIds)) {
+            $rawUnitIds = [$rawUnitIds];
+        }
+        $unitIds = array_values(array_unique(array_filter(array_map('intval', $rawUnitIds), static function (int $id): bool {
+            return $id > 0;
+        })));
         $defaultUnitId = !empty($data['default_unit_id']) ? (int)$data['default_unit_id'] : null;
         
         if ($typeId <= 0) {
@@ -193,7 +300,8 @@ class CategoryTypeUnitController extends Controller
         }
         
         if (empty($unitIds)) {
-            echo json_encode(['success' => false, 'message' => 'Please select at least one unit']);
+            $this->assignmentModel->bulkAssign($typeId, [], null);
+            echo json_encode(['success' => true, 'message' => 'All unit assignments cleared successfully']);
             exit;
         }
         

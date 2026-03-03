@@ -48,6 +48,14 @@ class CategoryType extends Model
     }
 
     /**
+     * Get category types by category ID
+     */
+    public function getByCategoryId(int $categoryId): array
+    {
+        return $this->getByCategory($categoryId);
+    }
+
+    /**
      * Find category type by ID
      */
     public function findById(int $id): ?array
