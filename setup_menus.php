@@ -52,7 +52,8 @@ try {
         ['Expense Management', 'expenses'],
         ['Non-Exploitable Mgmt', 'non-exploitable'],
         ['Certification', 'certification'],
-        ['Property Management', 'properties']
+        ['Property Management', 'properties'],
+        ['Account Reconciliation', 'account-reconciliation']
     ];
 
     $insertMenu = $pdo->prepare("INSERT INTO tbl_menus (menu_name, menu_identifier, status)

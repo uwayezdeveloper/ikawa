@@ -50,6 +50,7 @@ use App\Controllers\PropertyController;
 use App\Controllers\PropertyTypeController;
 use App\Controllers\CertificationController;
 use App\Controllers\CertificationTransactionController;
+use App\Controllers\AccountReconciliationController;
 $app = Application::getInstance();
 $router = $app->getRouter();
 
@@ -386,6 +387,13 @@ $router->get('/certification/categories', [CertificationController::class, 'inde
 $router->post('/certification/categories', [CertificationController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/certification/transactions', [CertificationTransactionController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/certification/transactions', [CertificationTransactionController::class, 'handleAction'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
+// ACCOUNT RECONCILIATION ROUTES
+// ============================================
+
+$router->get('/reconciliation', [AccountReconciliationController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/reconciliation/view-all-accounts', [AccountReconciliationController::class, 'viewAllAccounts'], ['AuthMiddleware', 'AdminMiddleware']);
 
 
 // ============================================

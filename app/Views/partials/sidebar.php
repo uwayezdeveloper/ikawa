@@ -107,7 +107,8 @@
                     $hasMenu('expenses') ||
                     $hasMenu('non-exploitable') ||
                     $hasMenu('certification') ||
-                    $hasMenu('properties');
+                    $hasMenu('properties') ||
+                    $hasMenu('account-reconciliation');
                 ?>
 
                 <?php if ($hasAnyManagementMenu): ?>
@@ -392,6 +393,33 @@
                                 </a>
                             </li>
                             
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
+
+                <!-- Account Reconciliation -->
+                <?php if ($hasMenu('account-reconciliation')): ?>
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#reconciliationMenu" aria-expanded="false" aria-controls="reconciliationMenu"
+                        class="side-nav-link">
+                        <span class="menu-icon"><i class="ti ti-file-check"></i></span>
+                        <span class="menu-text">Account Reconciliation</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+
+                    <div class="collapse" id="reconciliationMenu">
+                        <ul class="side-nav-second-level">
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/reconciliation" class="side-nav-link">
+                                    <span class="menu-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/reconciliation/view-all-accounts" class="side-nav-link">
+                                    <span class="menu-text">View All Accounts</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
