@@ -264,4 +264,146 @@ class StationFinanceController extends Controller
             return $response->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+
+    /**
+     * Show withdraw page (same-location account transfer)
+     */
+    public function withdraw($request, $response)
+    {
+        $user = $_SESSION['user'] ?? null;
+
+        if (!$this->hasPermission('view-station-finances')) {
+            return $response->redirect(APP_URL . '/dashboard');
+        }
+
+        $userLocationId = (int)($user['location_id'] ?? 0);
+        if ($userLocationId <= 0) {
+            $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/finance/station-finances');
+        }
+
+        $location = $this->locationModel->find($userLocationId);
+        $accounts = $this->accountModel->getByLocation($userLocationId);
+
+        return View::render('finance/station-finance/withdraw', [
+            'title' => 'Withdraw',
+            'user' => $user,
+            'location' => $location,
+            'accounts' => $accounts,
+        ], 'main');
+    }
+
+    /**
+     * Process withdraw (transfer within logged-in user's location)
+     */
+    public function processWithdraw($request, $response)
+    {
+        $user = $_SESSION['user'] ?? null;
+
+        if (!$this->hasPermission('view-station-finances')) {
+            return $response->redirect(APP_URL . '/dashboard');
+        }
+
+        $userLocationId = (int)($user['location_id'] ?? 0);
+        if ($userLocationId <= 0) {
+            $_SESSION['errors'] = ['general' => 'Your account has no location assigned.'];
+            return $response->redirect(APP_URL . '/finance/station-finances/withdraw');
+        }
+
+        $fromAccountId = (int)($_POST['from_account_id'] ?? 0);
+        $toAccountId = (int)($_POST['to_account_id'] ?? 0);
+        $amount = (float)($_POST['amount'] ?? 0);
+        $description = trim((string)($_POST['description'] ?? ''));
+
+        $errors = [];
+
+        if ($fromAccountId <= 0) {
+            $errors['from_account_id'] = 'Source account is required.';
+        }
+
+        if ($toAccountId <= 0) {
+            $errors['to_account_id'] = 'Destination account is required.';
+        }
+
+        if ($fromAccountId > 0 && $toAccountId > 0 && $fromAccountId === $toAccountId) {
+            $errors['to_account_id'] = 'Source and destination accounts cannot be the same.';
+        }
+
+        if ($amount <= 0) {
+            $errors['amount'] = 'Amount must be greater than 0.';
+        }
+
+        if ($description === '') {
+            $errors['description'] = 'Description is required.';
+        }
+
+        $fromAccount = null;
+        $toAccount = null;
+
+        if (empty($errors)) {
+            $fromAccount = $this->accountModel->findById($fromAccountId);
+            $toAccount = $this->accountModel->findById($toAccountId);
+
+            if (!$fromAccount || (int)($fromAccount['location_id'] ?? 0) !== $userLocationId) {
+                $errors['from_account_id'] = 'Source account must belong to your location.';
+            }
+
+            if (!$toAccount || (int)($toAccount['location_id'] ?? 0) !== $userLocationId) {
+                $errors['to_account_id'] = 'Destination account must belong to your location.';
+            }
+
+            if ($fromAccount && (float)($fromAccount['balance'] ?? 0) < $amount) {
+                $errors['amount'] = 'Insufficient balance in source account.';
+            }
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['errors'] = $errors;
+            $_SESSION['old'] = [
+                'from_account_id' => $fromAccountId,
+                'to_account_id' => $toAccountId,
+                'amount' => $_POST['amount'] ?? '',
+                'description' => $description,
+            ];
+            return $response->redirect(APP_URL . '/finance/station-finances/withdraw');
+        }
+
+        try {
+            Database::query("START TRANSACTION");
+
+            $this->transactionModel->createDebit(
+                $fromAccountId,
+                $amount,
+                'station_withdraw',
+                $toAccountId,
+                'Withdraw transfer to ' . ($toAccount['account_name'] ?? ('Account #' . $toAccountId)) . ': ' . $description,
+                (int)($user['id'] ?? 0)
+            );
+
+            $this->transactionModel->createCredit(
+                $toAccountId,
+                $amount,
+                'station_withdraw',
+                $fromAccountId,
+                'Withdraw transfer from ' . ($fromAccount['account_name'] ?? ('Account #' . $fromAccountId)) . ': ' . $description,
+                (int)($user['id'] ?? 0)
+            );
+
+            Database::query("COMMIT");
+
+            $_SESSION['flash_success'] = 'Withdraw transfer completed successfully.';
+            return $response->redirect(APP_URL . '/finance/station-finances/withdraw');
+        } catch (\Exception $e) {
+            Database::query("ROLLBACK");
+
+            $_SESSION['errors'] = ['general' => 'Failed to process transfer: ' . $e->getMessage()];
+            $_SESSION['old'] = [
+                'from_account_id' => $fromAccountId,
+                'to_account_id' => $toAccountId,
+                'amount' => $_POST['amount'] ?? '',
+                'description' => $description,
+            ];
+            return $response->redirect(APP_URL . '/finance/station-finances/withdraw');
+        }
+    }
 }

@@ -327,6 +327,11 @@
                                 </a>
                             </li>
                             <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/station-finances/withdraw" class="side-nav-link">
+                                    <span class="menu-text">Withdraw</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/accounts" class="side-nav-link">
                                     <span class="menu-text">Accounts</span>
                                 </a>
@@ -486,6 +491,11 @@
                             <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/station-finances" class="side-nav-link">
                                     <span class="menu-text">Station Finances</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/station-finances/withdraw" class="side-nav-link">
+                                    <span class="menu-text">Withdraw</span>
                                 </a>
                             </li>
                             <!-- <li class="side-nav-item">
