@@ -53,6 +53,7 @@ $old = $_SESSION['old'] ?? [];
                 <div class="alert alert-warning mb-0">No active accounts found for your location.</div>
                 <?php else: ?>
                 <form method="POST" action="<?= APP_URL ?>/finance/station-finances/withdraw">
+                    <input type="hidden" name="withdraw_token" value="<?= htmlspecialchars((string)($withdrawToken ?? '')) ?>">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="from_account_id" class="form-label">From Account <span class="text-danger">*</span></label>
@@ -103,7 +104,7 @@ $old = $_SESSION['old'] ?? [];
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">Process Withdraw</button>
+                        <button type="submit" class="btn btn-primary" id="processWithdrawBtn">Process Withdraw</button>
                     </div>
                 </form>
                 <?php endif; ?>
@@ -123,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var fromSelect = document.getElementById('from_account_id');
     var amountInput = document.getElementById('amount');
+    var submitBtn = document.getElementById('processWithdrawBtn');
 
     form.addEventListener('submit', function (e) {
         if (!fromSelect || !amountInput) return;
@@ -134,6 +136,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (amount > balance) {
             e.preventDefault();
             alert('Amount exceeds source account balance.');
+            return;
+        }
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
         }
     });
 });

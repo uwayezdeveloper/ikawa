@@ -120,9 +120,10 @@ class AccountTransaction extends Model
         $balanceAfter = $balanceBefore - $amount;
 
         $transactionNumber = $this->generateTransactionNumber();
+        $now = date('Y-m-d H:i:s');
         
-        $sql = "INSERT INTO {$this->table} (transaction_number, account_id, transaction_type, amount, balance_before, balance_after, reference_type, reference_id, description, transaction_date, created_by) 
-                VALUES (:transaction_number, :account_id, 'debit', :amount, :balance_before, :balance_after, :reference_type, :reference_id, :description, :transaction_date, :created_by)";
+        $sql = "INSERT INTO {$this->table} (transaction_number, account_id, transaction_type, amount, balance_before, balance_after, reference_type, reference_id, description, transaction_date, created_by, created_at) 
+            VALUES (:transaction_number, :account_id, 'debit', :amount, :balance_before, :balance_after, :reference_type, :reference_id, :description, :transaction_date, :created_by, :created_at)";
         
         Database::query($sql, [
             'transaction_number' => $transactionNumber,
@@ -133,7 +134,8 @@ class AccountTransaction extends Model
             'reference_type' => $referenceType,
             'reference_id' => $referenceId,
             'description' => $description,
-            'transaction_date' => date('Y-m-d'),
+            'transaction_date' => date('Y-m-d', strtotime($now)),
+            'created_at' => $now,
             'created_by' => $createdBy
         ]);
 
@@ -157,9 +159,10 @@ class AccountTransaction extends Model
         $balanceAfter = $balanceBefore + $amount;
 
         $transactionNumber = $this->generateTransactionNumber();
+        $now = date('Y-m-d H:i:s');
         
-        $sql = "INSERT INTO {$this->table} (transaction_number, account_id, transaction_type, amount, balance_before, balance_after, reference_type, reference_id, description, transaction_date, created_by) 
-                VALUES (:transaction_number, :account_id, 'credit', :amount, :balance_before, :balance_after, :reference_type, :reference_id, :description, :transaction_date, :created_by)";
+        $sql = "INSERT INTO {$this->table} (transaction_number, account_id, transaction_type, amount, balance_before, balance_after, reference_type, reference_id, description, transaction_date, created_by, created_at) 
+            VALUES (:transaction_number, :account_id, 'credit', :amount, :balance_before, :balance_after, :reference_type, :reference_id, :description, :transaction_date, :created_by, :created_at)";
         
         Database::query($sql, [
             'transaction_number' => $transactionNumber,
@@ -170,7 +173,8 @@ class AccountTransaction extends Model
             'reference_type' => $referenceType,
             'reference_id' => $referenceId,
             'description' => $description,
-            'transaction_date' => date('Y-m-d'),
+            'transaction_date' => date('Y-m-d', strtotime($now)),
+            'created_at' => $now,
             'created_by' => $createdBy
         ]);
 

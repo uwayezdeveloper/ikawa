@@ -284,12 +284,15 @@ class StationFinanceController extends Controller
 
         $location = $this->locationModel->find($userLocationId);
         $accounts = $this->accountModel->getByLocation($userLocationId);
+        $withdrawToken = bin2hex(random_bytes(16));
+        $_SESSION['withdraw_token'] = $withdrawToken;
 
         return View::render('finance/station-finance/withdraw', [
             'title' => 'Withdraw',
             'user' => $user,
             'location' => $location,
             'accounts' => $accounts,
+            'withdrawToken' => $withdrawToken,
         ], 'main');
     }
 
@@ -314,8 +317,15 @@ class StationFinanceController extends Controller
         $toAccountId = (int)($_POST['to_account_id'] ?? 0);
         $amount = (float)($_POST['amount'] ?? 0);
         $description = trim((string)($_POST['description'] ?? ''));
+        $formToken = (string)($_POST['withdraw_token'] ?? '');
+        $sessionToken = (string)($_SESSION['withdraw_token'] ?? '');
+        unset($_SESSION['withdraw_token']);
 
         $errors = [];
+
+        if ($formToken === '' || $sessionToken === '' || !hash_equals($sessionToken, $formToken)) {
+            $errors['general'] = 'Duplicate or invalid submission detected. Please try again.';
+        }
 
         if ($fromAccountId <= 0) {
             $errors['from_account_id'] = 'Source account is required.';
@@ -371,12 +381,39 @@ class StationFinanceController extends Controller
         try {
             Database::query("START TRANSACTION");
 
+            $debitDescription = 'Withdraw transfer to ' . ($toAccount['account_name'] ?? ('Account #' . $toAccountId)) . ': ' . $description;
+            $creditDescription = 'Withdraw transfer from ' . ($fromAccount['account_name'] ?? ('Account #' . $fromAccountId)) . ': ' . $description;
+
+            $duplicateCredit = Database::fetch(
+                "SELECT id FROM account_transactions
+                 WHERE account_id = :to_account_id
+                   AND transaction_type = 'credit'
+                   AND reference_type = 'station_withdraw'
+                   AND reference_id = :from_account_id
+                   AND amount = :amount
+                   AND created_by = :created_by
+                   AND description = :description
+                   AND created_at >= DATE_SUB(NOW(), INTERVAL 10 SECOND)
+                 LIMIT 1",
+                [
+                    'to_account_id' => $toAccountId,
+                    'from_account_id' => $fromAccountId,
+                    'amount' => $amount,
+                    'created_by' => (int)($user['id'] ?? 0),
+                    'description' => $creditDescription,
+                ]
+            );
+
+            if ($duplicateCredit) {
+                throw new \RuntimeException('Duplicate withdraw submission detected.');
+            }
+
             $this->transactionModel->createDebit(
                 $fromAccountId,
                 $amount,
                 'station_withdraw',
                 $toAccountId,
-                'Withdraw transfer to ' . ($toAccount['account_name'] ?? ('Account #' . $toAccountId)) . ': ' . $description,
+                $debitDescription,
                 (int)($user['id'] ?? 0)
             );
 
@@ -385,7 +422,7 @@ class StationFinanceController extends Controller
                 $amount,
                 'station_withdraw',
                 $fromAccountId,
-                'Withdraw transfer from ' . ($fromAccount['account_name'] ?? ('Account #' . $fromAccountId)) . ': ' . $description,
+                $creditDescription,
                 (int)($user['id'] ?? 0)
             );
 
@@ -405,5 +442,384 @@ class StationFinanceController extends Controller
             ];
             return $response->redirect(APP_URL . '/finance/station-finances/withdraw');
         }
+    }
+
+    /**
+     * Location journal report page
+     */
+    public function journal($request, $response)
+    {
+        $user = $_SESSION['user'] ?? null;
+
+        if (!$this->hasPermission('view-station-finances')) {
+            return $response->redirect(APP_URL . '/dashboard');
+        }
+
+        $locationId = (int)($user['location_id'] ?? 0);
+        if ($locationId <= 0) {
+            $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/finance/station-finances');
+        }
+
+        $dateFrom = trim((string)($_GET['date_from'] ?? ''));
+        $dateTo = trim((string)($_GET['date_to'] ?? ''));
+
+        $location = $this->locationModel->find($locationId);
+        try {
+            $journal = $this->getLocationJournalData($locationId, $dateFrom ?: null, $dateTo ?: null);
+        } catch (\Throwable $e) {
+            $journal = [
+                'rows' => [],
+                'totals' => ['debit' => 0.0, 'credit' => 0.0, 'balance' => 0.0],
+            ];
+            $_SESSION['flash_error'] = 'Failed to load journal data. Please contact administrator.';
+        }
+
+        return View::render('finance/station-finance/journal', [
+            'title' => 'Location Journal',
+            'user' => $user,
+            'location' => $location,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'journalRows' => $journal['rows'],
+            'journalTotals' => $journal['totals'],
+            'scripts' => ['js/pages/station-journal.js']
+        ], 'main');
+    }
+
+    private function getLocationJournalData(int $locationId, ?string $dateFrom = null, ?string $dateTo = null): array
+    {
+        $events = [];
+        $sortSeq = 0;
+
+        $accounts = Database::fetchAll("SELECT id, account_name, account_number, location_id FROM accounts");
+        $accountMap = [];
+        $locationAccountIds = [];
+        foreach ($accounts as $acc) {
+            $label = $acc['account_name'];
+            if (!empty($acc['account_number'])) {
+                $label .= ' (' . $acc['account_number'] . ')';
+            }
+            $accountMap[(int)$acc['id']] = $label;
+            if ((int)($acc['location_id'] ?? 0) === $locationId) {
+                $locationAccountIds[] = (int)$acc['id'];
+            }
+        }
+        $locationAccountIds = array_values(array_unique($locationAccountIds));
+
+        // Recharge history for this location (external receive money only)
+         $rechargeSql = "SELECT rh.rech_id, rh.amount, rh.due_date, rh.acc_id, rh.to_account,
+                       src.account_name AS src_account_name,
+                       src.account_number AS src_account_number,
+                       src.location_id AS src_location_id,
+                       dst.account_name AS dst_account_name,
+                       dst.account_number AS dst_account_number,
+                       dst.location_id AS dst_location_id
+                   FROM tbl_recharge_history rh
+                   LEFT JOIN accounts src ON rh.acc_id = src.id
+                   LEFT JOIN accounts dst ON rh.to_account = dst.id
+                   WHERE (src.location_id = :src_location_id OR dst.location_id = :dst_location_id)";
+
+        $rechargeParams = ['src_location_id' => $locationId, 'dst_location_id' => $locationId];
+        if ($dateFrom) {
+            $rechargeSql .= " AND DATE(rh.due_date) >= :date_from";
+            $rechargeParams['date_from'] = $dateFrom;
+        }
+        if ($dateTo) {
+            $rechargeSql .= " AND DATE(rh.due_date) <= :date_to";
+            $rechargeParams['date_to'] = $dateTo;
+        }
+        $rechargeSql .= " ORDER BY rh.due_date ASC, rh.rech_id ASC";
+
+        $recharges = Database::fetchAll($rechargeSql, $rechargeParams);
+        foreach ($recharges as $row) {
+            $srcLocationId = (int)($row['src_location_id'] ?? 0);
+            $dstLocationId = (int)($row['dst_location_id'] ?? 0);
+            $toAccountId = (int)($row['to_account'] ?? 0);
+
+            $srcLabel = (string)($row['src_account_name'] ?? 'N/A');
+            if (!empty($row['src_account_number'])) {
+                $srcLabel .= ' (' . $row['src_account_number'] . ')';
+            }
+
+            $dstLabel = (string)($row['dst_account_name'] ?? 'N/A');
+            if (!empty($row['dst_account_number'])) {
+                $dstLabel .= ' (' . $row['dst_account_number'] . ')';
+            }
+
+            $amount = (float)$row['amount'];
+
+            // Classic recharge (money coming into source account from outside)
+            if ($toAccountId <= 0) {
+                if ($srcLocationId === $locationId) {
+                    $events[] = [
+                        'sort_datetime' => $row['due_date'],
+                        'sort_seq' => ++$sortSeq,
+                        'date' => date('Y-m-d', strtotime($row['due_date'])),
+                        'description' => 'receive money',
+                        'bank_cash' => $srcLabel,
+                        'debit' => $amount,
+                        'credit' => 0.0,
+                    ];
+                }
+            }
+        }
+
+        // Paid-out entries from account transactions (only successful payments)
+        $paidOutSql = "SELECT at.created_at, at.amount, at.reference_type, at.description,
+                              a.account_name, a.account_number
+                       FROM account_transactions at
+                       INNER JOIN accounts a ON at.account_id = a.id
+                       WHERE a.location_id = :location_id
+                         AND at.transaction_type = 'debit'
+                         AND at.reference_type IN ('stock_receive', 'supplier_advance', 'payable_payment')";
+
+        $paidOutParams = ['location_id' => $locationId];
+        if ($dateFrom) {
+            $paidOutSql .= " AND DATE(at.created_at) >= :date_from";
+            $paidOutParams['date_from'] = $dateFrom;
+        }
+        if ($dateTo) {
+            $paidOutSql .= " AND DATE(at.created_at) <= :date_to";
+            $paidOutParams['date_to'] = $dateTo;
+        }
+        $paidOutSql .= " ORDER BY at.created_at ASC, at.id ASC";
+
+        $paidOutRows = Database::fetchAll($paidOutSql, $paidOutParams);
+        foreach ($paidOutRows as $row) {
+            $bankCash = $row['account_name'];
+            if (!empty($row['account_number'])) {
+                $bankCash .= ' (' . $row['account_number'] . ')';
+            }
+
+            $referenceType = strtolower((string)($row['reference_type'] ?? ''));
+            $baseDescription = 'payment';
+            if ($referenceType === 'stock_receive') {
+                $baseDescription = 'purchase';
+            } elseif ($referenceType === 'supplier_advance') {
+                $baseDescription = 'advance';
+            } elseif ($referenceType === 'payable_payment') {
+                $baseDescription = 'payment';
+            }
+
+            $desc = $baseDescription;
+            if (!empty($row['description'])) {
+                $desc .= ' - ' . $row['description'];
+            }
+
+            $events[] = [
+                'sort_datetime' => $row['created_at'],
+                'sort_seq' => ++$sortSeq,
+                'date' => date('Y-m-d', strtotime($row['created_at'])),
+                'description' => $desc,
+                'bank_cash' => $bankCash,
+                'debit' => 0.0,
+                'credit' => (float)$row['amount'],
+            ];
+        }
+
+                // Station withdraw transfers (incoming to account only)
+        $withdrawSql = "SELECT at.id, at.reference_id, at.created_at, at.transaction_type, at.amount, at.description,
+                               a.account_name, a.account_number,
+                               ref.account_name AS ref_account_name,
+                               ref.account_number AS ref_account_number
+                        FROM account_transactions at
+                        INNER JOIN accounts a ON at.account_id = a.id
+                        LEFT JOIN accounts ref ON at.reference_id = ref.id
+                        WHERE a.location_id = :location_id
+                                                    AND at.reference_type = 'station_withdraw'
+                                                    AND at.transaction_type = 'credit'";
+
+        $withdrawParams = ['location_id' => $locationId];
+        if ($dateFrom) {
+            $withdrawSql .= " AND DATE(at.created_at) >= :date_from";
+            $withdrawParams['date_from'] = $dateFrom;
+        }
+        if ($dateTo) {
+            $withdrawSql .= " AND DATE(at.created_at) <= :date_to";
+            $withdrawParams['date_to'] = $dateTo;
+        }
+        $withdrawSql .= " ORDER BY at.created_at ASC, at.id ASC";
+
+        $withdrawRows = Database::fetchAll($withdrawSql, $withdrawParams);
+        foreach ($withdrawRows as $row) {
+            $bankCash = $row['account_name'];
+            if (!empty($row['account_number'])) {
+                $bankCash .= ' (' . $row['account_number'] . ')';
+            }
+
+            $refBankCash = $row['ref_account_name'] ?? ('Account #' . (int)($row['reference_id'] ?? 0));
+            if (!empty($row['ref_account_number'])) {
+                $refBankCash .= ' (' . $row['ref_account_number'] . ')';
+            }
+
+            $desc = 'withdraw transfer in - from ' . $refBankCash;
+
+            $events[] = [
+                'sort_datetime' => $row['created_at'],
+                'sort_seq' => ++$sortSeq,
+                'date' => date('Y-m-d', strtotime($row['created_at'])),
+                'description' => $desc,
+                'bank_cash' => $bankCash,
+                'debit' => (float)$row['amount'],
+                'credit' => 0.0,
+            ];
+        }
+
+        // Other account transactions history for this location (global transfers/adjustments/other operations)
+        $otherTxnSql = "SELECT at.id, at.created_at, at.transaction_type, at.amount, at.reference_type, at.description,
+                               a.account_name, a.account_number
+                        FROM account_transactions at
+                        INNER JOIN accounts a ON at.account_id = a.id
+                        WHERE a.location_id = :location_id
+                          AND at.reference_type NOT IN ('stock_receive', 'supplier_advance', 'payable_payment', 'station_withdraw')";
+
+        $otherTxnParams = ['location_id' => $locationId];
+        if ($dateFrom) {
+            $otherTxnSql .= " AND DATE(at.created_at) >= :date_from";
+            $otherTxnParams['date_from'] = $dateFrom;
+        }
+        if ($dateTo) {
+            $otherTxnSql .= " AND DATE(at.created_at) <= :date_to";
+            $otherTxnParams['date_to'] = $dateTo;
+        }
+        $otherTxnSql .= " ORDER BY at.created_at ASC, at.id ASC";
+
+        $otherTxnRows = Database::fetchAll($otherTxnSql, $otherTxnParams);
+        foreach ($otherTxnRows as $row) {
+            $bankCash = $row['account_name'];
+            if (!empty($row['account_number'])) {
+                $bankCash .= ' (' . $row['account_number'] . ')';
+            }
+
+            $refType = trim((string)($row['reference_type'] ?? 'operation'));
+            $refLabel = str_replace('_', ' ', strtolower($refType));
+            $desc = $refLabel;
+            if (!empty($row['description'])) {
+                $desc .= ' - ' . $row['description'];
+            }
+
+            $isCredit = strtolower((string)($row['transaction_type'] ?? '')) === 'credit';
+            $events[] = [
+                'sort_datetime' => $row['created_at'],
+                'sort_seq' => ++$sortSeq,
+                'date' => date('Y-m-d', strtotime($row['created_at'])),
+                'description' => $desc,
+                'bank_cash' => $bankCash,
+                'debit' => $isCredit ? (float)$row['amount'] : 0.0,
+                'credit' => $isCredit ? 0.0 : (float)$row['amount'],
+            ];
+        }
+
+                // Expenses from expense-transactions, allocated to accounts in this location
+                $expenseSql = "SELECT ec.con_id, ec.pay_date, ec.recorded_date, ec.amount, ec.description, ec.pay_mode,
+                                             ex.expense_name
+                                             FROM tbl_expenseconsume ec
+                                             LEFT JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                                             WHERE ec.status = 1";
+
+                $expenseParams = [];
+        if ($dateFrom) {
+            $expenseSql .= " AND DATE(ec.pay_date) >= :date_from";
+            $expenseParams['date_from'] = $dateFrom;
+        }
+        if ($dateTo) {
+            $expenseSql .= " AND DATE(ec.pay_date) <= :date_to";
+            $expenseParams['date_to'] = $dateTo;
+        }
+        $expenseSql .= " ORDER BY ec.pay_date ASC, ec.con_id ASC";
+
+        $expenses = Database::fetchAll($expenseSql, $expenseParams);
+        foreach ($expenses as $row) {
+            $bankLabels = [];
+            $allocatedCredit = 0.0;
+
+            $payModeRaw = (string)($row['pay_mode'] ?? '');
+            $payMode = json_decode($payModeRaw, true);
+
+            if (is_array($payMode)) {
+                foreach ($payMode as $pm) {
+                    $accId = (int)($pm['account_id'] ?? 0);
+                    if ($accId > 0 && in_array($accId, $locationAccountIds, true)) {
+                        $bankLabels[] = $accountMap[$accId] ?? ('Account #' . $accId);
+                        $allocatedCredit += (float)($pm['amount'] ?? 0);
+                    }
+                }
+            } elseif (is_numeric($payModeRaw)) {
+                $accId = (int)$payModeRaw;
+                if ($accId > 0 && in_array($accId, $locationAccountIds, true)) {
+                    $bankLabels[] = $accountMap[$accId] ?? ('Account #' . $accId);
+                    $allocatedCredit = (float)($row['amount'] ?? 0);
+                }
+            }
+
+            if ($allocatedCredit <= 0) {
+                continue;
+            }
+
+            $expenseType = trim((string)($row['expense_name'] ?? ''));
+            $expenseLabel = 'expense' . ($expenseType !== '' ? ' (' . $expenseType . ')' : '');
+
+            $events[] = [
+                'sort_datetime' => $row['pay_date'],
+                'sort_seq' => ++$sortSeq,
+                'date' => date('Y-m-d', strtotime($row['pay_date'])),
+                'description' => $expenseLabel,
+                'bank_cash' => !empty($bankLabels) ? implode(', ', array_unique($bankLabels)) : 'N/A',
+                'debit' => 0.0,
+                'credit' => $allocatedCredit,
+            ];
+        }
+
+        usort($events, function ($a, $b) {
+            $toMicroTime = function ($value): float {
+                $raw = (string)$value;
+                if ($raw === '') {
+                    return 0.0;
+                }
+                $dt = date_create($raw);
+                if ($dt !== false) {
+                    return (float)$dt->format('U.u');
+                }
+                $seconds = strtotime($raw);
+                return $seconds !== false ? (float)$seconds : 0.0;
+            };
+
+            $timeCmp = $toMicroTime($a['sort_datetime'] ?? '') <=> $toMicroTime($b['sort_datetime'] ?? '');
+            if ($timeCmp !== 0) {
+                return $timeCmp;
+            }
+            return ((int)($a['sort_seq'] ?? 0)) <=> ((int)($b['sort_seq'] ?? 0));
+        });
+
+        $rows = [];
+        $runningBalance = 0.0;
+        $totalDebit = 0.0;
+        $totalCredit = 0.0;
+
+        foreach ($events as $event) {
+            $runningBalance += ($event['debit'] - $event['credit']);
+            $totalDebit += $event['debit'];
+            $totalCredit += $event['credit'];
+
+            $rows[] = [
+                'date' => $event['date'],
+                'datetime' => date('Y-m-d H:i:s', strtotime((string)($event['sort_datetime'] ?? $event['date']))),
+                'description' => $event['description'],
+                'bank_cash' => $event['bank_cash'],
+                'debit' => $event['debit'],
+                'credit' => $event['credit'],
+                'balance' => $runningBalance,
+            ];
+        }
+
+        return [
+            'rows' => $rows,
+            'totals' => [
+                'debit' => $totalDebit,
+                'credit' => $totalCredit,
+                'balance' => $runningBalance,
+            ],
+        ];
     }
 }
