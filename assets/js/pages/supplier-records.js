@@ -58,19 +58,20 @@
     }
 
     const payload = window.supplierRecordsPayload || {};
+    const company = payload.company || {};
     const supplier = payload.supplier || {};
-    const summary = payload.summary || {};
     const records = Array.isArray(payload.records) ? payload.records : [];
     const productSummary = Array.isArray(payload.productSummary)
       ? payload.productSummary
       : [];
 
     const jsPDF = window.jspdf.jsPDF;
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
+    const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const marginLeft = 12;
-    const lineHeight = 6;
+    const marginLeft = 10;
+    const lineHeight = 5.5;
     let y = 12;
 
     function money(v) {
@@ -81,11 +82,39 @@
       });
     }
 
+    function resolvePaymentMethod(rawMethod, advanceAmount, accountAmount) {
+      let method = String(rawMethod || "").toLowerCase().trim();
+      if (method === "account") {
+        method = "direct_pay";
+      }
+      if (method === "advance" || method === "direct_pay" || method === "pay_later") {
+        return method;
+      }
+
+      if (Number(advanceAmount || 0) > 0) {
+        return "advance";
+      }
+      if (Number(accountAmount || 0) > 0) {
+        return "direct_pay";
+      }
+      return "pay_later";
+    }
+
+    function paymentMethodLabel(method, accountName) {
+      if (method === "advance") {
+        return "Advance";
+      }
+      if (method === "direct_pay") {
+        return accountName ? "Direct Pay (" + accountName + ")" : "Direct Pay";
+      }
+      return "Pay Later";
+    }
+
     function addLine(text, size, isBold) {
       doc.setFont("helvetica", isBold ? "bold" : "normal");
       doc.setFontSize(size || 10);
 
-      const lines = doc.splitTextToSize(String(text || ""), 185);
+      const lines = doc.splitTextToSize(String(text || ""), pageWidth - marginLeft * 2);
       lines.forEach(function (line) {
         if (y > pageHeight - 12) {
           doc.addPage();
@@ -96,74 +125,326 @@
       });
     }
 
-    addLine("SUPPLIER RECORDS", 14, true);
+    function formatDateCell(dateValue) {
+      if (!dateValue) return "";
+      const d = new Date(dateValue);
+      if (!Number.isNaN(d.getTime())) {
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return day + "/" + month + "/" + year;
+      }
+      return String(dateValue);
+    }
+
+    function buildStatementData(productRows, timelineRows) {
+      const productTypesMap = new Map();
+
+      productRows.forEach(function (item) {
+        const typeName = String(item.type_name || item.product_name || "Product").trim();
+        if (!productTypesMap.has(typeName)) {
+          productTypesMap.set(typeName, {
+            name: typeName,
+            symbol: String(item.unit_symbol || "").trim(),
+          });
+        }
+      });
+
+      const productTypes = Array.from(productTypesMap.values()).sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });
+
+      const events = [];
+
+      timelineRows
+        .filter(function (row) {
+          return String(row.type || "") === "advance";
+        })
+        .forEach(function (row) {
+          events.push({
+            date: row.date,
+            datetime: row.datetime || row.date,
+            action: "advance",
+            amount: Number(row.debit || 0),
+          });
+        });
+
+      productRows.forEach(function (item) {
+        events.push({
+          date: item.receive_date,
+          datetime: item.receive_date,
+          action: "purchase",
+          amount: Number(item.total_price || 0),
+          amountPerKg: Number(item.unit_price || 0),
+          productType: String(item.type_name || item.product_name || "Product").trim(),
+          quantity: Number(item.quantity || 0),
+          quantityInKg: Number(item.quantity_in_kg != null ? item.quantity_in_kg : item.quantity || 0),
+          unitSymbol: String(item.unit_symbol || "").trim(),
+        });
+      });
+
+      timelineRows
+        .filter(function (row) {
+          return String(row.type || "") === "payment";
+        })
+        .forEach(function (row) {
+          events.push({
+            date: row.date,
+            datetime: row.datetime || row.date,
+            action: "payment",
+            amount: Number(row.debit || 0),
+          });
+        });
+
+      events.sort(function (a, b) {
+        const ad = new Date(a.datetime || a.date || 0).getTime();
+        const bd = new Date(b.datetime || b.date || 0).getTime();
+        return ad - bd;
+      });
+
+      const productTotals = {};
+      productTypes.forEach(function (pt) {
+        productTotals[pt.name] = 0;
+      });
+
+      let runningRemaining = 0;
+      let runningStockValue = 0;
+      let runningTotalKg = 0;
+
+      const statementRows = events.map(function (event) {
+        const row = {
+          date: formatDateCell(event.date),
+          action: event.action,
+          amount: "",
+          products: {},
+          amountPerKg: "",
+          totalAmount: "",
+          remaining: "",
+          totalInKg: "",
+          stockValue: "",
+        };
+
+        productTypes.forEach(function (pt) {
+          row.products[pt.name] = "";
+        });
+
+        if (event.action === "advance") {
+          runningRemaining += event.amount;
+          row.amount = money(event.amount);
+          row.remaining = money(runningRemaining);
+          row.totalInKg = money(runningTotalKg);
+          row.stockValue = money(runningStockValue);
+        } else if (event.action === "purchase") {
+          runningRemaining -= event.amount;
+          runningStockValue += event.amount;
+          const quantityInKg = Number(event.quantityInKg != null ? event.quantityInKg : event.quantity || 0);
+          runningTotalKg += quantityInKg;
+
+          const qtyText = money(event.quantity) + (event.unitSymbol ? " " + event.unitSymbol : "");
+          row.products[event.productType] = qtyText;
+          productTotals[event.productType] = (productTotals[event.productType] || 0) + Number(event.quantity || 0);
+
+          row.amountPerKg = money(event.amountPerKg);
+          row.totalAmount = money(event.amount);
+          row.remaining = money(runningRemaining);
+          row.totalInKg = money(runningTotalKg);
+          row.stockValue = money(runningStockValue);
+        } else if (event.action === "payment") {
+          runningRemaining += event.amount;
+          row.amount = money(event.amount);
+          row.remaining = money(runningRemaining);
+          row.totalInKg = money(runningTotalKg);
+          row.stockValue = money(runningStockValue);
+        }
+
+        return row;
+      });
+
+      return {
+        productTypes: productTypes,
+        productTotals: productTotals,
+        rows: statementRows,
+      };
+    }
+
+    function drawStatementTable(statementData) {
+      const tableX = marginLeft;
+      const tableWidth = pageWidth - marginLeft * 2;
+      const paddingX = 1.2;
+      const baseRowHeight = 7;
+      const lineGap = 3.1;
+
+      const productTypes = statementData.productTypes;
+      const headers = ["Date", "Description", "Payment/Advance"]
+        .concat(productTypes.map(function (pt) {
+          return pt.name;
+        }))
+        .concat(["Amount/Kg", "Total Amount", "Remaining", "Total in Kg", "Total Stock Value"]);
+
+      const fixedWidth = 18 + 18 + 28 + 16 + 20 + 20 + 18 + 24;
+      const productsArea = tableWidth - fixedWidth;
+      const perProductWidth = productTypes.length
+        ? Math.max(10, productsArea / productTypes.length)
+        : 0;
+
+      const colWidths = [18, 18, 28]
+        .concat(productTypes.map(function () {
+          return perProductWidth;
+        }))
+        .concat([16, 20, 20, 18, 24]);
+
+      function textLines(text, width) {
+        const lines = doc.splitTextToSize(String(text || ""), Math.max(2, width - paddingX * 2));
+        return lines.length ? lines : [""];
+      }
+
+      function drawHeaderRow() {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.2);
+        doc.setDrawColor(90, 90, 90);
+        doc.setLineWidth(0.22);
+
+        const headerLines = headers.map(function (h, idx) {
+          return textLines(h, colWidths[idx]);
+        });
+        const maxHeaderLines = Math.max.apply(
+          null,
+          headerLines.map(function (lines) {
+            return lines.length;
+          })
+        );
+        const headerHeight = Math.max(baseRowHeight, maxHeaderLines * lineGap + 2.6);
+
+        let x = tableX;
+        headers.forEach(function (_h, idx) {
+          doc.rect(x, y - 5.1, colWidths[idx], headerHeight, "S");
+          headerLines[idx].forEach(function (line, lineIdx) {
+            doc.text(line, x + paddingX, y - 1.5 + lineIdx * lineGap);
+          });
+          x += colWidths[idx];
+        });
+
+        y += headerHeight;
+      }
+
+      function drawDataRow(cells, isBold) {
+        const cellLines = cells.map(function (cell, idx) {
+          return textLines(cell, colWidths[idx]);
+        });
+        const maxLines = Math.max.apply(
+          null,
+          cellLines.map(function (lines) {
+            return lines.length;
+          })
+        );
+        const rowHeight = Math.max(baseRowHeight, maxLines * lineGap + 2.2);
+
+        if (y > pageHeight - (rowHeight + 5)) {
+          doc.addPage();
+          y = 12;
+          drawHeaderRow();
+        }
+
+        doc.setFont("helvetica", isBold ? "bold" : "normal");
+        doc.setFontSize(8);
+        doc.setDrawColor(120, 120, 120);
+        doc.setLineWidth(0.2);
+
+        let x = tableX;
+        cells.forEach(function (_cell, idx) {
+          const alignRight = idx >= 2 && (idx < 3 || idx >= 3 + productTypes.length);
+          doc.rect(x, y - 5.1, colWidths[idx], rowHeight, "S");
+
+          cellLines[idx].forEach(function (line, lineIdx) {
+            const ty = y - 1.6 + lineIdx * lineGap;
+            if (alignRight) {
+              const tw = doc.getTextWidth(line);
+              doc.text(line, x + colWidths[idx] - paddingX - tw, ty);
+            } else {
+              doc.text(line, x + paddingX, ty);
+            }
+          });
+
+          x += colWidths[idx];
+        });
+
+        y += rowHeight;
+      }
+
+      if (y > pageHeight - 25) {
+        doc.addPage();
+        y = 12;
+      }
+
+      drawHeaderRow();
+
+      statementData.rows.forEach(function (row) {
+        const actionLabel = row.action === "advance"
+          ? "advance"
+          : row.action === "payment"
+          ? "payment"
+          : "purchase";
+
+        const cells = [
+          row.date,
+          actionLabel,
+          row.amount,
+        ]
+          .concat(
+            productTypes.map(function (pt) {
+              return row.products[pt.name] || "";
+            })
+          )
+          .concat([row.amountPerKg, row.totalAmount, row.remaining, row.totalInKg, row.stockValue]);
+
+        drawDataRow(cells, false);
+      });
+
+      const totalsCells = ["", "totals", ""]
+        .concat(
+          productTypes.map(function (pt) {
+            return money(statementData.productTotals[pt.name] || 0);
+          })
+        )
+        .concat(["", "", "", "", ""]);
+
+      drawDataRow(totalsCells, true);
+    }
+
+    addLine("SUPPLIER STATEMENT", 14, true);
     addLine("Generated: " + new Date().toLocaleString(), 10, false);
     y += 2;
 
-    addLine("Supplier", 12, true);
-    addLine("Name: " + (supplier.name || "N/A"), 10, false);
-    addLine("Phone: " + (supplier.phone || "N/A"), 10, false);
-    addLine("Email: " + (supplier.email || "N/A"), 10, false);
-    addLine("Address: " + (supplier.address || "N/A"), 10, false);
-    y += 2;
+    const companyName =
+      company.company_name || company.name || "Gihanga Coffee Company Ltd";
+    const hq = company.company_address || "Gahanga Sector";
 
-    const advances = payload.summary?.advances || {};
-    const stock = payload.summary?.stock || {};
-    const payables = payload.summary?.payables || {};
-
-    addLine("Summary", 12, true);
-    addLine("Total Advances: " + money(advances.total_advance_amount), 10, false);
-    addLine("Total Stock Value: " + money(stock.total_stock_value), 10, false);
-    addLine("Pending Balance: " + money(payables.pending_balance), 10, false);
-    y += 2;
-
-    addLine("Products Supplied", 12, true);
-    if (!productSummary.length) {
-      addLine("No product records.", 10, false);
-    } else {
-      productSummary.forEach(function (item, index) {
-        addLine(
-          (index + 1) +
-            ". " +
-            (item.receive_date || "") +
-            " | " +
-            (item.product_name || "") +
-            " | " +
-            (item.type_name || "") +
-            " | Qty: " +
-            money(item.quantity) +
-            " " +
-            (item.unit_symbol || "") +
-            " | Total: " +
-            money(item.total_price),
-          9,
-          false
-        );
+    const stationSet = new Set();
+    productSummary.forEach(function (item) {
+      if (item && item.location_name) {
+        stationSet.add(String(item.location_name));
+      }
+    });
+    if (stationSet.size === 0) {
+      records.forEach(function (r) {
+        if (r && r.location) {
+          stationSet.add(String(r.location));
+        }
       });
     }
+    const stationText = stationSet.size ? Array.from(stationSet).join(", ") : "N/A";
+
+    addLine("Company name: " + companyName, 11, true);
+    addLine("Location: " + stationText, 10, false);
+    addLine("Supplier id: " + (supplier.id || "N/A"), 10, false);
+    addLine("Supplier name: " + (supplier.name || "N/A"), 10, false);
     y += 2;
 
-    addLine("Transaction History", 12, true);
     if (!records.length) {
-      addLine("No transactions.", 10, false);
+      addLine("No data found for this supplier.", 10, false);
     } else {
-      records.forEach(function (row, index) {
-        addLine(
-          (index + 1) +
-            ". " +
-            (row.date || "") +
-            " | " +
-            String(row.type || "").replace(/_/g, " ") +
-            " | Ref: " +
-            (row.reference || "-") +
-            " | Debit: " +
-            money(row.debit) +
-            " | Credit: " +
-            money(row.credit),
-          9,
-          false
-        );
-      });
+      const statementData = buildStatementData(productSummary, records);
+      drawStatementTable(statementData);
     }
 
     const fileName =

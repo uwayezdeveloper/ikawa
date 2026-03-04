@@ -13,11 +13,14 @@
   const typeUnitSelect = document.getElementById("typeUnitSelect");
   const supplierSelect = document.getElementById("supplierSelect");
   const accountSelect = document.getElementById("accountSelect");
+  const accountWrap = document.getElementById("accountWrap");
   const supplierAdvanceInfo = document.getElementById("supplierAdvanceInfo");
+  const advanceInfoWrap = document.getElementById("advanceInfoWrap");
   const quantityInput = document.getElementById("quantityInput");
   const unitPriceInput = document.getElementById("unitPriceInput");
   const totalPriceDisplay = document.getElementById("totalPriceDisplay");
   const receiveStockForm = document.getElementById("receiveStockForm");
+  const paymentMethodInputs = document.querySelectorAll('input[name="payment_method"]');
 
   // Get APP_URL from window or construct it
   const APP_URL = window.APP_URL || "";
@@ -97,7 +100,71 @@
       option.dataset.balance = acc.balance;
       select.appendChild(option);
     });
-    select.disabled = true; // Start disabled, enable based on advance check
+    select.disabled = true;
+  }
+
+  function getSelectedPaymentMethod() {
+    const selected = document.querySelector('input[name="payment_method"]:checked');
+    return selected ? selected.value : "pay_later";
+  }
+
+  function setAccountEnabledState() {
+    if (!accountSelect) return;
+    const method = getSelectedPaymentMethod();
+    const hasLocation = !!(locationSelect && locationSelect.value);
+    const hasAccounts = accountSelect.options.length > 1;
+
+    if (method === "direct_pay" && hasLocation && hasAccounts) {
+      accountSelect.disabled = false;
+    } else {
+      accountSelect.disabled = true;
+      if (method !== "direct_pay") {
+        accountSelect.value = "";
+      }
+    }
+  }
+
+  function updatePaymentMethodUI() {
+    const method = getSelectedPaymentMethod();
+
+    if (accountWrap) {
+      accountWrap.style.display = method === "direct_pay" ? "block" : "none";
+    }
+    if (advanceInfoWrap) {
+      advanceInfoWrap.style.display = method === "advance" ? "block" : "none";
+    }
+
+    if (supplierAdvanceInfo && method !== "advance") {
+      supplierAdvanceInfo.innerHTML = "";
+      supplierAdvanceInfo.style.display = "none";
+    }
+
+    setAccountEnabledState();
+
+    if (method === "direct_pay") {
+      if (locationSelect && locationSelect.value) {
+        postAjax("get_accounts", { location_id: locationSelect.value }, function (data) {
+          populateAccountSelect(accountSelect, data, "Select Account");
+          setAccountEnabledState();
+        });
+      }
+      return;
+    }
+
+    if (method === "advance") {
+      checkSupplierAdvance();
+      return;
+    }
+
+    if (method === "pay_later") {
+      if (accountSelect) {
+        resetSelect(accountSelect, "Select Account");
+      }
+      if (supplierAdvanceInfo) {
+        supplierAdvanceInfo.innerHTML = "";
+        supplierAdvanceInfo.style.display = "none";
+      }
+    }
   }
 
   /**
@@ -166,19 +233,21 @@
   function checkSupplierAdvance() {
     if (!supplierSelect || !supplierAdvanceInfo) return;
 
-    const supplierId = supplierSelect.value;
-    const quantity = parseFloat(quantityInput?.value) || 0;
-    const unitPrice = parseFloat(unitPriceInput?.value) || 0;
-    const totalAmount = quantity * unitPrice;
-
-    // Clear if no supplier selected or no amount
-    if (!supplierId || totalAmount <= 0) {
+    const method = getSelectedPaymentMethod();
+    if (method !== "advance") {
       supplierAdvanceInfo.innerHTML = "";
       supplierAdvanceInfo.style.display = "none";
-      // Keep account disabled when no supplier/amount
-      if (accountSelect) {
-        accountSelect.disabled = true;
-      }
+      return;
+    }
+
+    const supplierId = supplierSelect.value;
+    const totalText = totalPriceDisplay ? String(totalPriceDisplay.value || "") : "0";
+    const totalAmount = parseFloat(totalText.replace(/,/g, "")) || 0;
+
+    // Clear if no supplier selected
+    if (!supplierId) {
+      supplierAdvanceInfo.innerHTML = "";
+      supplierAdvanceInfo.style.display = "none";
       return;
     }
 
@@ -193,6 +262,18 @@
             maximumFractionDigits: 2,
           });
 
+        if (totalAmount <= 0) {
+          supplierAdvanceInfo.innerHTML =
+            '<div class="alert alert-info mb-0 py-2">' +
+            '<i class="fas fa-info-circle me-2"></i>' +
+            "Available advance: " +
+            formatAmount(data.total_advance) +
+            " FRW. Enter quantity and unit price to calculate deduction." +
+            "</div>";
+          supplierAdvanceInfo.style.display = "block";
+          return;
+        }
+
         if (data.fully_covered) {
           // Advance covers full amount
           supplierAdvanceInfo.innerHTML =
@@ -206,11 +287,6 @@
             " FRW" +
             "</div>";
           supplierAdvanceInfo.style.display = "block";
-          // Disable account select since advance covers everything
-          if (accountSelect) {
-            accountSelect.disabled = true;
-            accountSelect.value = "";
-          }
         } else if (data.has_advance) {
           // Partial advance - need account for remaining
           supplierAdvanceInfo.innerHTML =
@@ -227,24 +303,16 @@
             " FRW (from account or payable)</span>" +
             "</div>";
           supplierAdvanceInfo.style.display = "block";
-          // Enable account select for remaining amount
-          if (accountSelect && locationSelect && locationSelect.value) {
-            accountSelect.disabled = false;
-          }
         } else {
           // No advance at all
           supplierAdvanceInfo.innerHTML =
             '<div class="alert alert-info mb-0 py-2">' +
             '<i class="fas fa-info-circle me-2"></i>' +
-            "No advance available. Full payment (" +
+            "No advance available. Full amount (" +
             formatAmount(totalAmount) +
-            " FRW) from station account or recorded as payable." +
+            " FRW) will be recorded as payable." +
             "</div>";
           supplierAdvanceInfo.style.display = "block";
-          // Enable account select
-          if (accountSelect && locationSelect && locationSelect.value) {
-            accountSelect.disabled = false;
-          }
         }
       },
     );
@@ -300,11 +368,14 @@
 
       if (!locationId) return;
 
+      if (getSelectedPaymentMethod() !== "direct_pay") {
+        return;
+      }
+
       // Fetch accounts for this location
       postAjax("get_accounts", { location_id: locationId }, function (data) {
         populateAccountSelect(accountSelect, data, "Select Account");
-        // Re-check supplier advance to update account state
-        checkSupplierAdvance();
+        setAccountEnabledState();
       });
     });
   }
@@ -312,6 +383,12 @@
   // Supplier Change Handler - Check for available advance
   if (supplierSelect) {
     supplierSelect.addEventListener("change", checkSupplierAdvance);
+  }
+
+  if (paymentMethodInputs && paymentMethodInputs.length) {
+    paymentMethodInputs.forEach(function (input) {
+      input.addEventListener("change", updatePaymentMethodUI);
+    });
   }
 
   // Category Change Handler
@@ -380,6 +457,36 @@
   if (typeUnitSelect) {
     typeUnitSelect.addEventListener("change", calculateTotal);
   }
+
+  if (receiveStockForm) {
+    receiveStockForm.addEventListener("submit", function (e) {
+      const method = getSelectedPaymentMethod();
+
+      if (method === "direct_pay") {
+        if (!locationSelect || !locationSelect.value) {
+          e.preventDefault();
+          Swal.fire({
+            icon: "warning",
+            title: "Location Required",
+            text: "Select location before choosing direct pay account.",
+          });
+          return;
+        }
+
+        if (!accountSelect || !accountSelect.value) {
+          e.preventDefault();
+          Swal.fire({
+            icon: "warning",
+            title: "Account Required",
+            text: "Direct pay requires selecting a payment account.",
+          });
+          return;
+        }
+      }
+    });
+  }
+
+  updatePaymentMethodUI();
 
   // Form confirmation dialogs
   document.querySelectorAll(".approve-form").forEach(function (form) {

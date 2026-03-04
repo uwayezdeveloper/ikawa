@@ -164,6 +164,7 @@ class StockReceiveController extends Controller
         $categoryId = $_POST['product_category_id'] ?? null;
         $categoryTypeUnitId = $_POST['category_type_unit_id'] ?? null;
         $accountId = $_POST['account_id'] ?? null;
+        $paymentMethod = $_POST['payment_method'] ?? 'pay_later';
         $quantity = floatval($_POST['quantity'] ?? 0);
         $unitPrice = floatval($_POST['unit_price'] ?? 0);
         $receiveDate = $_POST['receive_date'] ?? date('Y-m-d');
@@ -186,6 +187,71 @@ class StockReceiveController extends Controller
             return $response->redirect(APP_URL . '/stock/receives');
         }
 
+        $allowedPaymentMethods = ['pay_later', 'advance', 'direct_pay'];
+        if (!in_array($paymentMethod, $allowedPaymentMethods, true)) {
+            $_SESSION['flash_error'] = 'Invalid payment method selected';
+            return $response->redirect(APP_URL . '/stock/receives');
+        }
+
+        if ($paymentMethod === 'direct_pay' && empty($accountId)) {
+            $_SESSION['flash_error'] = 'Direct pay requires a payment account';
+            return $response->redirect(APP_URL . '/stock/receives');
+        }
+
+        if ($paymentMethod === 'direct_pay' && !empty($accountId)) {
+            $account = Database::fetch(
+                "SELECT id FROM accounts WHERE id = :id AND location_id = :location_id AND status = 'active'",
+                ['id' => $accountId, 'location_id' => $locationId]
+            );
+
+            if (!$account) {
+                $_SESSION['flash_error'] = 'Selected account is invalid for this location';
+                return $response->redirect(APP_URL . '/stock/receives');
+            }
+
+            // Direct pay must be fully covered by selected account balance
+            $unitInfo = Database::fetch(
+                "SELECT mu.conversion_factor
+                 FROM category_type_units ctu
+                 JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
+                 WHERE ctu.id = :ctu_id",
+                ['ctu_id' => $categoryTypeUnitId]
+            );
+
+            $estimatedTotal = $quantity * $unitPrice;
+            if ($unitInfo) {
+                $conversionFactor = floatval($unitInfo['conversion_factor'] ?? 0);
+                if ($conversionFactor > 0) {
+                    $quantityInKg = $quantity * ($conversionFactor / 1000);
+                    $estimatedTotal = $unitPrice * $quantityInKg;
+                }
+            }
+
+            $accountBalanceRow = Database::fetch(
+                "SELECT balance FROM accounts WHERE id = :id",
+                ['id' => $accountId]
+            );
+            $accountBalance = floatval($accountBalanceRow['balance'] ?? 0);
+
+            if ($accountBalance < $estimatedTotal) {
+                $_SESSION['flash_error'] = 'Direct payment failed: selected account balance is not enough for this stock receive';
+                return $response->redirect(APP_URL . '/stock/receives');
+            }
+        }
+
+        if ($paymentMethod !== 'direct_pay') {
+            $accountId = null;
+        }
+
+        // DB column supports enum('advance','account') and nullable default.
+        // Map UI methods to DB-safe values.
+        $storedPaymentMethod = null;
+        if ($paymentMethod === 'direct_pay') {
+            $storedPaymentMethod = 'account';
+        } elseif ($paymentMethod === 'advance') {
+            $storedPaymentMethod = 'advance';
+        }
+
         $user = $_SESSION['user'] ?? null;
         $result = $this->stockReceiveModel->createReceive([
             'location_type_id' => $locationTypeId,
@@ -197,13 +263,30 @@ class StockReceiveController extends Controller
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
             'receive_date' => $receiveDate,
+            'payment_method' => $storedPaymentMethod,
             'notes' => $notes,
             'status' => 'pending',
             'created_by' => $user['id'] ?? null
         ]);
 
         if ($result) {
-            $_SESSION['flash_success'] = 'Stock receive created successfully';
+            // Direct pay should be processed immediately (already paid, no pending approval)
+            if ($paymentMethod === 'direct_pay') {
+                try {
+                    $approved = $this->stockReceiveModel->approveReceive((int)$result, (int)($user['id'] ?? 0));
+                    if ($approved) {
+                        $_SESSION['flash_success'] = 'Stock receive created and paid successfully';
+                    } else {
+                        $this->stockReceiveModel->delete((int)$result);
+                        $_SESSION['flash_error'] = 'Stock receive created, but direct payment approval failed';
+                    }
+                } catch (\Exception $e) {
+                    $this->stockReceiveModel->delete((int)$result);
+                    $_SESSION['flash_error'] = 'Direct payment failed: ' . $e->getMessage();
+                }
+            } else {
+                $_SESSION['flash_success'] = 'Stock receive created successfully';
+            }
         } else {
             $_SESSION['flash_error'] = 'Failed to create stock receive';
         }

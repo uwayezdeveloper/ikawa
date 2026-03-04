@@ -181,43 +181,68 @@ class StockReceive extends Model
             Database::query("START TRANSACTION");
             
             $totalPrice = floatval($receive['total_price']);
-            $remainingAmount = $totalPrice;
+            $remainingAmount = round($totalPrice, 2);
             $advanceAmount = 0;
             $accountAmount = 0;
             $payableAmount = 0;
+            $selectedPaymentMethod = strtolower(trim((string) ($receive['payment_method'] ?? 'pay_later')));
+            if ($selectedPaymentMethod === 'account') {
+                $selectedPaymentMethod = 'direct_pay';
+            }
+            if (!in_array($selectedPaymentMethod, ['pay_later', 'advance', 'direct_pay'], true)) {
+                $selectedPaymentMethod = 'pay_later';
+            }
+
             $paymentMethod = null;
+            if ($selectedPaymentMethod === 'direct_pay') {
+                $paymentMethod = 'account';
+            } elseif ($selectedPaymentMethod === 'advance') {
+                $paymentMethod = 'advance';
+            }
             $accountId = $receive['account_id'] ?? null;
             $advanceId = null;
-            
-            // Step 1: Check for approved advances and use them
-            $advances = $this->getApprovedAdvances($receive['supplier_id']);
-            
-            foreach ($advances as $advance) {
-                if ($remainingAmount <= 0) break;
-                
-                $advanceAmt = floatval($advance['amount']);
-                $useAmount = min($advanceAmt, $remainingAmount);
-                
-                $advanceAmount += $useAmount;
-                $remainingAmount -= $useAmount;
-                $advanceId = $advance['id']; // Track last used advance
-                
-                // Mark advance as settled
-                Database::query("UPDATE supplier_advances SET status = 'settled' WHERE id = :id", ['id' => $advance['id']]);
+
+            if ($selectedPaymentMethod === 'advance') {
+                $advances = $this->getApprovedAdvances($receive['supplier_id']);
+
+                foreach ($advances as $advance) {
+                    if ($remainingAmount <= 0) break;
+
+                    $advanceAmt = floatval($advance['amount']);
+                    $useAmount = round(min($advanceAmt, $remainingAmount), 2);
+
+                    if ($useAmount <= 0) {
+                        continue;
+                    }
+
+                    $advanceAmount += $useAmount;
+                    $remainingAmount = round($remainingAmount - $useAmount, 2);
+                    $advanceId = $advance['id'];
+
+                    Database::query("UPDATE supplier_advances SET status = 'settled' WHERE id = :id", ['id' => $advance['id']]);
+                }
             }
-            
-            // Step 2: Use account if there's remaining amount and account is selected
-            if ($remainingAmount > 0 && $accountId) {
-                // Get account balance
+
+            if ($selectedPaymentMethod === 'direct_pay') {
+                if (empty($accountId)) {
+                    throw new \RuntimeException('Direct payment requires selecting an account.');
+                }
+
                 $account = Database::fetch("SELECT balance FROM accounts WHERE id = :id", ['id' => $accountId]);
+                if (!$account) {
+                    throw new \RuntimeException('Selected payment account was not found.');
+                }
+
                 $accountBalance = floatval($account['balance'] ?? 0);
-                
-                // Use available balance (up to remaining amount)
-                $accountAmount = min($accountBalance, $remainingAmount);
-                $remainingAmount -= $accountAmount;
-                
+
+                if ($accountBalance < $remainingAmount) {
+                    throw new \RuntimeException('Insufficient account balance for direct payment.');
+                }
+
+                $accountAmount = round($remainingAmount, 2);
+                $remainingAmount = 0.00;
+
                 if ($accountAmount > 0) {
-                    // Create debit transaction
                     $transactionModel = new AccountTransaction();
                     $description = "Stock Payment: " . $receive['quantity'] . " units to supplier";
                     $transactionModel->createDebit(
@@ -230,8 +255,11 @@ class StockReceive extends Model
                     );
                 }
             }
-            
-            // Step 3: Record remaining as payable
+
+            if ($remainingAmount < 0.01) {
+                $remainingAmount = 0.00;
+            }
+
             if ($remainingAmount > 0) {
                 $payableAmount = $remainingAmount;
                 
@@ -250,15 +278,6 @@ class StockReceive extends Model
                     'amount' => $payableAmount,
                     'created_by' => $userId
                 ]);
-            }
-            
-            // Determine payment method
-            if ($advanceAmount > 0 && $accountAmount > 0) {
-                $paymentMethod = 'advance'; // Mixed but primary is advance
-            } elseif ($advanceAmount > 0) {
-                $paymentMethod = 'advance';
-            } elseif ($accountAmount > 0) {
-                $paymentMethod = 'account';
             }
             
             // Update receive status and payment info
@@ -330,7 +349,7 @@ class StockReceive extends Model
         } catch (\Exception $e) {
             Database::query("ROLLBACK");
             error_log("Error approving receive: " . $e->getMessage());
-            return false;
+            throw $e;
         }
     }
 

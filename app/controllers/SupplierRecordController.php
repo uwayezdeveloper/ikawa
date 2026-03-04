@@ -53,6 +53,10 @@ class SupplierRecordController extends Controller
         $summary = [];
         
         $productSummary = [];
+        $companySettings = [];
+
+        $settingModel = new Setting();
+        $companySettings = $settingModel->getCompanySettings();
 
         if ($selectedSupplierId) {
             $supplierInfo = $this->supplierModel->find($selectedSupplierId);
@@ -70,6 +74,7 @@ class SupplierRecordController extends Controller
             'records' => $records,
             'summary' => $summary,
             'productSummary' => $productSummary,
+            'companySettings' => $companySettings,
             'scripts' => ['js/pages/supplier-records.js']
         ], 'main');
     }
@@ -93,8 +98,7 @@ class SupplierRecordController extends Controller
     private function getSupplierRecords(int $supplierId): array
     {
         $records = [];
-        
-        // Get advances given to supplier
+
         $advances = $this->getSupplierAdvances($supplierId);
         foreach ($advances as $adv) {
             $records[] = [
@@ -104,16 +108,53 @@ class SupplierRecordController extends Controller
                 'reference' => $adv['advance_number'],
                 'description' => 'Advance given to supplier',
                 'location' => $adv['location_name'],
-                'debit' => $adv['amount'], // Money given out
+                'debit' => $adv['amount'],
                 'credit' => 0,
                 'status' => $adv['status'],
                 'notes' => $adv['description']
             ];
         }
-        
-        // Get stock receives from supplier
+
         $receives = $this->getSupplierStockReceives($supplierId);
         foreach ($receives as $rcv) {
+            $method = strtolower(trim((string)($rcv['payment_method'] ?? '')));
+            if ($method === '') {
+                if (floatval($rcv['payable_amount'] ?? 0) > 0 && floatval($rcv['advance_amount'] ?? 0) <= 0 && floatval($rcv['account_amount'] ?? 0) <= 0) {
+                    $method = 'pay_later';
+                } elseif (floatval($rcv['advance_amount'] ?? 0) > 0) {
+                    $method = 'advance';
+                } elseif (floatval($rcv['account_amount'] ?? 0) > 0) {
+                    $method = 'direct_pay';
+                }
+            }
+
+            if ($method === 'account') {
+                $method = 'direct_pay';
+            }
+
+            if (!in_array($method, ['pay_later', 'advance', 'direct_pay'], true)) {
+                if (floatval($rcv['advance_amount'] ?? 0) > 0) {
+                    $method = 'advance';
+                } elseif (floatval($rcv['account_amount'] ?? 0) > 0) {
+                    $method = 'direct_pay';
+                } else {
+                    $method = 'pay_later';
+                }
+            }
+
+            $methodLabel = 'Pay Later';
+            if ($method === 'pay_later') {
+                $methodLabel = 'Pay Later';
+            } elseif ($method === 'advance') {
+                $methodLabel = 'Advance';
+            } elseif ($method === 'direct_pay') {
+                $methodLabel = 'Direct Pay';
+            }
+
+            $loanRemaining = floatval($rcv['payable_remaining'] ?? ($rcv['payable_amount'] ?? 0));
+            $loanPaid = floatval($rcv['payable_paid_amount'] ?? 0);
+            $paymentStatus = $loanRemaining > 0 ? 'Loan' : 'Paid';
+
             $records[] = [
                 'date' => $rcv['receive_date'],
                 'datetime' => $rcv['created_at'],
@@ -122,13 +163,15 @@ class SupplierRecordController extends Controller
                 'description' => 'Stock received: ' . $rcv['quantity'] . ' ' . $rcv['unit_symbol'] . ' of ' . $rcv['category_name'] . ' (' . $rcv['type_name'] . ')',
                 'location' => $rcv['location_name'],
                 'debit' => 0,
-                'credit' => $rcv['total_price'], // Goods received (credit to supplier)
+                'credit' => $rcv['total_price'],
                 'status' => $rcv['status'],
-                'notes' => 'Paid: Adv=' . number_format($rcv['advance_amount'] ?? 0) . ', Acc=' . number_format($rcv['account_amount'] ?? 0) . ', Due=' . number_format($rcv['payable_amount'] ?? 0)
+                'payment_method' => $method,
+                'payment_method_label' => $methodLabel,
+                'payment_status' => $paymentStatus,
+                'notes' => 'Method: ' . $methodLabel . ', Status: ' . $paymentStatus . ', Advance=' . number_format($rcv['advance_amount'] ?? 0) . ', Account=' . number_format($rcv['account_amount'] ?? 0) . ', Loan Paid=' . number_format($loanPaid) . ', Loan Remaining=' . number_format($loanRemaining)
             ];
         }
-        
-        // Get payable payments made to supplier
+
         $payments = $this->getSupplierPayablePayments($supplierId);
         foreach ($payments as $pay) {
             $records[] = [
@@ -136,20 +179,19 @@ class SupplierRecordController extends Controller
                 'datetime' => $pay['created_at'],
                 'type' => 'payment',
                 'reference' => $pay['payable_number'],
-                'description' => 'Payment for payable',
+                'description' => 'Loan payment for ' . ($pay['receive_number'] ? $pay['receive_number'] : 'supplier payable'),
                 'location' => $pay['location_name'],
-                'debit' => $pay['paid_amount'], // Money paid out
+                'debit' => $pay['paid_amount'],
                 'credit' => 0,
                 'status' => $pay['status'],
                 'notes' => 'Total: ' . number_format($pay['amount']) . ', Remaining: ' . number_format($pay['amount'] - $pay['paid_amount'])
             ];
         }
-        
-        // Sort by datetime descending
-        usort($records, function($a, $b) {
+
+        usort($records, function ($a, $b) {
             return strtotime($b['datetime']) - strtotime($a['datetime']);
         });
-        
+
         return $records;
     }
 
@@ -174,13 +216,26 @@ class SupplierRecordController extends Controller
     {
         $sql = "SELECT sr.*, l.name as location_name, 
                 pc.name as category_name, ct.name as type_name,
-                mu.symbol as unit_symbol
+                mu.symbol as unit_symbol,
+                a.account_name,
+                COALESCE(spx.total_payable, sr.payable_amount, 0) as payable_total,
+                COALESCE(spx.total_paid, 0) as payable_paid_amount,
+                COALESCE(spx.total_remaining, sr.payable_amount, 0) as payable_remaining
                 FROM stock_receives sr
                 LEFT JOIN locations l ON sr.location_id = l.id
                 LEFT JOIN product_categories pc ON sr.product_category_id = pc.id
                 LEFT JOIN category_type_units ctu ON sr.category_type_unit_id = ctu.id
                 LEFT JOIN category_types ct ON ctu.category_type_id = ct.id
                 LEFT JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
+                LEFT JOIN accounts a ON sr.account_id = a.id
+                LEFT JOIN (
+                    SELECT stock_receive_id,
+                           SUM(amount) as total_payable,
+                           SUM(paid_amount) as total_paid,
+                           SUM(amount - paid_amount) as total_remaining
+                    FROM supplier_payables
+                    GROUP BY stock_receive_id
+                ) spx ON spx.stock_receive_id = sr.id
                 WHERE sr.supplier_id = :supplier_id
                 ORDER BY sr.receive_date DESC, sr.created_at DESC";
         return Database::fetchAll($sql, ['supplier_id' => $supplierId]);
@@ -191,9 +246,10 @@ class SupplierRecordController extends Controller
      */
     private function getSupplierPayablePayments(int $supplierId): array
     {
-        $sql = "SELECT sp.*, l.name as location_name
+        $sql = "SELECT sp.*, l.name as location_name, sr.receive_number
                 FROM supplier_payables sp
                 LEFT JOIN locations l ON sp.location_id = l.id
+            LEFT JOIN stock_receives sr ON sp.stock_receive_id = sr.id
                 WHERE sp.supplier_id = :supplier_id
                 AND sp.paid_amount > 0
                 ORDER BY sp.updated_at DESC";
@@ -257,6 +313,14 @@ class SupplierRecordController extends Controller
                     sr.quantity,
                     sr.unit_price,
                     sr.total_price,
+                    sr.advance_amount,
+                    sr.account_amount,
+                    sr.payable_amount,
+                    sr.payment_method,
+                    a.account_name,
+                    COALESCE(spx.total_payable, sr.payable_amount, 0) as payable_total,
+                    COALESCE(spx.total_paid, 0) as payable_paid_amount,
+                    COALESCE(spx.total_remaining, sr.payable_amount, 0) as payable_remaining,
                     sr.notes,
                     pc.name as product_name,
                     ct.name as type_name,
@@ -268,6 +332,15 @@ class SupplierRecordController extends Controller
                 JOIN category_types ct ON ctu.category_type_id = ct.id
                 JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
                 LEFT JOIN locations l ON sr.location_id = l.id
+                LEFT JOIN accounts a ON sr.account_id = a.id
+                LEFT JOIN (
+                    SELECT stock_receive_id,
+                           SUM(amount) as total_payable,
+                           SUM(paid_amount) as total_paid,
+                           SUM(amount - paid_amount) as total_remaining
+                    FROM supplier_payables
+                    GROUP BY stock_receive_id
+                ) spx ON spx.stock_receive_id = sr.id
                 WHERE sr.supplier_id = :supplier_id
                 AND sr.status = 'approved'
                 ORDER BY sr.receive_date DESC, sr.id DESC";

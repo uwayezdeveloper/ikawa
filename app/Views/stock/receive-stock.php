@@ -123,16 +123,45 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-3">
+                        <label class="form-label d-block">Payment Method <span class="text-danger">*</span></label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paymentMethodLater"
+                                    value="pay_later" checked>
+                                <label class="form-check-label" for="paymentMethodLater">Pay Later</label>
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paymentMethodAdvance"
+                                    value="advance">
+                                <label class="form-check-label" for="paymentMethodAdvance">Advance</label>
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paymentMethodDirect"
+                                    value="direct_pay">
+                                <label class="form-check-label" for="paymentMethodDirect">Direct Pay</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advance info (shown when Advance is selected) -->
+                    <div class="mb-3" id="advanceInfoWrap" style="display: none;">
+                        <label class="form-label">Supplier Advance</label>
                         <div id="supplierAdvanceInfo" class="mt-1" style="display: none;"></div>
                     </div>
 
-                    <!-- Account (for payment if no advance) -->
-                    <div class="mb-3">
-                        <label class="form-label">Payment Account</label>
+                    <!-- Account (shown when Direct Pay is selected) -->
+                    <div class="mb-3" id="accountWrap" style="display: none;">
+                        <label class="form-label">Payment Account <span class="text-danger">*</span></label>
                         <select class="form-select" name="account_id" id="accountSelect" disabled>
                             <option value="">Select Location first</option>
                         </select>
-                        <small class="text-muted">Used if supplier has no advance. Leave empty to pay later.</small>
+                        <small class="text-muted">Select account from the chosen location.</small>
                     </div>
 
                     <!-- Quantity and Price -->
@@ -275,19 +304,33 @@ document.addEventListener('DOMContentLoaded', function() {
                                     $advanceAmt = floatval($receive['advance_amount'] ?? 0);
                                     $accountAmt = floatval($receive['account_amount'] ?? 0);
                                     $payableAmt = floatval($receive['payable_amount'] ?? 0);
+                                    $paymentMethod = strtolower(trim((string)($receive['payment_method'] ?? '')));
                                     ?>
-                                <?php if ($advanceAmt > 0): ?>
-                                <div><span class="badge bg-warning-subtle text-warning">Adv:
-                                        <?= number_format($advanceAmt, 0) ?></span></div>
+                                <?php if ($paymentMethod === 'pay_later' && $payableAmt > 0): ?>
+                                <div><span class="badge bg-danger-subtle text-danger">Supplier Loan: RWF
+                                    <?= number_format($payableAmt, 2) ?></span></div>
                                 <?php endif; ?>
-                                <?php if ($accountAmt > 0): ?>
-                                <div><span class="badge bg-primary-subtle text-primary">Acc:
-                                        <?= number_format($accountAmt, 0) ?></span></div>
+
+                                <?php if ($paymentMethod === 'advance' && $advanceAmt > 0): ?>
+                                <div><span class="badge bg-warning-subtle text-warning">Paid by Advance: RWF
+                                    <?= number_format($advanceAmt, 2) ?></span></div>
                                 <?php endif; ?>
-                                <?php if ($payableAmt > 0): ?>
-                                <div><span class="badge bg-danger-subtle text-danger">Due:
-                                        <?= number_format($payableAmt, 0) ?></span></div>
+
+                                <?php if ($paymentMethod === 'advance' && $payableAmt > 0): ?>
+                                <div><span class="badge bg-danger-subtle text-danger">Remaining Supplier Loan: RWF
+                                    <?= number_format($payableAmt, 2) ?></span></div>
                                 <?php endif; ?>
+
+                                <?php if (($paymentMethod === 'direct_pay' || $paymentMethod === 'account') && $accountAmt > 0): ?>
+                                <div><span class="badge bg-primary-subtle text-primary">Paid from Account<?= !empty($receive['account_name']) ? ' (' . htmlspecialchars($receive['account_name']) . ')' : '' ?>: RWF
+                                    <?= number_format($accountAmt, 2) ?></span></div>
+                                <?php endif; ?>
+
+                                <?php if (($paymentMethod === 'direct_pay' || $paymentMethod === 'account') && $payableAmt > 0): ?>
+                                <div><span class="badge bg-danger-subtle text-danger">Unpaid Balance (Supplier Loan): RWF
+                                    <?= number_format($payableAmt, 2) ?></span></div>
+                                <?php endif; ?>
+
                                 <?php if ($advanceAmt == 0 && $accountAmt == 0 && $payableAmt == 0): ?>
                                 <span class="text-muted">-</span>
                                 <?php endif; ?>
@@ -308,7 +351,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td>
                                 <div class="d-flex justify-content-center gap-1">
                                     <?php if ($receive['status'] === 'pending'): ?>
+                                    <?php $isDirectPayPending = in_array(strtolower((string)($receive['payment_method'] ?? '')), ['direct_pay', 'account'], true); ?>
                                     <?php if ($canApprove): ?>
+                                    <?php if (!$isDirectPayPending): ?>
                                     <form action="<?= APP_URL ?>/stock/receives/action" method="POST"
                                         class="d-inline approve-form">
                                         <input type="hidden" name="action" value="approve">
@@ -325,6 +370,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <i class="ti ti-x"></i>
                                         </button>
                                     </form>
+                                    <?php else: ?>
+                                    <span class="badge bg-info-subtle text-info">Direct Paid</span>
+                                    <?php endif; ?>
                                     <?php endif; ?>
                                     <?php if ($canDelete): ?>
                                     <form action="<?= APP_URL ?>/stock/receives/action" method="POST"

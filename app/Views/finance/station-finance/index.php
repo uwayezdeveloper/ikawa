@@ -233,6 +233,7 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
                                 <th>Supplier</th>
                                 <th>Reference</th>
                                 <th class="text-end">Remaining</th>
+                                <th class="text-center">Clearance</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -256,6 +257,9 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
                                     <br><small class="text-success">Paid:
                                         <?= number_format($payable['paid_amount'], 2) ?></small>
                                     <?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger-subtle text-danger">Not Cleared</span>
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-success pay-payable-btn"

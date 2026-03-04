@@ -70,6 +70,10 @@
     <!-- App js -->
     <script src="<?= \App\Core\View::asset('js/app.js') ?>"></script>
 
+    <script>
+        window.APP_URL = '<?= APP_URL ?>';
+    </script>
+
     <!-- Page specific scripts -->
     <?php if (isset($scripts)): ?>
     <?php foreach ($scripts as $script): ?>

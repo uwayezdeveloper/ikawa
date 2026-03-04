@@ -162,6 +162,8 @@ $payables = $summary['payables'] ?? [];
                         <th class="text-end">Quantity</th>
                         <th class="text-end">Unit Price</th>
                         <th class="text-end">Total Value</th>
+                        <th>Payment Method</th>
+                        <th>Payment Status</th>
                         <th>Notes</th>
                     </tr>
                 </thead>
@@ -193,6 +195,44 @@ $payables = $summary['payables'] ?? [];
                         </td>
                         <td class="text-end"><?= number_format($item['unit_price'], 2) ?></td>
                         <td class="text-end"><strong class="text-success"><?= number_format($item['total_price'], 2) ?></strong></td>
+                        <td>
+                            <?php
+                                $method = strtolower(trim((string)($item['payment_method'] ?? '')));
+                                if ($method === '') {
+                                    if (floatval($item['advance_amount'] ?? 0) > 0) {
+                                        $method = 'advance';
+                                    } elseif (floatval($item['account_amount'] ?? 0) > 0) {
+                                        $method = 'direct_pay';
+                                    } elseif (floatval($item['payable_remaining'] ?? $item['payable_amount'] ?? 0) > 0) {
+                                        $method = 'pay_later';
+                                    }
+                                }
+
+                                $methodLabel = 'Unknown';
+                                if ($method === 'pay_later') {
+                                    $methodLabel = 'Pay Later';
+                                } elseif ($method === 'advance') {
+                                    $methodLabel = 'Advance';
+                                } elseif ($method === 'direct_pay' || $method === 'account') {
+                                    $methodLabel = 'Direct Pay';
+                                }
+                            ?>
+                            <span class="badge bg-info-subtle text-info"><?= htmlspecialchars($methodLabel) ?></span>
+                            <?php if (($method === 'direct_pay' || $method === 'account') && !empty($item['account_name'])): ?>
+                            <br><small class="text-muted"><?= htmlspecialchars($item['account_name']) ?></small>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (floatval($item['payable_remaining'] ?? $item['payable_amount'] ?? 0) > 0): ?>
+                            <span class="badge bg-danger-subtle text-danger">Loan</span>
+                            <br><small class="text-muted">Remaining: <?= number_format(($item['payable_remaining'] ?? $item['payable_amount'] ?? 0), 2) ?> FRW</small>
+                            <?php else: ?>
+                            <span class="badge bg-success-subtle text-success">Paid</span>
+                            <?php if (floatval($item['payable_paid_amount'] ?? 0) > 0): ?>
+                            <br><small class="text-success">Loan Paid: <?= number_format(($item['payable_paid_amount'] ?? 0), 2) ?> FRW</small>
+                            <?php endif; ?>
+                            <?php endif; ?>
+                        </td>
                         <td><small class="text-muted"><?= htmlspecialchars($item['notes'] ?? '-') ?></small></td>
                     </tr>
                     <?php endforeach; ?>
@@ -203,6 +243,8 @@ $payables = $summary['payables'] ?? [];
                         <td class="text-end"><?= number_format($grandTotalQty, 2) ?></td>
                         <td></td>
                         <td class="text-end text-success"><?= number_format($grandTotalValue, 2) ?></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
                 </tfoot>
@@ -243,6 +285,8 @@ $payables = $summary['payables'] ?? [];
                         <th>Reference</th>
                         <th>Description</th>
                         <th>Location</th>
+                        <th>Payment Method</th>
+                        <th>Payment Status</th>
                         <th class="text-end text-danger">Debit (Out)</th>
                         <th class="text-end text-success">Credit (In)</th>
                         <th>Status</th>
@@ -286,6 +330,24 @@ $payables = $summary['payables'] ?? [];
                             <?php endif; ?>
                         </td>
                         <td><?= htmlspecialchars($record['location']) ?></td>
+                        <td>
+                            <?php if ($record['type'] === 'stock_receive'): ?>
+                            <span class="badge bg-info-subtle text-info"><?= htmlspecialchars($record['payment_method_label'] ?? 'Unknown') ?></span>
+                            <?php else: ?>
+                            <span class="text-muted">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($record['type'] === 'stock_receive'): ?>
+                            <?php if (($record['payment_status'] ?? '') === 'Loan'): ?>
+                            <span class="badge bg-danger-subtle text-danger">Loan</span>
+                            <?php else: ?>
+                            <span class="badge bg-success-subtle text-success">Paid</span>
+                            <?php endif; ?>
+                            <?php else: ?>
+                            <span class="text-muted">-</span>
+                            <?php endif; ?>
+                        </td>
                         <td class="text-end">
                             <?php if ($record['debit'] > 0): ?>
                             <span class="text-danger fw-bold"><?= number_format($record['debit'], 2) ?></span>
@@ -316,7 +378,7 @@ $payables = $summary['payables'] ?? [];
                 </tbody>
                 <tfoot class="bg-light">
                     <tr class="fw-bold">
-                        <td colspan="5" class="text-end">Totals:</td>
+                        <td colspan="7" class="text-end">Totals:</td>
                         <td class="text-end text-danger"><?= number_format($totalDebit, 2) ?></td>
                         <td class="text-end text-success"><?= number_format($totalCredit, 2) ?></td>
                         <td>
@@ -344,6 +406,7 @@ $payables = $summary['payables'] ?? [];
 window.APP_URL = '<?= APP_URL ?>';
 <?php if ($supplierInfo): ?>
 window.supplierRecordsPayload = {
+    company: <?= json_encode($companySettings ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
     supplier: <?= json_encode($supplierInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
     summary: <?= json_encode($summary, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
     records: <?= json_encode($records, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
