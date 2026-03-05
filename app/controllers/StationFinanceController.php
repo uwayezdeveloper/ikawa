@@ -382,31 +382,6 @@ class StationFinanceController extends Controller
             Database::query("START TRANSACTION");
 
             $debitDescription = 'Withdraw transfer to ' . ($toAccount['account_name'] ?? ('Account #' . $toAccountId)) . ': ' . $description;
-            $creditDescription = 'Withdraw transfer from ' . ($fromAccount['account_name'] ?? ('Account #' . $fromAccountId)) . ': ' . $description;
-
-            $duplicateCredit = Database::fetch(
-                "SELECT id FROM account_transactions
-                 WHERE account_id = :to_account_id
-                   AND transaction_type = 'credit'
-                   AND reference_type = 'station_withdraw'
-                   AND reference_id = :from_account_id
-                   AND amount = :amount
-                   AND created_by = :created_by
-                   AND description = :description
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 10 SECOND)
-                 LIMIT 1",
-                [
-                    'to_account_id' => $toAccountId,
-                    'from_account_id' => $fromAccountId,
-                    'amount' => $amount,
-                    'created_by' => (int)($user['id'] ?? 0),
-                    'description' => $creditDescription,
-                ]
-            );
-
-            if ($duplicateCredit) {
-                throw new \RuntimeException('Duplicate withdraw submission detected.');
-            }
 
             $this->transactionModel->createDebit(
                 $fromAccountId,
@@ -417,14 +392,7 @@ class StationFinanceController extends Controller
                 (int)($user['id'] ?? 0)
             );
 
-            $this->transactionModel->createCredit(
-                $toAccountId,
-                $amount,
-                'station_withdraw',
-                $fromAccountId,
-                $creditDescription,
-                (int)($user['id'] ?? 0)
-            );
+            $this->accountModel->updateBalance($toAccountId, $amount, 'add');
 
             Database::query("COMMIT");
 
@@ -485,6 +453,555 @@ class StationFinanceController extends Controller
             'journalTotals' => $journal['totals'],
             'scripts' => ['js/pages/station-journal.js']
         ], 'main');
+    }
+
+    /**
+     * Final location report page
+     */
+    public function finalReport($request, $response)
+    {
+        $user = $_SESSION['user'] ?? null;
+
+        if (!$this->hasPermission('view-station-finances')) {
+            return $response->redirect(APP_URL . '/dashboard');
+        }
+
+        $userLocationId = (int)($user['location_id'] ?? 0);
+        if ($userLocationId <= 0) {
+            $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/finance/station-finances');
+        }
+
+        $debugMode = (string)($_GET['debug'] ?? '') === '1';
+        $debugLocationId = (int)($_GET['location_id'] ?? 0);
+
+        $locationId = $userLocationId;
+        if ($debugMode && $debugLocationId > 0) {
+            $locationId = $debugLocationId;
+        }
+
+        $location = $this->locationModel->find($locationId);
+        $report = $this->getFinalLocationReportData($locationId);
+        $expenseDebug = $debugMode ? $this->getFinalReportExpenseDiagnostics($locationId) : null;
+        $accountDebug = $debugMode ? $this->getFinalReportAccountDiagnostics($locationId) : null;
+
+        return View::render('finance/station-finance/final-report', [
+            'title' => 'Final Location Report',
+            'user' => $user,
+            'location' => $location,
+            'report' => $report,
+            'debugMode' => $debugMode,
+            'expenseDebug' => $expenseDebug,
+            'accountDebug' => $accountDebug,
+            'userLocationId' => $userLocationId,
+            'effectiveLocationId' => $locationId,
+            'scripts' => ['js/pages/station-final-report.js']
+        ], 'main');
+    }
+
+    private function accountHasIdentifiersColumn(): bool
+    {
+        static $hasColumn = null;
+
+        if ($hasColumn !== null) {
+            return $hasColumn;
+        }
+
+        $column = Database::fetch("SHOW COLUMNS FROM accounts LIKE 'identifiers'");
+        $hasColumn = !empty($column);
+
+        return $hasColumn;
+    }
+
+    private function getFinalLocationReportData(int $locationId): array
+    {
+        $activeAdvances = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(amount), 0) as total
+             FROM supplier_advances
+             WHERE location_id = :location_id
+               AND status = 'approved'",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $incomingLoan = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(rh.amount), 0) as total
+             FROM tbl_recharge_history rh
+             INNER JOIN accounts a ON a.id = rh.acc_id
+             WHERE a.location_id = :location_id
+               AND rh.amount > 0
+               AND rh.in_id IS NULL
+               AND rh.to_account IS NULL",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $outgoingLoan = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(ABS(rh.amount)), 0) as total
+             FROM tbl_recharge_history rh
+             INNER JOIN accounts a ON a.id = rh.acc_id
+             WHERE a.location_id = :location_id
+               AND rh.amount < 0
+               AND rh.in_id IS NULL
+               AND rh.to_account IS NULL",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $transferLoanAvailable = max(0, $incomingLoan - $outgoingLoan);
+
+        $stockValue = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(total_value), 0) as total
+             FROM stock_summary
+             WHERE location_id = :location_id",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $journalBankBreakdown = $this->getJournalBankBreakdown($locationId);
+        $journalAmount = (float)($journalBankBreakdown['journal'] ?? 0);
+        $bankAmount = (float)($journalBankBreakdown['bank'] ?? 0);
+
+                $totalExpensesAll = (float)(Database::fetch(
+                        "SELECT COALESCE(SUM(ec.amount), 0) as total
+                         FROM tbl_expenseconsume ec
+                         WHERE ec.status = 1
+                             AND ec.station_id = :location_id",
+                        ['location_id' => $locationId]
+                )['total'] ?? 0);
+
+                $expenseRows = Database::fetchAll(
+                        "SELECT
+                                ex.categ_id,
+                                LOWER(COALESCE(cat.categ_name, '')) as categ_name,
+                                LOWER(COALESCE(ex.expense_name, '')) as expense_name,
+                                COALESCE(SUM(ec.amount), 0) as total
+                         FROM tbl_expenseconsume ec
+                         LEFT JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                         LEFT JOIN tbl_expensecategories cat ON cat.categ_id = ex.categ_id
+                         WHERE ec.status = 1
+                             AND ec.station_id = :location_id
+                         GROUP BY ex.categ_id, cat.categ_name, ex.expense_name",
+                        ['location_id' => $locationId]
+                );
+
+        $expenseByCategory = [
+            1 => 0.0,
+            2 => 0.0,
+            3 => 0.0,
+            4 => 0.0,
+        ];
+
+        $unmappedExpenseAmount = 0.0;
+
+        foreach ($expenseRows as $row) {
+            $catId = (int)($row['categ_id'] ?? 0);
+            $amount = (float)($row['total'] ?? 0);
+
+            if (isset($expenseByCategory[$catId])) {
+                $expenseByCategory[$catId] += $amount;
+                continue;
+            }
+
+            $categoryName = (string)($row['categ_name'] ?? '');
+            $expenseName = (string)($row['expense_name'] ?? '');
+            $nameProbe = trim($categoryName . ' ' . $expenseName);
+
+            if ($nameProbe !== '') {
+                if (strpos($nameProbe, 'non exploitable') !== false || strpos($nameProbe, 'non-exploitable') !== false) {
+                    $expenseByCategory[2] += $amount;
+                    continue;
+                }
+
+                if (strpos($nameProbe, 'exploitable') !== false) {
+                    $expenseByCategory[1] += $amount;
+                    continue;
+                }
+
+                if (strpos($nameProbe, 'certif') !== false) {
+                    $expenseByCategory[4] += $amount;
+                    continue;
+                }
+
+                if (
+                    strpos($nameProbe, 'invest') !== false ||
+                    strpos($nameProbe, 'liabil') !== false ||
+                    strpos($nameProbe, 'construction') !== false ||
+                    strpos($nameProbe, 'rehabil') !== false
+                ) {
+                    $expenseByCategory[3] += $amount;
+                    continue;
+                }
+            }
+
+            $unmappedExpenseAmount += $amount;
+        }
+
+        if ($unmappedExpenseAmount > 0) {
+            $expenseByCategory[3] += $unmappedExpenseAmount;
+        }
+
+        $approvisionnement = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(rh.amount), 0) as total
+             FROM tbl_recharge_history rh
+             INNER JOIN accounts src ON src.id = rh.acc_id
+             INNER JOIN accounts dst ON dst.id = rh.to_account
+             WHERE rh.to_account IS NOT NULL
+               AND dst.location_id = :location_id
+               AND src.location_type_id = 3",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $supplierLoansPending = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(amount - paid_amount), 0) as total
+             FROM supplier_payables
+             WHERE location_id = :location_id
+               AND status IN ('pending', 'partial')",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $suppliersTotal = $activeAdvances + $transferLoanAvailable;
+        $journalBankTotal = $journalAmount + $bankAmount;
+        $expensesTotal = $totalExpensesAll;
+        $overallTotal = $suppliersTotal + $stockValue + $journalBankTotal + $expensesTotal;
+        $liabilityTotal = $approvisionnement + $supplierLoansPending;
+
+        return [
+            'suppliers' => [
+                'advance' => $activeAdvances,
+                'loan_transfer' => $transferLoanAvailable,
+                'total' => $suppliersTotal,
+            ],
+            'stock' => [
+                'stock_value' => $stockValue,
+                'total' => $stockValue,
+            ],
+            'journal_bank' => [
+                'journal' => $journalAmount,
+                'bank' => $bankAmount,
+                'total' => $journalBankTotal,
+            ],
+            'expenses' => [
+                'exploitable' => $expenseByCategory[1],
+                'non_exploitable' => $expenseByCategory[2],
+                'investment_liability' => $expenseByCategory[3],
+                'certification' => $expenseByCategory[4],
+                'total' => $expensesTotal,
+            ],
+            'main_total' => $overallTotal,
+            'liability' => [
+                'approvisionnement' => $approvisionnement,
+                'supplier_loans' => $supplierLoansPending,
+                'total' => $liabilityTotal,
+            ],
+        ];
+    }
+
+    private function getFinalReportExpenseDiagnostics(int $locationId): array
+    {
+        $databaseName = (string)(Database::fetch("SELECT DATABASE() as db")['db'] ?? '');
+
+        $globalExpenseStats = Database::fetch(
+            "SELECT COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume"
+        ) ?: ['cnt' => 0, 'total' => 0];
+
+        $globalActiveExpenseStats = Database::fetch(
+            "SELECT COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume
+             WHERE status = 1"
+        ) ?: ['cnt' => 0, 'total' => 0];
+
+        $activeForLocation = Database::fetch(
+            "SELECT COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume
+             WHERE station_id = :location_id AND status = 1",
+            ['location_id' => $locationId]
+        ) ?: ['cnt' => 0, 'total' => 0];
+
+        $anyStatusForLocation = Database::fetch(
+            "SELECT COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume
+             WHERE station_id = :location_id",
+            ['location_id' => $locationId]
+        ) ?: ['cnt' => 0, 'total' => 0];
+
+        $topStations = Database::fetchAll(
+            "SELECT station_id, COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume
+             WHERE status = 1
+             GROUP BY station_id
+             ORDER BY total DESC
+             LIMIT 10"
+        );
+
+        $byCategory = Database::fetchAll(
+            "SELECT
+                ec.station_id,
+                ex.categ_id,
+                cat.categ_name,
+                ex.expense_name,
+                COUNT(*) as cnt,
+                COALESCE(SUM(ec.amount), 0) as total
+             FROM tbl_expenseconsume ec
+             LEFT JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+             LEFT JOIN tbl_expensecategories cat ON cat.categ_id = ex.categ_id
+             WHERE ec.station_id = :location_id
+               AND ec.status = 1
+             GROUP BY ec.station_id, ex.categ_id, cat.categ_name, ex.expense_name
+             ORDER BY total DESC",
+            ['location_id' => $locationId]
+        );
+
+        $orphans = Database::fetch(
+            "SELECT COUNT(*) as cnt, COALESCE(SUM(ec.amount), 0) as total
+             FROM tbl_expenseconsume ec
+             LEFT JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+             WHERE ec.station_id = :location_id
+               AND ec.status = 1
+               AND ex.expense_id IS NULL",
+            ['location_id' => $locationId]
+        ) ?: ['cnt' => 0, 'total' => 0];
+
+        $statusBreakdown = Database::fetchAll(
+            "SELECT status, COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume
+             WHERE station_id = :location_id
+             GROUP BY status
+             ORDER BY status",
+            ['location_id' => $locationId]
+        );
+
+        $expenseIdBreakdown = Database::fetchAll(
+            "SELECT expense_id, COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total
+             FROM tbl_expenseconsume
+             WHERE station_id = :location_id
+               AND status = 1
+             GROUP BY expense_id
+             ORDER BY total DESC",
+            ['location_id' => $locationId]
+        );
+
+        $expenseTypeMap = Database::fetchAll(
+            "SELECT ex.expense_id, ex.categ_id, ex.expense_name, cat.categ_name
+             FROM tbl_expenses ex
+             LEFT JOIN tbl_expensecategories cat ON cat.categ_id = ex.categ_id
+             ORDER BY ex.expense_id"
+        );
+
+        $recentRows = Database::fetchAll(
+            "SELECT con_id, expense_id, station_id, amount, status, recorded_date
+             FROM tbl_expenseconsume
+             WHERE station_id = :location_id
+             ORDER BY con_id DESC
+             LIMIT 20",
+            ['location_id' => $locationId]
+        );
+
+        return [
+            'database_name' => $databaseName,
+            'location_id' => $locationId,
+            'global_expense_stats' => $globalExpenseStats,
+            'global_active_expense_stats' => $globalActiveExpenseStats,
+            'active_for_location' => $activeForLocation,
+            'any_status_for_location' => $anyStatusForLocation,
+            'top_stations' => $topStations,
+            'by_category' => $byCategory,
+            'orphans' => $orphans,
+            'status_breakdown' => $statusBreakdown,
+            'expense_id_breakdown' => $expenseIdBreakdown,
+            'expense_type_map' => $expenseTypeMap,
+            'recent_rows' => $recentRows,
+        ];
+    }
+
+    private function getJournalBankBreakdown(int $locationId): array
+    {
+        $bank = 0.0;
+        $journal = 0.0;
+        $unknown = 0.0;
+
+        if ($this->accountHasIdentifiersColumn()) {
+            $rows = Database::fetchAll(
+                "SELECT id, account_name, account_number, status, identifiers, balance
+                 FROM accounts
+                 WHERE location_id = :location_id",
+                ['location_id' => $locationId]
+            );
+
+            foreach ($rows as $row) {
+                $balance = (float)($row['balance'] ?? 0);
+                $identifierRaw = strtolower(trim((string)($row['identifiers'] ?? '')));
+
+                if ($identifierRaw === '1' || $identifierRaw === 'bank') {
+                    $bank += $balance;
+                    continue;
+                }
+
+                if ($identifierRaw === '2' || $identifierRaw === 'journal') {
+                    $journal += $balance;
+                    continue;
+                }
+
+                $unknown += $balance;
+            }
+
+            return [
+                'bank' => $bank,
+                'journal' => $journal,
+                'unknown' => $unknown,
+                'mode' => 'identifiers',
+            ];
+        }
+
+        $rows = Database::fetchAll(
+            "SELECT a.id, a.account_name, a.account_number, a.status, a.balance, pm.name as payment_mode_name
+             FROM accounts a
+             LEFT JOIN payment_modes pm ON pm.id = a.payment_mode_id
+             WHERE a.location_id = :location_id",
+            ['location_id' => $locationId]
+        );
+
+        foreach ($rows as $row) {
+            $balance = (float)($row['balance'] ?? 0);
+            $probe = strtolower(trim((string)($row['payment_mode_name'] ?? '')));
+
+            if (strpos($probe, 'bank') !== false) {
+                $bank += $balance;
+                continue;
+            }
+
+            if (strpos($probe, 'journal') !== false || strpos($probe, 'cash') !== false) {
+                $journal += $balance;
+                continue;
+            }
+
+            $unknown += $balance;
+        }
+
+        return [
+            'bank' => $bank,
+            'journal' => $journal,
+            'unknown' => $unknown,
+            'mode' => 'payment_mode_fallback',
+        ];
+    }
+
+    private function getFinalReportAccountDiagnostics(int $locationId): array
+    {
+        $databaseName = (string)(Database::fetch("SELECT DATABASE() as db")['db'] ?? '');
+        $hasIdentifiers = $this->accountHasIdentifiersColumn();
+        $breakdown = $this->getJournalBankBreakdown($locationId);
+
+        $totalAll = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(balance), 0) as total
+             FROM accounts
+             WHERE location_id = :location_id",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $totalActive = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(balance), 0) as total
+             FROM accounts
+             WHERE location_id = :location_id
+               AND status = 'active'",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $strictBankAll = 0.0;
+        $strictJournalAll = 0.0;
+        $strictBankActive = 0.0;
+        $strictJournalActive = 0.0;
+
+        if ($hasIdentifiers) {
+            $strictAll = Database::fetch(
+                "SELECT
+                    COALESCE(SUM(CASE WHEN identifiers = 1 THEN balance ELSE 0 END), 0) as bank_total,
+                    COALESCE(SUM(CASE WHEN identifiers = 2 THEN balance ELSE 0 END), 0) as journal_total
+                 FROM accounts
+                 WHERE location_id = :location_id",
+                ['location_id' => $locationId]
+            ) ?: [];
+
+            $strictBankAll = (float)($strictAll['bank_total'] ?? 0);
+            $strictJournalAll = (float)($strictAll['journal_total'] ?? 0);
+
+            $strictActive = Database::fetch(
+                "SELECT
+                    COALESCE(SUM(CASE WHEN identifiers = 1 THEN balance ELSE 0 END), 0) as bank_total,
+                    COALESCE(SUM(CASE WHEN identifiers = 2 THEN balance ELSE 0 END), 0) as journal_total
+                 FROM accounts
+                 WHERE location_id = :location_id
+                   AND status = 'active'",
+                ['location_id' => $locationId]
+            ) ?: [];
+
+            $strictBankActive = (float)($strictActive['bank_total'] ?? 0);
+            $strictJournalActive = (float)($strictActive['journal_total'] ?? 0);
+        }
+
+        $statusBreakdown = Database::fetchAll(
+            "SELECT COALESCE(status, 'NULL') as status, COUNT(*) as cnt, COALESCE(SUM(balance), 0) as total
+             FROM accounts
+             WHERE location_id = :location_id
+             GROUP BY status
+             ORDER BY status",
+            ['location_id' => $locationId]
+        );
+
+        $identifierBreakdown = [];
+        if ($hasIdentifiers) {
+            $identifierBreakdown = Database::fetchAll(
+                "SELECT COALESCE(CAST(identifiers AS CHAR), 'NULL') as identifiers, COUNT(*) as cnt, COALESCE(SUM(balance), 0) as total
+                 FROM accounts
+                 WHERE location_id = :location_id
+                 GROUP BY identifiers
+                 ORDER BY identifiers",
+                ['location_id' => $locationId]
+            );
+        }
+
+        $accountRows = Database::fetchAll(
+            "SELECT a.id, a.account_name, a.account_number, a.status, a.balance,
+                    " . ($hasIdentifiers ? "a.identifiers" : "NULL") . " as identifiers,
+                    pm.name as payment_mode_name
+             FROM accounts a
+             LEFT JOIN payment_modes pm ON pm.id = a.payment_mode_id
+             WHERE a.location_id = :location_id
+             ORDER BY a.id ASC",
+            ['location_id' => $locationId]
+        );
+
+        return [
+            'database_name' => $databaseName,
+            'location_id' => $locationId,
+            'has_identifiers' => $hasIdentifiers,
+            'classification_mode' => (string)($breakdown['mode'] ?? ''),
+            'formula_checks' => [
+                'total_balance_all_status' => $totalAll,
+                'total_balance_active_only' => $totalActive,
+                'strict_identifiers_all_status' => [
+                    'bank' => $strictBankAll,
+                    'journal' => $strictJournalAll,
+                    'total' => $strictBankAll + $strictJournalAll,
+                ],
+                'strict_identifiers_active_only' => [
+                    'bank' => $strictBankActive,
+                    'journal' => $strictJournalActive,
+                    'total' => $strictBankActive + $strictJournalActive,
+                ],
+                'flex_identifiers_all_status' => [
+                    'bank' => (float)($breakdown['bank'] ?? 0),
+                    'journal' => (float)($breakdown['journal'] ?? 0),
+                    'unknown' => (float)($breakdown['unknown'] ?? 0),
+                    'total' => (float)($breakdown['bank'] ?? 0) + (float)($breakdown['journal'] ?? 0) + (float)($breakdown['unknown'] ?? 0),
+                ],
+            ],
+            'totals' => [
+                'bank' => (float)($breakdown['bank'] ?? 0),
+                'journal' => (float)($breakdown['journal'] ?? 0),
+                'unknown' => (float)($breakdown['unknown'] ?? 0),
+            ],
+            'status_breakdown' => $statusBreakdown,
+            'identifier_breakdown' => $identifierBreakdown,
+            'accounts' => $accountRows,
+        ];
     }
 
     private function getLocationJournalData(int $locationId, ?string $dateFrom = null, ?string $dateTo = null): array
@@ -566,7 +1083,7 @@ class StationFinanceController extends Controller
         }
 
         // Paid-out entries from account transactions (only successful payments)
-        $paidOutSql = "SELECT at.created_at, at.amount, at.reference_type, at.description,
+            $paidOutSql = "SELECT at.created_at, at.created_by, at.amount, at.reference_type, at.reference_id, at.description,
                               a.account_name, a.account_number
                        FROM account_transactions at
                        INNER JOIN accounts a ON at.account_id = a.id
@@ -583,9 +1100,20 @@ class StationFinanceController extends Controller
             $paidOutSql .= " AND DATE(at.created_at) <= :date_to";
             $paidOutParams['date_to'] = $dateTo;
         }
-        $paidOutSql .= " ORDER BY at.created_at ASC, at.id ASC";
+        $paidOutSql .= " ORDER BY at.created_at ASC, at.created_by ASC";
 
         $paidOutRows = Database::fetchAll($paidOutSql, $paidOutParams);
+        $payableIds = [];
+        foreach ($paidOutRows as $row) {
+            if (strtolower((string)($row['reference_type'] ?? '')) === 'payable_payment') {
+                $payableId = (int)($row['reference_id'] ?? 0);
+                if ($payableId > 0) {
+                    $payableIds[] = $payableId;
+                }
+            }
+        }
+        $payableDetailsMap = $this->getJournalPayableDetailsMap(array_values(array_unique($payableIds)));
+
         foreach ($paidOutRows as $row) {
             $bankCash = $row['account_name'];
             if (!empty($row['account_number'])) {
@@ -603,12 +1131,24 @@ class StationFinanceController extends Controller
             }
 
             $desc = $baseDescription;
-            if (!empty($row['description'])) {
+            if ($referenceType === 'payable_payment') {
+                $payableId = (int)($row['reference_id'] ?? 0);
+                $payableInfo = $payableDetailsMap[$payableId] ?? null;
+
+                if (!empty($payableInfo)) {
+                    $supplierName = trim((string)($payableInfo['supplier_name'] ?? 'Supplier'));
+                    $productName = trim((string)($payableInfo['product_name'] ?? 'Product'));
+                    $desc = 'payment - ' . $supplierName . ' / ' . $productName;
+                } elseif (!empty($row['description'])) {
+                    $desc .= ' - ' . $row['description'];
+                }
+            } elseif (!empty($row['description'])) {
                 $desc .= ' - ' . $row['description'];
             }
 
             $events[] = [
                 'sort_datetime' => $row['created_at'],
+                'sort_created_by' => (int)($row['created_by'] ?? 0),
                 'sort_seq' => ++$sortSeq,
                 'date' => date('Y-m-d', strtotime($row['created_at'])),
                 'description' => $desc,
@@ -619,7 +1159,7 @@ class StationFinanceController extends Controller
         }
 
                 // Station withdraw transfers (incoming to account only)
-        $withdrawSql = "SELECT at.id, at.reference_id, at.created_at, at.transaction_type, at.amount, at.description,
+        $withdrawSql = "SELECT at.reference_id, at.created_at, at.created_by, at.transaction_type, at.amount, at.description,
                                a.account_name, a.account_number,
                                ref.account_name AS ref_account_name,
                                ref.account_number AS ref_account_number
@@ -627,8 +1167,7 @@ class StationFinanceController extends Controller
                         INNER JOIN accounts a ON at.account_id = a.id
                         LEFT JOIN accounts ref ON at.reference_id = ref.id
                         WHERE a.location_id = :location_id
-                                                    AND at.reference_type = 'station_withdraw'
-                                                    AND at.transaction_type = 'credit'";
+                                AND at.reference_type = 'station_withdraw'";
 
         $withdrawParams = ['location_id' => $locationId];
         if ($dateFrom) {
@@ -639,7 +1178,7 @@ class StationFinanceController extends Controller
             $withdrawSql .= " AND DATE(at.created_at) <= :date_to";
             $withdrawParams['date_to'] = $dateTo;
         }
-        $withdrawSql .= " ORDER BY at.created_at ASC, at.id ASC";
+        $withdrawSql .= " ORDER BY at.created_at ASC, at.created_by ASC";
 
         $withdrawRows = Database::fetchAll($withdrawSql, $withdrawParams);
         foreach ($withdrawRows as $row) {
@@ -653,10 +1192,14 @@ class StationFinanceController extends Controller
                 $refBankCash .= ' (' . $row['ref_account_number'] . ')';
             }
 
-            $desc = 'withdraw transfer in - from ' . $refBankCash;
+            $txnType = strtolower((string)($row['transaction_type'] ?? ''));
+            $desc = $txnType === 'credit'
+                ? 'withdraw transfer in - from ' . $refBankCash
+                : 'withdraw transfer out - to ' . $refBankCash;
 
             $events[] = [
                 'sort_datetime' => $row['created_at'],
+                'sort_created_by' => (int)($row['created_by'] ?? 0),
                 'sort_seq' => ++$sortSeq,
                 'date' => date('Y-m-d', strtotime($row['created_at'])),
                 'description' => $desc,
@@ -667,7 +1210,7 @@ class StationFinanceController extends Controller
         }
 
         // Other account transactions history for this location (global transfers/adjustments/other operations)
-        $otherTxnSql = "SELECT at.id, at.created_at, at.transaction_type, at.amount, at.reference_type, at.description,
+        $otherTxnSql = "SELECT at.created_at, at.created_by, at.transaction_type, at.amount, at.reference_type, at.description,
                                a.account_name, a.account_number
                         FROM account_transactions at
                         INNER JOIN accounts a ON at.account_id = a.id
@@ -683,7 +1226,7 @@ class StationFinanceController extends Controller
             $otherTxnSql .= " AND DATE(at.created_at) <= :date_to";
             $otherTxnParams['date_to'] = $dateTo;
         }
-        $otherTxnSql .= " ORDER BY at.created_at ASC, at.id ASC";
+        $otherTxnSql .= " ORDER BY at.created_at ASC, at.created_by ASC";
 
         $otherTxnRows = Database::fetchAll($otherTxnSql, $otherTxnParams);
         foreach ($otherTxnRows as $row) {
@@ -702,6 +1245,7 @@ class StationFinanceController extends Controller
             $isCredit = strtolower((string)($row['transaction_type'] ?? '')) === 'credit';
             $events[] = [
                 'sort_datetime' => $row['created_at'],
+                'sort_created_by' => (int)($row['created_by'] ?? 0),
                 'sort_seq' => ++$sortSeq,
                 'date' => date('Y-m-d', strtotime($row['created_at'])),
                 'description' => $desc,
@@ -711,14 +1255,16 @@ class StationFinanceController extends Controller
             ];
         }
 
-                // Expenses from expense-transactions, allocated to accounts in this location
-                $expenseSql = "SELECT ec.con_id, ec.pay_date, ec.recorded_date, ec.amount, ec.description, ec.pay_mode,
-                                             ex.expense_name
-                                             FROM tbl_expenseconsume ec
-                                             LEFT JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
-                                             WHERE ec.status = 1";
+        // Expenses from expense-transactions, allocated to accounts in this location
+         $expenseSql = "SELECT ec.con_id, ec.pay_date, ec.recorded_date, ec.amount, ec.description, ec.pay_mode,
+                      ex.expense_name,
+                      ecr.cons_name as consumer_name
+                       FROM tbl_expenseconsume ec
+                       LEFT JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                  LEFT JOIN tbl_expenseconsumer ecr ON ecr.cons_id = ec.payer_name
+                       WHERE ec.status = 1";
 
-                $expenseParams = [];
+        $expenseParams = [];
         if ($dateFrom) {
             $expenseSql .= " AND DATE(ec.pay_date) >= :date_from";
             $expenseParams['date_from'] = $dateFrom;
@@ -757,11 +1303,12 @@ class StationFinanceController extends Controller
                 continue;
             }
 
-            $expenseType = trim((string)($row['expense_name'] ?? ''));
-            $expenseLabel = 'expense' . ($expenseType !== '' ? ' (' . $expenseType . ')' : '');
+            $expenseComment = trim((string)($row['description'] ?? ''));
+            $expenseLabel = $expenseComment !== '' ? ('expense - ' . $expenseComment) : 'expense';
 
             $events[] = [
                 'sort_datetime' => $row['pay_date'],
+                'sort_created_by' => 0,
                 'sort_seq' => ++$sortSeq,
                 'date' => date('Y-m-d', strtotime($row['pay_date'])),
                 'description' => $expenseLabel,
@@ -789,6 +1336,12 @@ class StationFinanceController extends Controller
             if ($timeCmp !== 0) {
                 return $timeCmp;
             }
+
+            $createdByCmp = ((int)($a['sort_created_by'] ?? 0)) <=> ((int)($b['sort_created_by'] ?? 0));
+            if ($createdByCmp !== 0) {
+                return $createdByCmp;
+            }
+
             return ((int)($a['sort_seq'] ?? 0)) <=> ((int)($b['sort_seq'] ?? 0));
         });
 
@@ -802,9 +1355,27 @@ class StationFinanceController extends Controller
             $totalDebit += $event['debit'];
             $totalCredit += $event['credit'];
 
+            $rawDateTime = trim((string)($event['sort_datetime'] ?? ''));
+            if ($rawDateTime === '') {
+                $rawDateTime = trim((string)($event['date'] ?? ''));
+            }
+
+            if ($rawDateTime !== '') {
+                $rawDateTime = str_replace('T', ' ', $rawDateTime);
+                $rawDateTime = preg_replace('/\.\d+$/', '', $rawDateTime) ?? $rawDateTime;
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawDateTime)) {
+                    $rawDateTime .= ' 00:00:00';
+                }
+            }
+
+            $rawDate = '';
+            if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $rawDateTime, $m)) {
+                $rawDate = $m[1];
+            }
+
             $rows[] = [
-                'date' => $event['date'],
-                'datetime' => date('Y-m-d H:i:s', strtotime((string)($event['sort_datetime'] ?? $event['date']))),
+                'date' => $rawDate !== '' ? $rawDate : (string)($event['date'] ?? ''),
+                'datetime' => $rawDateTime,
                 'description' => $event['description'],
                 'bank_cash' => $event['bank_cash'],
                 'debit' => $event['debit'],
@@ -821,5 +1392,38 @@ class StationFinanceController extends Controller
                 'balance' => $runningBalance,
             ],
         ];
+    }
+
+    private function getJournalPayableDetailsMap(array $payableIds): array
+    {
+        if (empty($payableIds)) {
+            return [];
+        }
+
+        $params = [];
+        $placeholders = [];
+        foreach ($payableIds as $index => $payableId) {
+            $key = 'payable_id_' . $index;
+            $placeholders[] = ':' . $key;
+            $params[$key] = (int)$payableId;
+        }
+
+        $sql = "SELECT sp.id as payable_id,
+                       sp.payable_number,
+                       COALESCE(s.name, 'Unknown Supplier') as supplier_name,
+                       COALESCE(pc.name, 'Unknown Product') as product_name
+                FROM supplier_payables sp
+                LEFT JOIN suppliers s ON s.id = sp.supplier_id
+                LEFT JOIN stock_receives sr ON sr.id = sp.stock_receive_id
+                LEFT JOIN product_categories pc ON pc.id = sr.product_category_id
+                WHERE sp.id IN (" . implode(', ', $placeholders) . ")";
+
+        $rows = Database::fetchAll($sql, $params);
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int)($row['payable_id'] ?? 0)] = $row;
+        }
+
+        return $map;
     }
 }

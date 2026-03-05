@@ -337,6 +337,11 @@
                                 </a>
                             </li>
                             <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/station-finances/final-report" class="side-nav-link">
+                                    <span class="menu-text">Final Report</span>
+                                </a>
+                            </li>
+                            <li class="side-nav-item">
                                 <a href="<?= APP_URL ?>/finance/accounts" class="side-nav-link">
                                     <span class="menu-text">Accounts</span>
                                 </a>

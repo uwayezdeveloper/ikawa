@@ -65,6 +65,19 @@ class DashboardController extends Controller
             $accountBalances[] = (float) $r['balance'];
         }
 
+        // Per-location stock cards (total amount + total quantity)
+        $locationCards = Database::fetchAll(
+            "SELECT l.id,
+                    l.name as location_name,
+                    COALESCE(SUM(ss.total_value), 0) as total_amount,
+                    COALESCE(SUM(ss.total_quantity), 0) as total_quantity
+             FROM locations l
+             LEFT JOIN stock_summary ss ON ss.location_id = l.id
+             WHERE l.status = 'active'
+             GROUP BY l.id, l.name
+             ORDER BY l.name ASC"
+        );
+
         // Prepare simple time-series: expenses last 7 days
         $expensesLast7 = Database::fetchAll("SELECT DATE(recorded_date) as d, COALESCE(SUM(amount),0) as total FROM tbl_expenseconsume WHERE recorded_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(recorded_date) ORDER BY DATE(recorded_date) ASC");
         $expenseDates = [];
@@ -115,7 +128,8 @@ class DashboardController extends Controller
                 'expense' => [ 'labels' => $expenseDates, 'data' => $expenseValues ],
                 'invoices' => [ 'labels' => $invLabels, 'counts' => $invCounts, 'totals' => $invTotals ]
                 , 'accounts' => ['labels' => $accountLabels, 'data' => $accountBalances]
-            ]
+            ],
+            'locationCards' => $locationCards
         ], 'main');
     }
 }

@@ -38,11 +38,12 @@ class ExpenseTransaction extends Model
         
         $params = [];
         
-        // Filter by user's location if provided
-        if ($userId) {
-            // Skip user-based filtering since locations table doesn't have created_by
-            // $sql .= " AND l.created_by = :user_id";
-            // $params['user_id'] = $userId;
+        if (!empty($userId)) {
+            $userLocationId = $this->getUserLocationId((int)$userId);
+            if ($userLocationId > 0) {
+                $sql .= " AND ec.station_id = :location_id";
+                $params['location_id'] = $userLocationId;
+            }
         }
 
         if (!empty($search)) {
@@ -366,11 +367,12 @@ class ExpenseTransaction extends Model
         $params = [];
         $conditions = [];
         
-        if ($userId) {
-            // Skip user-based filtering since locations table doesn't have created_by
-            // $sql .= " INNER JOIN locations l ON ec.station_id = l.id";
-            // $conditions[] = "l.created_by = :user_id";
-            // $params['user_id'] = $userId;
+        if (!empty($userId)) {
+            $userLocationId = $this->getUserLocationId((int)$userId);
+            if ($userLocationId > 0) {
+                $conditions[] = "ec.station_id = :location_id";
+                $params['location_id'] = $userLocationId;
+            }
         }
         
         if ($dateFrom) {
@@ -394,6 +396,17 @@ class ExpenseTransaction extends Model
             'avg_amount' => 0,
             'active_transactions' => 0
         ];
+    }
+
+    private function getUserLocationId(int $userId): int
+    {
+        $sessionLocationId = (int)($_SESSION['user']['location_id'] ?? 0);
+        if ($sessionLocationId > 0) {
+            return $sessionLocationId;
+        }
+
+        $row = Database::fetch("SELECT location_id FROM users WHERE id = :id", ['id' => $userId]);
+        return (int)($row['location_id'] ?? 0);
     }
 
     /**

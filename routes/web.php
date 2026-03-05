@@ -202,6 +202,7 @@ $router->post('/finance/station-finances/action', [StationFinanceController::cla
 $router->get('/finance/station-finances/withdraw', [StationFinanceController::class, 'withdraw'], ['AuthMiddleware']);
 $router->post('/finance/station-finances/withdraw', [StationFinanceController::class, 'processWithdraw'], ['AuthMiddleware']);
 $router->get('/finance/station-finances/journal', [StationFinanceController::class, 'journal'], ['AuthMiddleware']);
+$router->get('/finance/station-finances/final-report', [StationFinanceController::class, 'finalReport'], ['AuthMiddleware']);
 
 // Stock management - Receive Stock
 $router->get('/stock/receives', [StockReceiveController::class, 'index'], ['AuthMiddleware']);

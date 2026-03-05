@@ -43,7 +43,7 @@
                 <!-- Location Info -->
                 <div class="alert alert-info">
                     <i class="ti ti-map-pin me-2"></i>
-                    <strong>Transaction Location:</strong> Station ID 3 (User Location)
+                    <strong>Transaction Location:</strong> Station ID <?= (int)($userLocationId ?? ($_SESSION['user']['location_id'] ?? 0)) ?> (User Location)
                 </div>
 
                 <!-- Form -->

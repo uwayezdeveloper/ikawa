@@ -117,12 +117,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- Supplier -->
                     <div class="mb-3">
                         <label class="form-label">Supplier <span class="text-danger">*</span></label>
-                        <select class="form-select" name="supplier_id" id="supplierSelect" required>
-                            <option value="">Select Supplier</option>
+                        <input type="text" class="form-control" id="supplierSearchInput" list="supplierOptions"
+                            placeholder="Type supplier name to search..." autocomplete="off" required>
+                        <datalist id="supplierOptions">
                             <?php foreach ($suppliers as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
+                            <option value="<?= htmlspecialchars($s['name']) ?>" data-id="<?= $s['id'] ?>"></option>
                             <?php endforeach; ?>
-                        </select>
+                        </datalist>
+                        <input type="hidden" name="supplier_id" id="supplierIdInput">
+                        <small class="text-muted">Start typing supplier name and select from suggestions.</small>
                     </div>
 
                     <!-- Payment Method -->

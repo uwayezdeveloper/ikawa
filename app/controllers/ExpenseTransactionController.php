@@ -36,8 +36,14 @@ class ExpenseTransactionController extends Controller
         $search = $_GET['search'] ?? '';
         $perPage = 20;
         $userId = $_SESSION['user']['id'] ?? null;
+        $userLocationId = (int)($_SESSION['user']['location_id'] ?? 0);
         $dateFrom = $_GET['date_from'] ?? null;
         $dateTo = $_GET['date_to'] ?? null;
+
+        if ($userLocationId <= 0) {
+            $_SESSION['error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/dashboard');
+        }
 
         $result = $this->expenseTransaction->getPaginatedTransactions($page, $perPage, $search, $userId, $dateFrom, $dateTo);
         $stats = $this->expenseTransaction->getTransactionStats($userId, $dateFrom, $dateTo);
@@ -65,13 +71,18 @@ class ExpenseTransactionController extends Controller
     public function create(Request $request, Response $response)
     {
         $userId = $_SESSION['user']['id'] ?? null;
+        $userLocationId = (int)($_SESSION['user']['location_id'] ?? 0);
         
         if (!$userId) {
             $_SESSION['error'] = 'User session not found';
             return $response->redirect(APP_URL . '/finance/expense-transactions');
         }
 
-        // Use User ID 3 directly as station/location reference
+        if ($userLocationId <= 0) {
+            $_SESSION['error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/finance/expense-transactions');
+        }
+
         // Get related data
         $expenseTypes = $this->expenseType->getActiveExpenseTypes();
         $consumers = $this->expenseConsumer->getActiveConsumers();
@@ -83,6 +94,7 @@ class ExpenseTransactionController extends Controller
             'consumers' => $consumers,
             'accounts' => $accounts,
             'receiptTypes' => $receiptTypes,
+            'userLocationId' => $userLocationId,
             'title' => 'New Expense Transaction',
             'user' => $_SESSION['user'] ?? []
         ];
@@ -100,9 +112,15 @@ class ExpenseTransactionController extends Controller
         }
 
         $userId = $_SESSION['user']['id'] ?? null;
+        $userLocationId = (int)($_SESSION['user']['location_id'] ?? 0);
         
         if (!$userId) {
             $_SESSION['error'] = 'User session not found';
+            return $response->redirect(APP_URL . '/finance/expense-transactions');
+        }
+
+        if ($userLocationId <= 0) {
+            $_SESSION['error'] = 'Your account has no location assigned. Contact administrator.';
             return $response->redirect(APP_URL . '/finance/expense-transactions');
         }
 
@@ -138,7 +156,7 @@ class ExpenseTransactionController extends Controller
         
         $data = [
             'expense_id' => (int) ($_POST['expense_id'] ?? 0),
-            'station_id' => 3, // Use User ID 3 as station/location reference
+            'station_id' => $userLocationId,
             'amount' => (float) ($_POST['amount'] ?? 0),
             'charges' => (float) ($_POST['charges'] ?? 0),
             'pay_mode' => $payMode,
@@ -338,11 +356,17 @@ class ExpenseTransactionController extends Controller
     public function export(Request $request, Response $response)
     {
         $userId = $_SESSION['user']['id'] ?? null;
+        $userLocationId = (int)($_SESSION['user']['location_id'] ?? 0);
         $dateFrom = $_GET['date_from'] ?? null;
         $dateTo = $_GET['date_to'] ?? null;
+
+        if ($userLocationId <= 0) {
+            $_SESSION['error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/finance/expense-transactions');
+        }
         
         // Get all transactions for export
-        $result = $this->expenseTransaction->getPaginatedTransactions(1, 10000, '', $userId);
+        $result = $this->expenseTransaction->getPaginatedTransactions(1, 10000, '', $userId, $dateFrom, $dateTo);
         
         $filename = 'expense_transactions_' . date('Y-m-d_H-i-s') . '.csv';
         

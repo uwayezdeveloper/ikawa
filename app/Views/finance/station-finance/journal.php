@@ -1,6 +1,28 @@
 <?php
 $rows = $journalRows ?? [];
 $totals = $journalTotals ?? ['debit' => 0, 'credit' => 0, 'balance' => 0];
+
+$formatJournalDateTime = static function ($value): string {
+    $raw = trim((string)$value);
+    if ($raw === '') {
+        return '';
+    }
+
+    $raw = str_replace('T', ' ', $raw);
+    $raw = preg_replace('/\.\d+$/', '', $raw) ?? $raw;
+
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $raw, $m)) {
+        $year = $m[1];
+        $month = $m[2];
+        $day = $m[3];
+        $hour = $m[4] ?? '00';
+        $minute = $m[5] ?? '00';
+        $second = $m[6] ?? '00';
+        return $day . '/' . $month . '/' . $year . ' ' . $hour . ':' . $minute . ':' . $second;
+    }
+
+    return $raw;
+};
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -61,7 +83,7 @@ $totals = $journalTotals ?? ['debit' => 0, 'credit' => 0, 'balance' => 0];
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                     <tr>
-                        <td><?= htmlspecialchars(date('d/m/Y H:i:s', strtotime($row['datetime'] ?? $row['date']))) ?></td>
+                        <td><?= htmlspecialchars($formatJournalDateTime($row['datetime'] ?? $row['date'] ?? '')) ?></td>
                         <td><?= htmlspecialchars($row['description']) ?></td>
                         <td><?= htmlspecialchars($row['bank_cash']) ?></td>
                         <td class="text-end"><?= $row['debit'] > 0 ? number_format((float)$row['debit'], 2) : '' ?></td>

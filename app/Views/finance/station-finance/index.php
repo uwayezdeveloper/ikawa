@@ -24,13 +24,18 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
         </nav>
     </div>
     <div>
-        <select id="locationSelect" class="form-select" style="min-width: 250px;">
-            <?php foreach ($locations as $loc): ?>
-            <option value="<?= $loc['id'] ?>" <?= $loc['id'] == $selectedLocationId ? 'selected' : '' ?>>
-                <?= htmlspecialchars($loc['type_name'] . ' - ' . $loc['name']) ?>
-            </option>
-            <?php endforeach; ?>
-        </select>
+        <div class="d-flex align-items-center gap-2">
+            <a href="<?= APP_URL ?>/finance/station-finances/final-report" class="btn btn-outline-primary">
+                <i class="ti ti-report-analytics me-1"></i> Final Report
+            </a>
+            <select id="locationSelect" class="form-select" style="min-width: 250px;">
+                <?php foreach ($locations as $loc): ?>
+                <option value="<?= $loc['id'] ?>" <?= $loc['id'] == $selectedLocationId ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($loc['type_name'] . ' - ' . $loc['name']) ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
     </div>
 </div>
 

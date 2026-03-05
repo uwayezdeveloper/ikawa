@@ -11,7 +11,9 @@
   const categorySelect = document.getElementById("categorySelect");
   const categoryTypeSelect = document.getElementById("categoryTypeSelect");
   const typeUnitSelect = document.getElementById("typeUnitSelect");
-  const supplierSelect = document.getElementById("supplierSelect");
+  const supplierSearchInput = document.getElementById("supplierSearchInput");
+  const supplierIdInput = document.getElementById("supplierIdInput");
+  const supplierOptions = document.getElementById("supplierOptions");
   const accountSelect = document.getElementById("accountSelect");
   const accountWrap = document.getElementById("accountWrap");
   const supplierAdvanceInfo = document.getElementById("supplierAdvanceInfo");
@@ -106,6 +108,22 @@
   function getSelectedPaymentMethod() {
     const selected = document.querySelector('input[name="payment_method"]:checked');
     return selected ? selected.value : "pay_later";
+  }
+
+  function syncSupplierIdFromInput() {
+    if (!supplierSearchInput || !supplierIdInput || !supplierOptions) return;
+
+    const typedName = String(supplierSearchInput.value || "").trim().toLowerCase();
+    if (!typedName) {
+      supplierIdInput.value = "";
+      return;
+    }
+
+    const matchedOption = Array.from(supplierOptions.options).find(function (opt) {
+      return String(opt.value || "").trim().toLowerCase() === typedName;
+    });
+
+    supplierIdInput.value = matchedOption ? String(matchedOption.dataset.id || "") : "";
   }
 
   function setAccountEnabledState() {
@@ -231,7 +249,7 @@
    * Check if supplier has available advance for the total amount
    */
   function checkSupplierAdvance() {
-    if (!supplierSelect || !supplierAdvanceInfo) return;
+    if (!supplierIdInput || !supplierAdvanceInfo) return;
 
     const method = getSelectedPaymentMethod();
     if (method !== "advance") {
@@ -240,7 +258,7 @@
       return;
     }
 
-    const supplierId = supplierSelect.value;
+    const supplierId = supplierIdInput.value;
     const totalText = totalPriceDisplay ? String(totalPriceDisplay.value || "") : "0";
     const totalAmount = parseFloat(totalText.replace(/,/g, "")) || 0;
 
@@ -380,9 +398,17 @@
     });
   }
 
-  // Supplier Change Handler - Check for available advance
-  if (supplierSelect) {
-    supplierSelect.addEventListener("change", checkSupplierAdvance);
+  // Supplier Search Handlers
+  if (supplierSearchInput) {
+    supplierSearchInput.addEventListener("input", function () {
+      syncSupplierIdFromInput();
+      checkSupplierAdvance();
+    });
+
+    supplierSearchInput.addEventListener("change", function () {
+      syncSupplierIdFromInput();
+      checkSupplierAdvance();
+    });
   }
 
   if (paymentMethodInputs && paymentMethodInputs.length) {
@@ -460,6 +486,18 @@
 
   if (receiveStockForm) {
     receiveStockForm.addEventListener("submit", function (e) {
+      syncSupplierIdFromInput();
+
+      if (!supplierIdInput || !supplierIdInput.value) {
+        e.preventDefault();
+        Swal.fire({
+          icon: "warning",
+          title: "Supplier Required",
+          text: "Type supplier name and pick an existing supplier from suggestions.",
+        });
+        return;
+      }
+
       const method = getSelectedPaymentMethod();
 
       if (method === "direct_pay") {
@@ -486,6 +524,7 @@
     });
   }
 
+  syncSupplierIdFromInput();
   updatePaymentMethodUI();
 
   // Form confirmation dialogs

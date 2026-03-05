@@ -271,6 +271,39 @@
     </div>
 </div>
 
+<!-- Location Totals Cards -->
+<?php $locationCards = $locationCards ?? []; ?>
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Location Totals</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <?php if (!empty($locationCards)): ?>
+                        <?php foreach ($locationCards as $locationCard): ?>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="border rounded p-3 h-100">
+                                    <h6 class="mb-2"><?= htmlspecialchars((string)($locationCard['location_name'] ?? 'N/A')) ?></h6>
+                                    <p class="mb-1 text-muted">Total Amount</p>
+                                    <h5 class="mb-2"><?= number_format((float)($locationCard['total_amount'] ?? 0), 2) ?></h5>
+                                    <p class="mb-1 text-muted">Total Quantity</p>
+                                    <h6 class="mb-0"><?= number_format((float)($locationCard['total_quantity'] ?? 0), 2) ?></h6>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12">
+                            <p class="text-muted mb-0">No location totals available.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Quick Actions -->
 <div class="row">
     <div class="col-12">
