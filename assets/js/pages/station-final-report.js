@@ -161,6 +161,11 @@
     doc.text("Location: " + textValue(location.name || "N/A"), margin + 2, y + 9.2);
     y += 16;
 
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("cheries: " + Number(stock.cheries_total_quantity || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), margin + 2, y - 1);
+    y += 5;
+
     const mainColumns = [
       { title: "Section", width: 55 },
       { title: "Description", width: 167 },

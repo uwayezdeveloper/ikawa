@@ -554,6 +554,15 @@ class StationFinanceController extends Controller
             ['location_id' => $locationId]
         )['total'] ?? 0);
 
+                $stockCheriesQuantity = (float)(Database::fetch(
+                        "SELECT COALESCE(SUM(ss.total_quantity), 0) as total
+                         FROM stock_summary ss
+                         INNER JOIN product_categories pc ON pc.id = ss.product_category_id
+                         WHERE ss.location_id = :location_id
+                             AND pc.id = 1",
+                        ['location_id' => $locationId]
+                )['total'] ?? 0);
+
         $journalBankBreakdown = $this->getJournalBankBreakdown($locationId);
         $journalAmount = (float)($journalBankBreakdown['journal'] ?? 0);
         $bankAmount = (float)($journalBankBreakdown['bank'] ?? 0);
@@ -670,6 +679,7 @@ class StationFinanceController extends Controller
             ],
             'stock' => [
                 'stock_value' => $stockValue,
+                'cheries_total_quantity' => $stockCheriesQuantity,
                 'total' => $stockValue,
             ],
             'journal_bank' => [

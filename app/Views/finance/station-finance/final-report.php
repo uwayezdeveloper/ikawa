@@ -6,6 +6,8 @@ $journalBank = $reportData['journal_bank'] ?? [];
 $expenses = $reportData['expenses'] ?? [];
 $liability = $reportData['liability'] ?? [];
 $mainTotal = (float)($reportData['main_total'] ?? 0);
+$cheriesTotalQuantity = (float)($stock['cheries_total_quantity'] ?? 0);
+$generatedAt = date('Y-m-d H:i:s');
 $debugMode = (bool)($debugMode ?? false);
 $expenseDebug = $expenseDebug ?? [];
 $accountDebug = $accountDebug ?? [];
@@ -39,6 +41,22 @@ $effectiveLocationId = (int)($effectiveLocationId ?? 0);
             <span class="badge bg-primary-subtle text-primary fs-6">
                 Total: <?= number_format($mainTotal, 2) ?> FRW
             </span>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <strong>Generated:</strong> <?= htmlspecialchars($generatedAt) ?>
+            </div>
+            <div class="col-md-4">
+                <strong>Location:</strong> <?= htmlspecialchars($location['name'] ?? 'N/A') ?>
+            </div>
+            <div class="col-md-4">
+                <strong>cheries:</strong> <?= number_format($cheriesTotalQuantity, 2) ?>
+            </div>
         </div>
     </div>
 </div>
@@ -386,7 +404,7 @@ window.APP_URL = '<?= APP_URL ?>';
 window.finalLocationReportPayload = {
     location: <?= json_encode($location ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
     report: <?= json_encode($reportData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
-    generatedAt: <?= json_encode(date('Y-m-d H:i:s'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>
+    generatedAt: <?= json_encode($generatedAt, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
