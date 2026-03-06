@@ -499,6 +499,128 @@ class StationFinanceController extends Controller
         ], 'main');
     }
 
+    /**
+     * Detailed expense report page
+     */
+    public function detailedExpenseReport($request, $response)
+    {
+        $user = $_SESSION['user'] ?? null;
+
+        if (!$this->hasPermission('view-station-finances')) {
+            return $response->redirect(APP_URL . '/dashboard');
+        }
+
+        $locationId = (int)($user['location_id'] ?? 0);
+        if ($locationId <= 0) {
+            $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
+            return $response->redirect(APP_URL . '/finance/station-finances');
+        }
+
+        $location = $this->locationModel->find($locationId);
+        $detailedExpense = $this->getDetailedExpenseReportData($locationId);
+
+        return View::render('finance/station-finance/detailed-expense-report', [
+            'title' => 'Detailed Expense Report',
+            'user' => $user,
+            'location' => $location,
+            'detailedExpenseRows' => $detailedExpense['rows'],
+            'detailedExpenseTotalAmount' => $detailedExpense['total_amount'],
+            'detailedExpenseTotalPerKg' => $detailedExpense['total_per_kg'],
+            'cheriesQuantity' => $detailedExpense['cheries_quantity'],
+            'generatedAt' => date('Y-m-d H:i:s'),
+            'scripts' => ['js/pages/station-detailed-expense-report.js']
+        ], 'main');
+    }
+
+    private function getDetailedExpenseReportData(int $locationId): array
+    {
+        $cheriesQuantity = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(ss.total_quantity), 0) AS total
+             FROM stock_summary ss
+             INNER JOIN product_categories pc ON pc.id = ss.product_category_id
+             WHERE ss.location_id = :location_id
+               AND pc.id = 1",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $stockValue = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(ss.total_value), 0) AS total
+             FROM stock_summary ss
+             INNER JOIN product_categories pc ON pc.id = ss.product_category_id
+             WHERE ss.location_id = :location_id
+               AND pc.id = 1",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $rows = [
+            [
+                'details' => 'cheries',
+                'amount' => $cheriesQuantity,
+                'per_kg' => null,
+            ],
+            [
+                'details' => 'stock value',
+                'amount' => $stockValue,
+                'per_kg' => $cheriesQuantity > 0 ? ($stockValue / $cheriesQuantity) : 0,
+            ],
+        ];
+
+        $categoryOneRows = Database::fetchAll(
+            "SELECT
+                    ex.expense_id,
+                    COALESCE(ex.expense_name, 'Unknown Expense Type') AS expense_type,
+                    COALESCE(SUM(ec.amount), 0) AS total_amount
+             FROM tbl_expenses ex
+             LEFT JOIN tbl_expenseconsume ec
+                    ON ec.expense_id = ex.expense_id
+                   AND ec.status = 1
+                   AND ec.station_id = :location_id
+             WHERE ex.categ_id = 1
+             GROUP BY ex.expense_id, ex.expense_name
+             ORDER BY ex.expense_name ASC",
+            ['location_id' => $locationId]
+        );
+
+        foreach ($categoryOneRows as $expenseRow) {
+            $amount = (float)($expenseRow['total_amount'] ?? 0);
+            $rows[] = [
+                'details' => (string)($expenseRow['expense_type'] ?? 'Unknown Expense Type'),
+                'amount' => $amount,
+                'per_kg' => $cheriesQuantity > 0 ? ($amount / $cheriesQuantity) : 0,
+            ];
+        }
+
+        $nonExploitableAmount = (float)(Database::fetch(
+            "SELECT COALESCE(SUM(ec.amount), 0) AS total
+             FROM tbl_expenseconsume ec
+             INNER JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+             WHERE ec.status = 1
+               AND ec.station_id = :location_id
+               AND ex.categ_id = 2",
+            ['location_id' => $locationId]
+        )['total'] ?? 0);
+
+        $rows[] = [
+            'details' => 'Non-Exploitable',
+            'amount' => $nonExploitableAmount,
+            'per_kg' => $cheriesQuantity > 0 ? ($nonExploitableAmount / $cheriesQuantity) : 0,
+        ];
+
+        $totalAmount = 0.0;
+        for ($i = 1; $i < count($rows); $i++) {
+            $totalAmount += (float)($rows[$i]['amount'] ?? 0);
+        }
+
+        $totalPerKg = $cheriesQuantity > 0 ? ($totalAmount / $cheriesQuantity) : 0;
+
+        return [
+            'rows' => $rows,
+            'cheries_quantity' => $cheriesQuantity,
+            'total_amount' => $totalAmount,
+            'total_per_kg' => $totalPerKg,
+        ];
+    }
+
     private function accountHasIdentifiersColumn(): bool
     {
         static $hasColumn = null;
@@ -588,6 +710,8 @@ class StationFinanceController extends Controller
                              AND ec.station_id = :location_id",
                         ['location_id' => $locationId]
                 )['total'] ?? 0);
+
+                $detailedExpense = $this->getDetailedExpenseReportData($locationId);
 
                 $expenseRows = Database::fetchAll(
                         "SELECT
@@ -720,6 +844,7 @@ class StationFinanceController extends Controller
                 'certification' => $expenseByCategory[4],
                 'total' => $expensesTotal,
             ],
+            'detailed_expense' => $detailedExpense,
             'main_total' => $overallTotal,
             'liability' => [
                 'approvisionnement' => $approvisionnement,

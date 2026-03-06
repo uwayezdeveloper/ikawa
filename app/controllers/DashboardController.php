@@ -65,18 +65,124 @@ class DashboardController extends Controller
             $accountBalances[] = (float) $r['balance'];
         }
 
-        // Per-location stock cards (total amount + total quantity)
+        // Per-location totals cards with cherries, stock value, liabilities, expenses and production cost.
         $locationCards = Database::fetchAll(
             "SELECT l.id,
                     l.name as location_name,
-                    COALESCE(SUM(ss.total_value), 0) as total_amount,
-                    COALESCE(SUM(ss.total_quantity), 0) as total_quantity
+                    COALESCE(SUM(CASE WHEN pc.id = 1 THEN ss.total_quantity ELSE 0 END), 0) as cheries_quantity,
+                    COALESCE(SUM(CASE WHEN pc.id = 1 THEN ss.total_value ELSE 0 END), 0) as stock_value,
+
+                    (
+                        SELECT COALESCE(SUM(sa.amount), 0)
+                        FROM supplier_advances sa
+                        WHERE sa.location_id = l.id
+                          AND sa.status = 'approved'
+                    ) as advances_total,
+
+                    (
+                        SELECT COALESCE(SUM(rh.amount), 0)
+                        FROM tbl_recharge_history rh
+                        INNER JOIN accounts src ON src.id = rh.acc_id
+                        INNER JOIN accounts dst ON dst.id = rh.to_account
+                        WHERE rh.to_account IS NOT NULL
+                          AND dst.location_id = l.id
+                          AND src.location_type_id = 3
+                    ) as approvisionnement_total,
+
+                    (
+                        SELECT COALESCE(SUM(sp.amount - sp.paid_amount), 0)
+                        FROM supplier_payables sp
+                        WHERE sp.location_id = l.id
+                          AND sp.status IN ('pending', 'partial')
+                    ) as loan_total,
+
+                    (
+                        SELECT COALESCE(SUM(ec.amount), 0)
+                        FROM tbl_expenseconsume ec
+                        INNER JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                        WHERE ec.station_id = l.id
+                          AND ec.status = 1
+                          AND ex.categ_id = 1
+                    ) as expense_cat_1_total,
+
+                    (
+                        SELECT COALESCE(SUM(ec.amount), 0)
+                        FROM tbl_expenseconsume ec
+                        INNER JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                        WHERE ec.station_id = l.id
+                          AND ec.status = 1
+                          AND ex.categ_id = 2
+                    ) as expense_cat_2_total,
+
+                    (
+                        SELECT COALESCE(SUM(ec.amount), 0)
+                        FROM tbl_expenseconsume ec
+                        INNER JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                        WHERE ec.station_id = l.id
+                          AND ec.status = 1
+                          AND ex.categ_id = 3
+                    ) as expense_cat_3_total,
+
+                    (
+                        SELECT COALESCE(SUM(ec.amount), 0)
+                        FROM tbl_expenseconsume ec
+                        INNER JOIN tbl_expenses ex ON ex.expense_id = ec.expense_id
+                        WHERE ec.station_id = l.id
+                          AND ec.status = 1
+                          AND ex.categ_id = 4
+                    ) as expense_cat_4_total
              FROM locations l
              LEFT JOIN stock_summary ss ON ss.location_id = l.id
+            LEFT JOIN product_categories pc ON pc.id = ss.product_category_id
              WHERE l.status = 'active'
              GROUP BY l.id, l.name
              ORDER BY l.name ASC"
         );
+
+        $generalLocationTotals = [
+            'locations_count' => 0,
+            'cheries_quantity' => 0.0,
+            'stock_value' => 0.0,
+            'advances_total' => 0.0,
+            'approvisionnement_total' => 0.0,
+            'loan_total' => 0.0,
+            'expense_cat_1_total' => 0.0,
+            'expense_cat_2_total' => 0.0,
+            'expense_cat_3_total' => 0.0,
+            'expense_cat_4_total' => 0.0,
+            'production_cost_per_kg' => 0.0,
+        ];
+
+        foreach ($locationCards as &$locationCard) {
+            $cheriesQty = (float)($locationCard['cheries_quantity'] ?? 0);
+            $stockValueByCat1 = (float)($locationCard['stock_value'] ?? 0);
+            $expenseCat1 = (float)($locationCard['expense_cat_1_total'] ?? 0);
+            $expenseCat2 = (float)($locationCard['expense_cat_2_total'] ?? 0);
+            $productionAmount = $stockValueByCat1 + $expenseCat1 + $expenseCat2;
+
+            $locationCard['production_cost_per_kg'] = $cheriesQty > 0 ? ($productionAmount / $cheriesQty) : 0.0;
+
+            $generalLocationTotals['locations_count'] += 1;
+            $generalLocationTotals['cheries_quantity'] += $cheriesQty;
+            $generalLocationTotals['stock_value'] += $stockValueByCat1;
+            $generalLocationTotals['advances_total'] += (float)($locationCard['advances_total'] ?? 0);
+            $generalLocationTotals['approvisionnement_total'] += (float)($locationCard['approvisionnement_total'] ?? 0);
+            $generalLocationTotals['loan_total'] += (float)($locationCard['loan_total'] ?? 0);
+            $generalLocationTotals['expense_cat_1_total'] += $expenseCat1;
+            $generalLocationTotals['expense_cat_2_total'] += $expenseCat2;
+            $generalLocationTotals['expense_cat_3_total'] += (float)($locationCard['expense_cat_3_total'] ?? 0);
+            $generalLocationTotals['expense_cat_4_total'] += (float)($locationCard['expense_cat_4_total'] ?? 0);
+        }
+        unset($locationCard);
+
+        $generalProductionAmount =
+            $generalLocationTotals['stock_value'] +
+            $generalLocationTotals['expense_cat_1_total'] +
+            $generalLocationTotals['expense_cat_2_total'];
+        $generalLocationTotals['production_cost_per_kg'] =
+            $generalLocationTotals['cheries_quantity'] > 0
+                ? ($generalProductionAmount / $generalLocationTotals['cheries_quantity'])
+                : 0.0;
 
         // Prepare simple time-series: expenses last 7 days
         $expensesLast7 = Database::fetchAll("SELECT DATE(recorded_date) as d, COALESCE(SUM(amount),0) as total FROM tbl_expenseconsume WHERE recorded_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(recorded_date) ORDER BY DATE(recorded_date) ASC");
@@ -129,7 +235,8 @@ class DashboardController extends Controller
                 'invoices' => [ 'labels' => $invLabels, 'counts' => $invCounts, 'totals' => $invTotals ]
                 , 'accounts' => ['labels' => $accountLabels, 'data' => $accountBalances]
             ],
-            'locationCards' => $locationCards
+            'locationCards' => $locationCards,
+            'generalLocationTotals' => $generalLocationTotals,
         ], 'main');
     }
 }

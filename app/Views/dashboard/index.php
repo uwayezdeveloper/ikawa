@@ -104,6 +104,115 @@
                     </script>
 </div>
 
+<!-- Location Totals Cards (Placed Before Dashboard Stats) -->
+<?php $locationCards = $locationCards ?? []; $generalLocationTotals = $generalLocationTotals ?? []; ?>
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                    <h5 class="mb-0 text-primary">Location Totals (All Stations Combined)</h5>
+                    <span class="badge bg-primary-subtle text-primary fs-6">
+                        Locations: <?= number_format((int)($generalLocationTotals['locations_count'] ?? 0)) ?>
+                    </span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-3"><small class="text-muted d-block">Total Cheries Qty</small><strong><?= number_format((float)($generalLocationTotals['cheries_quantity'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Stock Value (Cat 1)</small><strong><?= number_format((float)($generalLocationTotals['stock_value'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Approvisionnement</small><strong><?= number_format((float)($generalLocationTotals['approvisionnement_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Loan</small><strong><?= number_format((float)($generalLocationTotals['loan_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Total Advances</small><strong><?= number_format((float)($generalLocationTotals['advances_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Exploitable</small><strong><?= number_format((float)($generalLocationTotals['expense_cat_1_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Non-Exploitable</small><strong><?= number_format((float)($generalLocationTotals['expense_cat_2_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Investment/Liability</small><strong><?= number_format((float)($generalLocationTotals['expense_cat_3_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Certification</small><strong><?= number_format((float)($generalLocationTotals['expense_cat_4_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Production Cost (/kg)</small><strong><?= number_format((float)($generalLocationTotals['production_cost_per_kg'] ?? 0), 2) ?></strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Location Totals</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <?php if (!empty($locationCards)): ?>
+                        <?php
+                        $locationCardThemes = [
+                            ['bg' => '#eef6ff', 'border' => '#b9d9ff', 'title' => '#0f4c81'],
+                            ['bg' => '#effaf4', 'border' => '#bde7ce', 'title' => '#1f6f43'],
+                            ['bg' => '#fff7ea', 'border' => '#f3d8a4', 'title' => '#8a5a00'],
+                            ['bg' => '#f3f1ff', 'border' => '#d6cdfc', 'title' => '#4b3f8a'],
+                            ['bg' => '#fff1f3', 'border' => '#f6c4cc', 'title' => '#8c2f3d'],
+                            ['bg' => '#eefaf8', 'border' => '#bfe7df', 'title' => '#1f5f57'],
+                        ];
+                        ?>
+                        <?php foreach ($locationCards as $idx => $locationCard): ?>
+                            <?php $theme = $locationCardThemes[$idx % count($locationCardThemes)]; ?>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="rounded p-3 h-100" style="background-color: <?= $theme['bg'] ?>; border: 1px solid <?= $theme['border'] ?>;">
+                                    <h6 class="mb-3 fw-bold" style="color: <?= $theme['title'] ?>; font-weight: 700;"><?= htmlspecialchars((string)($locationCard['location_name'] ?? 'N/A')) ?></h6>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="small text-muted">Cheries Qty</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['cheries_quantity'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Stock Value (Cat 1)</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['stock_value'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Approvisionnement</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['approvisionnement_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Loan</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['loan_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Total Advance</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['advances_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Exploitable</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['expense_cat_1_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Non-Exploitable</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['expense_cat_2_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Investment/Liability</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['expense_cat_3_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Certification</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['expense_cat_4_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Production Cost (/kg)</div>
+                                            <div class="fw-bold text-primary"><?= number_format((float)($locationCard['production_cost_per_kg'] ?? 0), 2) ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12">
+                            <p class="text-muted mb-0">No location totals available.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Stats Cards -->
 <?php $stats = $stats ?? []; $charts = $charts ?? []; ?>
 <div class="row">
@@ -199,7 +308,7 @@
                     <div class="flex-grow-1 ms-3">
                         <h5 class="mb-1">Suppliers</h5>
                         <p class="mb-0 text-muted">
-                            <span class="fs-24 fw-bold"><?= number_format($stats['totalFarmers'] ?? 0) ?></span>
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalSuppliers'] ?? 0) ?></span>
                         </p>
                     </div>
                 </div>
@@ -218,7 +327,7 @@
                     <div class="flex-grow-1 ms-3">
                         <h5 class="mb-1">farmers</h5>
                         <p class="mb-0 text-muted">
-                            <span class="fs-24 fw-bold"><?= number_format($stats['totalSuppliers'] ?? 0) ?></span>
+                            <span class="fs-24 fw-bold"><?= number_format($stats['totalFarmers'] ?? 0) ?></span>
                         </p>
                     </div>
                 </div>
@@ -265,39 +374,6 @@
                     <div class="flex-shrink-0" style="width:120px;">
                         <canvas id="accountsChart" height="120"></canvas>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Location Totals Cards -->
-<?php $locationCards = $locationCards ?? []; ?>
-<div class="row mt-3">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Location Totals</h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <?php if (!empty($locationCards)): ?>
-                        <?php foreach ($locationCards as $locationCard): ?>
-                            <div class="col-md-6 col-xl-4">
-                                <div class="border rounded p-3 h-100">
-                                    <h6 class="mb-2"><?= htmlspecialchars((string)($locationCard['location_name'] ?? 'N/A')) ?></h6>
-                                    <p class="mb-1 text-muted">Total Amount</p>
-                                    <h5 class="mb-2"><?= number_format((float)($locationCard['total_amount'] ?? 0), 2) ?></h5>
-                                    <p class="mb-1 text-muted">Total Quantity</p>
-                                    <h6 class="mb-0"><?= number_format((float)($locationCard['total_quantity'] ?? 0), 2) ?></h6>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="col-12">
-                            <p class="text-muted mb-0">No location totals available.</p>
-                        </div>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>

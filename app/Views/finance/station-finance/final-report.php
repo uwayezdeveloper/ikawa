@@ -514,16 +514,17 @@ window.finalLocationReportPayload = {
                         <td class="text-end"><?= number_format((float)($liability['approvisionnement'] ?? 0), 2) ?></td>
                         <td>Loan </td>
                         <td class="text-end"><?= number_format((float)($liability['supplier_loans'] ?? 0), 2) ?></td>
-                        <td class="text-end\"><?= number_format((float)($liability['autre_credit'] ?? 0), 2) ?></td>
+                        <td class="text-end"><?= number_format((float)($liability['autre_credit'] ?? 0), 2) ?></td>
                     </tr>
                 </tbody>
                 <tfoot class="table-secondary fw-bold">
                     <tr>
                         <td colspan="4">Liability Total</td>
-                        <td class="text-end\"><?= number_format((float)($liability['total'] ?? 0), 2) ?></td>
+                        <td class="text-end"><?= number_format((float)($liability['total'] ?? 0), 2) ?></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
 </div>
+
