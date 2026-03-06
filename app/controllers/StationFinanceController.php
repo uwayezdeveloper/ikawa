@@ -513,6 +513,20 @@ class StationFinanceController extends Controller
         return $hasColumn;
     }
 
+    private function autreCreditTableExists(): bool
+    {
+        static $exists = null;
+
+        if ($exists !== null) {
+            return $exists;
+        }
+
+        $table = Database::fetch("SHOW TABLES LIKE 'tbl_autre_credit'");
+        $exists = !empty($table);
+
+        return $exists;
+    }
+
     private function getFinalLocationReportData(int $locationId): array
     {
         $activeAdvances = (float)(Database::fetch(
@@ -665,11 +679,23 @@ class StationFinanceController extends Controller
             ['location_id' => $locationId]
         )['total'] ?? 0);
 
+        $autreCreditPending = 0.0;
+        if ($this->autreCreditTableExists()) {
+            $autreCreditPending = (float)(Database::fetch(
+                "SELECT COALESCE(SUM(ac.outstanding_amount), 0) as total
+                 FROM tbl_autre_credit ac
+                 INNER JOIN accounts a ON a.id = ac.account_id
+                 WHERE a.location_id = :location_id
+                   AND COALESCE(ac.outstanding_amount, 0) > 0",
+                ['location_id' => $locationId]
+            )['total'] ?? 0);
+        }
+
         $suppliersTotal = $activeAdvances + $transferLoanAvailable;
         $journalBankTotal = $journalAmount + $bankAmount;
         $expensesTotal = $totalExpensesAll;
         $overallTotal = $suppliersTotal + $stockValue + $journalBankTotal + $expensesTotal;
-        $liabilityTotal = $approvisionnement + $supplierLoansPending;
+        $liabilityTotal = $approvisionnement + $supplierLoansPending + $autreCreditPending;
 
         return [
             'suppliers' => [
@@ -698,6 +724,7 @@ class StationFinanceController extends Controller
             'liability' => [
                 'approvisionnement' => $approvisionnement,
                 'supplier_loans' => $supplierLoansPending,
+                'autre_credit' => $autreCreditPending,
                 'total' => $liabilityTotal,
             ],
         ];

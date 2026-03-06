@@ -194,10 +194,11 @@
     drawTable(mainColumns, mainRows, "Main Report Summary");
 
     const liabilityColumns = [
-      { title: "Description", width: 90 },
-      { title: "Amount (FRW)", width: 48, align: "right" },
-      { title: "Names", width: 91 },
-      { title: "Amount (FRW)", width: 48, align: "right" },
+      { title: "Description", width: 86 },
+      { title: "Amount (FRW)", width: 42, align: "right" },
+      { title: "Names", width: 71 },
+      { title: "Amount (FRW)", width: 42, align: "right" },
+      { title: "Autre Credit (FRW)", width: 36, align: "right" },
     ];
 
     const liabilityRows = [
@@ -207,11 +208,13 @@
           { text: money(liability.approvisionnement || 0), align: "right" },
           { text: "Loan (loans we have to suppliers)" },
           { text: money(liability.supplier_loans || 0), align: "right" },
+          { text: money(liability.autre_credit || 0), align: "right" },
         ],
       },
       {
         cells: [
           { text: "Liability Total", align: "right" },
+          { text: "" },
           { text: "" },
           { text: "" },
           { text: money(liability.total || 0), align: "right" },

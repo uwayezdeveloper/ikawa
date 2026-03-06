@@ -412,6 +412,11 @@
                                     <span class="menu-text">Register Source of Income</span>
                                 </a>
                             </li>
+                            <li class="side-nav-item">
+                                <a href="<?= APP_URL ?>/finance/autre-credit" class="side-nav-link">
+                                    <span class="menu-text">Autre Credit</span>
+                                </a>
+                            </li>
                             
                         </ul>
                     </div>

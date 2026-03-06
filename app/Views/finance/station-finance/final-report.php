@@ -423,11 +423,11 @@ window.finalLocationReportPayload = {
                 <tbody>
                     <tr class="table-primary">
                         <td rowspan="3" class="fw-bold align-middle">Suppliers</td>
-                        <td>Advance (active advances in this location)</td>
+                        <td>Advance</td>
                         <td class="text-end"><?= number_format((float)($suppliers['advance'] ?? 0), 2) ?></td>
                     </tr>
                     <tr>
-                        <td>Loan (transfer from one station to another)</td>
+                        <td>Loan</td>
                         <td class="text-end"><?= number_format((float)($suppliers['loan_transfer'] ?? 0), 2) ?></td>
                     </tr>
                     <tr class="table-light fw-bold">
@@ -447,11 +447,11 @@ window.finalLocationReportPayload = {
 
                     <tr class="table-info">
                         <td rowspan="3" class="fw-bold align-middle">Journal/Bank</td>
-                        <td>Journal (accounts where identifiers = 2)</td>
+                        <td>Journal </td>
                         <td class="text-end"><?= number_format((float)($journalBank['journal'] ?? 0), 2) ?></td>
                     </tr>
                     <tr>
-                        <td>Bank (accounts where identifiers = 1)</td>
+                        <td>Bank </td>
                         <td class="text-end"><?= number_format((float)($journalBank['bank'] ?? 0), 2) ?></td>
                     </tr>
                     <tr class="table-light fw-bold">
@@ -461,19 +461,19 @@ window.finalLocationReportPayload = {
 
                     <tr class="table-warning">
                         <td rowspan="5" class="fw-bold align-middle">Expenses</td>
-                        <td>Exploatable (categ_id = 1)</td>
+                        <td>Exploatable </td>
                         <td class="text-end"><?= number_format((float)($expenses['exploitable'] ?? 0), 2) ?></td>
                     </tr>
                     <tr>
-                        <td>Non exploatable (categ_id = 2)</td>
+                        <td>Non exploatable </td>
                         <td class="text-end"><?= number_format((float)($expenses['non_exploitable'] ?? 0), 2) ?></td>
                     </tr>
                     <tr>
-                        <td>Investment/Liability (categ_id = 3)</td>
+                        <td>Investment/Liability </td>
                         <td class="text-end"><?= number_format((float)($expenses['investment_liability'] ?? 0), 2) ?></td>
                     </tr>
                     <tr>
-                        <td>Certification (categ_id = 4)</td>
+                        <td>Certification </td>
                         <td class="text-end"><?= number_format((float)($expenses['certification'] ?? 0), 2) ?></td>
                     </tr>
                     <tr class="table-light fw-bold">
@@ -501,24 +501,26 @@ window.finalLocationReportPayload = {
             <table class="table table-bordered table-sm mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th style="width: 30%">Description</th>
-                        <th style="width: 25%" class="text-end">Amount (FRW)</th>
-                        <th style="width: 30%">Names</th>
-                        <th style="width: 15%" class="text-end">Amount (FRW)</th>
+                        <th style="width: 28%">Description</th>
+                        <th style="width: 18%" class="text-end">Amount (FRW)</th>
+                        <th style="width: 26%">Names</th>
+                        <th style="width: 14%" class="text-end">Amount (FRW)</th>
+                        <th style="width: 14%" class="text-end">Autre Credit (FRW)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Approvisionnement (HQ account-transfer history)</td>
                         <td class="text-end"><?= number_format((float)($liability['approvisionnement'] ?? 0), 2) ?></td>
-                        <td>Loan (loans we have to suppliers)</td>
+                        <td>Loan </td>
                         <td class="text-end"><?= number_format((float)($liability['supplier_loans'] ?? 0), 2) ?></td>
+                        <td class="text-end\"><?= number_format((float)($liability['autre_credit'] ?? 0), 2) ?></td>
                     </tr>
                 </tbody>
                 <tfoot class="table-secondary fw-bold">
                     <tr>
-                        <td colspan="3">Liability Total</td>
-                        <td class="text-end"><?= number_format((float)($liability['total'] ?? 0), 2) ?></td>
+                        <td colspan="4">Liability Total</td>
+                        <td class="text-end\"><?= number_format((float)($liability['total'] ?? 0), 2) ?></td>
                     </tr>
                 </tfoot>
             </table>

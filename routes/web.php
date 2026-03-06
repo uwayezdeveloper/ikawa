@@ -45,6 +45,7 @@ use App\Controllers\WarehouseReceiveController;
 use App\Controllers\WarehouseSaleController;
 use App\Controllers\ProfileController;
 use App\Controllers\SourceOfIncomeController;
+use App\Controllers\AutreCreditController;
 use App\Controllers\NonExploitableCategoryController;
 use App\Controllers\NonExploitableTransactionController;
 use App\Controllers\PropertyController;
@@ -315,6 +316,11 @@ $router->post('/finance/source-of-income/{id}/update', [SourceOfIncomeController
 $router->post('/finance/source-of-income/{id}/delete', [SourceOfIncomeController::class, 'delete'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->post('/finance/source-of-income/{id}/toggle-status', [SourceOfIncomeController::class, 'toggleStatus'], ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/api/finance/source-of-income/active', [SourceOfIncomeController::class, 'getActive'], ['AuthMiddleware', 'AdminMiddleware']);
+
+// Autre Credit
+$router->get('/finance/autre-credit', [AutreCreditController::class, 'index'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/autre-credit/store', [AutreCreditController::class, 'store'], ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/finance/autre-credit/{id}/repay', [AutreCreditController::class, 'repay'], ['AuthMiddleware', 'AdminMiddleware']);
 
 
 // Worker Loan Requests
