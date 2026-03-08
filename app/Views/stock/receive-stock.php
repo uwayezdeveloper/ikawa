@@ -98,21 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </select>
                     </div>
 
-                    <!-- Category Type -->
-                    <div class="mb-3">
-                        <label class="form-label">Category Type <span class="text-danger">*</span></label>
-                        <select class="form-select" name="category_type_id" id="categoryTypeSelect" required disabled>
-                            <option value="">Select Category first</option>
-                        </select>
-                    </div>
-
-                    <!-- Type Unit (category_type_unit_id) -->
-                    <div class="mb-3">
-                        <label class="form-label">Unit <span class="text-danger">*</span></label>
-                        <select class="form-select" name="category_type_unit_id" id="typeUnitSelect" required disabled>
-                            <option value="">Select Category Type first</option>
-                        </select>
-                    </div>
 
                     <!-- Supplier -->
                     <div class="mb-3">
@@ -167,33 +152,60 @@ document.addEventListener('DOMContentLoaded', function() {
                         <small class="text-muted">Select account from the chosen location.</small>
                     </div>
 
-                    <!-- Quantity and Price -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="quantity" id="quantityInput" required
-                                min="0.01" step="0.01">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Price/kg <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="unit_price" id="unitPriceInput" required
-                                min="0" step="0.01" placeholder="Price per kg">
-                        </div>
-                    </div>
-
-                    <!-- Total Price (calculated) -->
+                    <!-- Multi Item Lines -->
                     <div class="mb-3">
-                        <label class="form-label">Total Price</label>
-                        <input type="text" class="form-control bg-light" id="totalPriceDisplay" readonly value="0.00">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <label class="form-label mb-0">Stock Items <span class="text-danger">*</span></label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="addReceiveItemBtn">
+                                <i class="ti ti-plus me-1"></i>Add Another Category Type
+                            </button>
+                        </div>
+
+                        <div id="lineItemsContainer" class="d-flex flex-column gap-2">
+                            <div class="border rounded p-2 receive-line-item" data-row-index="0">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted fw-semibold line-item-label">Item #1</small>
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0 remove-line-item-btn d-none">
+                                        <i class="ti ti-trash me-1"></i>Remove
+                                    </button>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Category Type <span class="text-danger">*</span></label>
+                                    <select class="form-select category-type-select" name="items[0][category_type_id]" required disabled>
+                                        <option value="">Select Category first</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Unit <span class="text-danger">*</span></label>
+                                    <select class="form-select type-unit-select" name="items[0][category_type_unit_id]" required disabled>
+                                        <option value="">Select Category Type first</option>
+                                    </select>
+                                </div>
+
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control quantity-input" name="items[0][quantity]" required min="0.01" step="0.01">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Price/kg <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control unit-price-input" name="items[0][unit_price]" required min="0" step="0.01" placeholder="Price per kg">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Line Total</label>
+                                        <input type="text" class="form-control bg-light item-total-display" readonly value="0.00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Kg Conversion Preview -->
-                    <div class="mb-3 p-2 bg-light rounded" id="kgConversionPreview" style="display: none;">
-                        <small class="text-muted d-block mb-1">Base Unit Conversion:</small>
-                        <div class="d-flex justify-content-between">
-                            <span>Quantity in kg: <strong id="qtyInKgPreview">0</strong></span>
-                            <span>Price/kg: <strong id="pricePerKgPreview">0</strong></span>
-                        </div>
+                    <!-- Grand Total Price (calculated) -->
+                    <div class="mb-3">
+                        <label class="form-label">Total Price (All Items)</label>
+                        <input type="text" class="form-control bg-light" id="totalPriceDisplay" readonly value="0.00">
                     </div>
 
                     <!-- Receive Date -->

@@ -162,28 +162,62 @@ class StockReceiveController extends Controller
         $locationId = $_POST['location_id'] ?? null;
         $supplierId = $_POST['supplier_id'] ?? null;
         $categoryId = $_POST['product_category_id'] ?? null;
-        $categoryTypeUnitId = $_POST['category_type_unit_id'] ?? null;
         $accountId = $_POST['account_id'] ?? null;
         $paymentMethod = $_POST['payment_method'] ?? 'pay_later';
-        $quantity = floatval($_POST['quantity'] ?? 0);
-        $unitPrice = floatval($_POST['unit_price'] ?? 0);
         $receiveDate = $_POST['receive_date'] ?? date('Y-m-d');
         $notes = trim($_POST['notes'] ?? '');
 
+        $rawItems = $_POST['items'] ?? [];
+        if (!is_array($rawItems) || empty($rawItems)) {
+            // Backward-compatible fallback for legacy single-item payloads.
+            $rawItems = [[
+                'category_type_unit_id' => $_POST['category_type_unit_id'] ?? null,
+                'quantity' => $_POST['quantity'] ?? null,
+                'unit_price' => $_POST['unit_price'] ?? null
+            ]];
+        }
+
+        $items = [];
+        foreach ($rawItems as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $categoryTypeUnitId = $item['category_type_unit_id'] ?? null;
+            $quantity = floatval($item['quantity'] ?? 0);
+            $unitPrice = floatval($item['unit_price'] ?? 0);
+
+            if (empty($categoryTypeUnitId)) {
+                $_SESSION['flash_error'] = 'Unit is required for item #' . ($index + 1);
+                return $response->redirect(APP_URL . '/stock/receives');
+            }
+
+            if ($quantity <= 0) {
+                $_SESSION['flash_error'] = 'Quantity must be greater than zero for item #' . ($index + 1);
+                return $response->redirect(APP_URL . '/stock/receives');
+            }
+
+            if ($unitPrice <= 0) {
+                $_SESSION['flash_error'] = 'Price/kg must be greater than zero for item #' . ($index + 1);
+                return $response->redirect(APP_URL . '/stock/receives');
+            }
+
+            $items[] = [
+                'category_type_unit_id' => (int)$categoryTypeUnitId,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice
+            ];
+        }
+
+        if (empty($items)) {
+            $_SESSION['flash_error'] = 'Please add at least one valid stock item';
+            return $response->redirect(APP_URL . '/stock/receives');
+        }
+
         // Validation
         if (empty($locationTypeId) || empty($locationId) || empty($supplierId) || 
-            empty($categoryId) || empty($categoryTypeUnitId)) {
+            empty($categoryId)) {
             $_SESSION['flash_error'] = 'All dropdown fields are required';
-            return $response->redirect(APP_URL . '/stock/receives');
-        }
-
-        if ($quantity <= 0) {
-            $_SESSION['flash_error'] = 'Quantity must be greater than zero';
-            return $response->redirect(APP_URL . '/stock/receives');
-        }
-
-        if ($unitPrice <= 0) {
-            $_SESSION['flash_error'] = 'Unit price must be greater than zero';
             return $response->redirect(APP_URL . '/stock/receives');
         }
 
@@ -210,20 +244,28 @@ class StockReceiveController extends Controller
             }
 
             // Direct pay must be fully covered by selected account balance
-            $unitInfo = Database::fetch(
-                "SELECT mu.conversion_factor
-                 FROM category_type_units ctu
-                 JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
-                 WHERE ctu.id = :ctu_id",
-                ['ctu_id' => $categoryTypeUnitId]
-            );
+            $estimatedTotal = 0;
+            $conversionFactorCache = [];
 
-            $estimatedTotal = $quantity * $unitPrice;
-            if ($unitInfo) {
-                $conversionFactor = floatval($unitInfo['conversion_factor'] ?? 0);
+            foreach ($items as $item) {
+                $ctuId = (int)$item['category_type_unit_id'];
+                if (!array_key_exists($ctuId, $conversionFactorCache)) {
+                    $unitInfo = Database::fetch(
+                        "SELECT mu.conversion_factor
+                         FROM category_type_units ctu
+                         JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
+                         WHERE ctu.id = :ctu_id",
+                        ['ctu_id' => $ctuId]
+                    );
+                    $conversionFactorCache[$ctuId] = floatval($unitInfo['conversion_factor'] ?? 0);
+                }
+
+                $conversionFactor = $conversionFactorCache[$ctuId];
                 if ($conversionFactor > 0) {
-                    $quantityInKg = $quantity * ($conversionFactor / 1000);
-                    $estimatedTotal = $unitPrice * $quantityInKg;
+                    $quantityInKg = $item['quantity'] * ($conversionFactor / 1000);
+                    $estimatedTotal += ($item['unit_price'] * $quantityInKg);
+                } else {
+                    $estimatedTotal += ($item['quantity'] * $item['unit_price']);
                 }
             }
 
@@ -253,42 +295,74 @@ class StockReceiveController extends Controller
         }
 
         $user = $_SESSION['user'] ?? null;
-        $result = $this->stockReceiveModel->createReceive([
-            'location_type_id' => $locationTypeId,
-            'location_id' => $locationId,
-            'supplier_id' => $supplierId,
-            'product_category_id' => $categoryId,
-            'category_type_unit_id' => $categoryTypeUnitId,
-            'account_id' => $accountId ?: null,
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-            'receive_date' => $receiveDate,
-            'payment_method' => $storedPaymentMethod,
-            'notes' => $notes,
-            'status' => 'pending',
-            'created_by' => $user['id'] ?? null
-        ]);
+        $createdIds = [];
+        $creationFailed = false;
+        $failureMessage = 'Failed to create stock receive';
 
-        if ($result) {
+        foreach ($items as $index => $item) {
+            $result = $this->stockReceiveModel->createReceive([
+                'location_type_id' => $locationTypeId,
+                'location_id' => $locationId,
+                'supplier_id' => $supplierId,
+                'product_category_id' => $categoryId,
+                'category_type_unit_id' => $item['category_type_unit_id'],
+                'account_id' => $accountId ?: null,
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+                'receive_date' => $receiveDate,
+                'payment_method' => $storedPaymentMethod,
+                'notes' => $notes,
+                'status' => 'pending',
+                'created_by' => $user['id'] ?? null
+            ]);
+
+            if (!$result) {
+                $creationFailed = true;
+                $failureMessage = 'Failed to create stock receive for item #' . ($index + 1);
+                break;
+            }
+
+            $createdIds[] = (int)$result;
+
             // Direct pay should be processed immediately (already paid, no pending approval)
             if ($paymentMethod === 'direct_pay') {
                 try {
                     $approved = $this->stockReceiveModel->approveReceive((int)$result, (int)($user['id'] ?? 0));
-                    if ($approved) {
-                        $_SESSION['flash_success'] = 'Stock receive created and paid successfully';
-                    } else {
+                    if (!$approved) {
                         $this->stockReceiveModel->delete((int)$result);
-                        $_SESSION['flash_error'] = 'Stock receive created, but direct payment approval failed';
+                        $creationFailed = true;
+                        $failureMessage = 'Direct payment approval failed for item #' . ($index + 1);
+                        break;
                     }
                 } catch (\Exception $e) {
                     $this->stockReceiveModel->delete((int)$result);
-                    $_SESSION['flash_error'] = 'Direct payment failed: ' . $e->getMessage();
+                    $creationFailed = true;
+                    $failureMessage = 'Direct payment failed for item #' . ($index + 1) . ': ' . $e->getMessage();
+                    break;
                 }
-            } else {
-                $_SESSION['flash_success'] = 'Stock receive created successfully';
             }
+        }
+
+        if ($creationFailed) {
+            // For non-direct-pay, cleanup pending rows created in this request to keep it atomic.
+            if ($paymentMethod !== 'direct_pay') {
+                foreach ($createdIds as $createdId) {
+                    $this->stockReceiveModel->delete($createdId);
+                }
+            }
+
+            $_SESSION['flash_error'] = $failureMessage;
         } else {
-            $_SESSION['flash_error'] = 'Failed to create stock receive';
+            $createdCount = count($createdIds);
+            if ($paymentMethod === 'direct_pay') {
+                $_SESSION['flash_success'] = $createdCount === 1
+                    ? 'Stock receive created and paid successfully'
+                    : $createdCount . ' stock receives created and paid successfully';
+            } else {
+                $_SESSION['flash_success'] = $createdCount === 1
+                    ? 'Stock receive created successfully'
+                    : $createdCount . ' stock receives created successfully';
+            }
         }
 
         return $response->redirect(APP_URL . '/stock/receives');

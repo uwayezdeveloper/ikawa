@@ -174,20 +174,20 @@
 
     const mainRows = [
       { cells: [{ text: "Suppliers" }, { text: "Advance (active advances in this location)" }, { text: money(suppliers.advance || 0), align: "right" }] },
-      { cells: [{ text: "" }, { text: "Loan (transfer from one station to another)" }, { text: money(suppliers.loan_transfer || 0), align: "right" }] },
+      { cells: [{ text: "" }, { text: "Loan (station gave loan another station)" }, { text: money(suppliers.loan_transfer || 0), align: "right" }] },
       { cells: [{ text: "" }, { text: "Total" }, { text: money(suppliers.total || 0), align: "right" }], bold: true, fill: [247, 247, 247] },
 
       { cells: [{ text: "Stock" }, { text: "Stock value" }, { text: money(stock.stock_value || 0), align: "right" }] },
       { cells: [{ text: "" }, { text: "Total" }, { text: money(stock.total || 0), align: "right" }], bold: true, fill: [247, 247, 247] },
 
-      { cells: [{ text: "Journal / Bank" }, { text: "Journal (accounts where identifiers = 2)" }, { text: money(journalBank.journal || 0), align: "right" }] },
-      { cells: [{ text: "" }, { text: "Bank (accounts where identifiers = 1)" }, { text: money(journalBank.bank || 0), align: "right" }] },
+      { cells: [{ text: "Journal / Bank" }, { text: "Journal " }, { text: money(journalBank.journal || 0), align: "right" }] },
+      { cells: [{ text: "" }, { text: "Bank " }, { text: money(journalBank.bank || 0), align: "right" }] },
       { cells: [{ text: "" }, { text: "Total" }, { text: money(journalBank.total || 0), align: "right" }], bold: true, fill: [247, 247, 247] },
 
-      { cells: [{ text: "Expenses" }, { text: "Exploitable (categ_id = 1)" }, { text: money(expenses.exploitable || 0), align: "right" }] },
-      { cells: [{ text: "" }, { text: "Non exploitable (categ_id = 2)" }, { text: money(expenses.non_exploitable || 0), align: "right" }] },
-      { cells: [{ text: "" }, { text: "Investment/Liability (categ_id = 3)" }, { text: money(expenses.investment_liability || 0), align: "right" }] },
-      { cells: [{ text: "" }, { text: "Certification (categ_id = 4)" }, { text: money(expenses.certification || 0), align: "right" }] },
+      { cells: [{ text: "Expenses" }, { text: "Exploitable " }, { text: money(expenses.exploitable || 0), align: "right" }] },
+      { cells: [{ text: "" }, { text: "Non exploitable " }, { text: money(expenses.non_exploitable || 0), align: "right" }] },
+      { cells: [{ text: "" }, { text: "Investment/Liability " }, { text: money(expenses.investment_liability || 0), align: "right" }] },
+      { cells: [{ text: "" }, { text: "Certification " }, { text: money(expenses.certification || 0), align: "right" }] },
       { cells: [{ text: "" }, { text: "Total" }, { text: money(expenses.total || 0), align: "right" }], bold: true, fill: [247, 247, 247] },
     ];
 

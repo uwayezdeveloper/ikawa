@@ -1,6 +1,6 @@
 /**
  * Stock Receive Page JavaScript
- * Handles cascade dropdowns and form interactions
+ * Handles cascade dropdowns, multi-item receive rows, and form interactions
  */
 (function () {
   "use strict";
@@ -9,8 +9,8 @@
   const locationTypeSelect = document.getElementById("locationTypeSelect");
   const locationSelect = document.getElementById("locationSelect");
   const categorySelect = document.getElementById("categorySelect");
-  const categoryTypeSelect = document.getElementById("categoryTypeSelect");
-  const typeUnitSelect = document.getElementById("typeUnitSelect");
+  const lineItemsContainer = document.getElementById("lineItemsContainer");
+  const addReceiveItemBtn = document.getElementById("addReceiveItemBtn");
   const supplierSearchInput = document.getElementById("supplierSearchInput");
   const supplierIdInput = document.getElementById("supplierIdInput");
   const supplierOptions = document.getElementById("supplierOptions");
@@ -18,11 +18,10 @@
   const accountWrap = document.getElementById("accountWrap");
   const supplierAdvanceInfo = document.getElementById("supplierAdvanceInfo");
   const advanceInfoWrap = document.getElementById("advanceInfoWrap");
-  const quantityInput = document.getElementById("quantityInput");
-  const unitPriceInput = document.getElementById("unitPriceInput");
   const totalPriceDisplay = document.getElementById("totalPriceDisplay");
   const receiveStockForm = document.getElementById("receiveStockForm");
   const paymentMethodInputs = document.querySelectorAll('input[name="payment_method"]');
+  let categoryTypeOptionsCache = [];
 
   // Get APP_URL from window or construct it
   const APP_URL = window.APP_URL || "";
@@ -83,6 +82,257 @@
       select.appendChild(option);
     });
     select.disabled = false;
+  }
+
+  function getLineRows() {
+    if (!lineItemsContainer) return [];
+    return Array.from(lineItemsContainer.querySelectorAll(".receive-line-item"));
+  }
+
+  function setLineRemoveButtonsVisibility() {
+    const rows = getLineRows();
+    rows.forEach(function (row, index) {
+      const removeBtn = row.querySelector(".remove-line-item-btn");
+      if (!removeBtn) return;
+      removeBtn.classList.toggle("d-none", rows.length === 1 || index === 0);
+    });
+  }
+
+  function reindexLineRows() {
+    const rows = getLineRows();
+
+    rows.forEach(function (row, index) {
+      row.dataset.rowIndex = String(index);
+
+      const label = row.querySelector(".line-item-label");
+      if (label) {
+        label.textContent = "Item #" + (index + 1);
+      }
+
+      const categoryTypeSelect = row.querySelector(".category-type-select");
+      const typeUnitSelect = row.querySelector(".type-unit-select");
+      const quantityInput = row.querySelector(".quantity-input");
+      const unitPriceInput = row.querySelector(".unit-price-input");
+
+      if (categoryTypeSelect) {
+        categoryTypeSelect.name = "items[" + index + "][category_type_id]";
+      }
+      if (typeUnitSelect) {
+        typeUnitSelect.name = "items[" + index + "][category_type_unit_id]";
+      }
+      if (quantityInput) {
+        quantityInput.name = "items[" + index + "][quantity]";
+      }
+      if (unitPriceInput) {
+        unitPriceInput.name = "items[" + index + "][unit_price]";
+      }
+    });
+
+    setLineRemoveButtonsVisibility();
+  }
+
+  function createLineItemRow(index) {
+    const row = document.createElement("div");
+    row.className = "border rounded p-2 receive-line-item";
+    row.dataset.rowIndex = String(index);
+    row.innerHTML =
+      '<div class="d-flex justify-content-between align-items-center mb-2">' +
+      '<small class="text-muted fw-semibold line-item-label">Item #' +
+      (index + 1) +
+      "</small>" +
+      '<button type="button" class="btn btn-sm btn-link text-danger p-0 remove-line-item-btn">' +
+      '<i class="ti ti-trash me-1"></i>Remove' +
+      "</button>" +
+      "</div>" +
+      '<div class="mb-2">' +
+      '<label class="form-label">Category Type <span class="text-danger">*</span></label>' +
+      '<select class="form-select category-type-select" required>' +
+      '<option value="">Select Category first</option>' +
+      "</select>" +
+      "</div>" +
+      '<div class="mb-2">' +
+      '<label class="form-label">Unit <span class="text-danger">*</span></label>' +
+      '<select class="form-select type-unit-select" required disabled>' +
+      '<option value="">Select Category Type first</option>' +
+      "</select>" +
+      "</div>" +
+      '<div class="row g-2 align-items-end">' +
+      '<div class="col-md-4">' +
+      '<label class="form-label">Quantity <span class="text-danger">*</span></label>' +
+      '<input type="number" class="form-control quantity-input" required min="0.01" step="0.01">' +
+      "</div>" +
+      '<div class="col-md-4">' +
+      '<label class="form-label">Price/kg <span class="text-danger">*</span></label>' +
+      '<input type="number" class="form-control unit-price-input" required min="0" step="0.01" placeholder="Price per kg">' +
+      "</div>" +
+      '<div class="col-md-4">' +
+      '<label class="form-label">Line Total</label>' +
+      '<input type="text" class="form-control bg-light item-total-display" readonly value="0.00">' +
+      "</div>" +
+      "</div>";
+
+    if (categoryTypeOptionsCache.length > 0) {
+      const categoryTypeSelect = row.querySelector(".category-type-select");
+      populateSelect(
+        categoryTypeSelect,
+        categoryTypeOptionsCache,
+        "id",
+        "name",
+        "Select Category Type",
+      );
+      categoryTypeSelect.disabled = false;
+    } else {
+      const categoryTypeSelect = row.querySelector(".category-type-select");
+      categoryTypeSelect.disabled = true;
+    }
+
+    return row;
+  }
+
+  function resetLineUnits(row) {
+    const typeUnitSelect = row.querySelector(".type-unit-select");
+    if (typeUnitSelect) {
+      resetSelect(typeUnitSelect, "Select Category Type first");
+    }
+  }
+
+  function populateCategoryTypesForAllRows(options) {
+    const rows = getLineRows();
+    rows.forEach(function (row) {
+      const categoryTypeSelect = row.querySelector(".category-type-select");
+      if (!categoryTypeSelect) return;
+
+      const previousValue = categoryTypeSelect.value;
+      populateSelect(
+        categoryTypeSelect,
+        options,
+        "id",
+        "name",
+        "Select Category Type",
+      );
+
+      if (previousValue) {
+        categoryTypeSelect.value = previousValue;
+        if (!categoryTypeSelect.value) {
+          resetLineUnits(row);
+        }
+      }
+    });
+  }
+
+  function resetAllLineItems() {
+    if (!lineItemsContainer) return;
+
+    const rows = getLineRows();
+    rows.forEach(function (row, index) {
+      if (index > 0) {
+        row.remove();
+      }
+    });
+
+    const firstRow = getLineRows()[0];
+    if (!firstRow) return;
+
+    const categoryTypeSelect = firstRow.querySelector(".category-type-select");
+    const typeUnitSelect = firstRow.querySelector(".type-unit-select");
+    const quantityInput = firstRow.querySelector(".quantity-input");
+    const unitPriceInput = firstRow.querySelector(".unit-price-input");
+    const itemTotalDisplay = firstRow.querySelector(".item-total-display");
+
+    if (categoryTypeSelect) {
+      resetSelect(categoryTypeSelect, "Select Category first");
+      categoryTypeSelect.disabled = true;
+    }
+    if (typeUnitSelect) {
+      resetSelect(typeUnitSelect, "Select Category Type first");
+      typeUnitSelect.disabled = true;
+    }
+    if (quantityInput) quantityInput.value = "";
+    if (unitPriceInput) unitPriceInput.value = "";
+    if (itemTotalDisplay) {
+      itemTotalDisplay.value = "0.00";
+      itemTotalDisplay.dataset.rawTotal = "0";
+    }
+
+    reindexLineRows();
+  }
+
+  function calculateLineTotal(row) {
+    const typeUnitSelect = row.querySelector(".type-unit-select");
+    const quantityInput = row.querySelector(".quantity-input");
+    const unitPriceInput = row.querySelector(".unit-price-input");
+    const itemTotalDisplay = row.querySelector(".item-total-display");
+
+    if (!typeUnitSelect || !quantityInput || !unitPriceInput || !itemTotalDisplay) {
+      return 0;
+    }
+
+    const quantity = parseFloat(quantityInput.value) || 0;
+    const unitPrice = parseFloat(unitPriceInput.value) || 0;
+    const selectedOption = typeUnitSelect.options[typeUnitSelect.selectedIndex];
+    const conversionFactor = parseFloat(selectedOption?.dataset?.conversionFactor) || 0;
+
+    let total = 0;
+    if (conversionFactor > 0) {
+      const quantityInKg = quantity * (conversionFactor / 1000);
+      total = unitPrice * quantityInKg;
+    } else {
+      total = quantity * unitPrice;
+    }
+
+    itemTotalDisplay.dataset.rawTotal = String(total);
+    itemTotalDisplay.value = total.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    return total;
+  }
+
+  function calculateGrandTotal() {
+    const rows = getLineRows();
+    let grandTotal = 0;
+
+    rows.forEach(function (row) {
+      const itemTotalDisplay = row.querySelector(".item-total-display");
+      if (!itemTotalDisplay) return;
+
+      const rawTotal = parseFloat(itemTotalDisplay.dataset.rawTotal || "0") || 0;
+      grandTotal += rawTotal;
+    });
+
+    if (totalPriceDisplay) {
+      totalPriceDisplay.value = grandTotal.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    checkSupplierAdvance();
+  }
+
+  function loadTypeUnitsForRow(row, categoryTypeId) {
+    const typeUnitSelect = row.querySelector(".type-unit-select");
+    if (!typeUnitSelect) return;
+
+    resetSelect(typeUnitSelect, "Loading units...");
+
+    if (!categoryTypeId) {
+      resetSelect(typeUnitSelect, "Select Category Type first");
+      calculateLineTotal(row);
+      calculateGrandTotal();
+      return;
+    }
+
+    postAjax(
+      "get_type_units",
+      { category_type_id: categoryTypeId },
+      function (data) {
+        populateSelect(typeUnitSelect, data, "id", "unit_name", "Select Unit");
+        calculateLineTotal(row);
+        calculateGrandTotal();
+      },
+    );
   }
 
   /**
@@ -186,66 +436,6 @@
   }
 
   /**
-   * Calculate total price and kg conversion
-   * unit_price is ALWAYS price per kg
-   * total = unit_price × quantity_in_kg
-   */
-  function calculateTotal() {
-    if (!quantityInput || !unitPriceInput || !totalPriceDisplay) return;
-    const quantity = parseFloat(quantityInput.value) || 0;
-    const unitPrice = parseFloat(unitPriceInput.value) || 0; // Price per kg
-
-    // Calculate kg conversion preview
-    const kgPreview = document.getElementById("kgConversionPreview");
-    const qtyInKgPreview = document.getElementById("qtyInKgPreview");
-    const pricePerKgPreview = document.getElementById("pricePerKgPreview");
-
-    let total = 0;
-    let qtyInKg = 0;
-
-    if (typeUnitSelect) {
-      const selectedOption =
-        typeUnitSelect.options[typeUnitSelect.selectedIndex];
-      const conversionFactor =
-        parseFloat(selectedOption?.dataset?.conversionFactor) || 0;
-
-      if (conversionFactor > 0 && quantity > 0) {
-        // conversion_factor is in grams, kg = 1000 grams
-        qtyInKg = quantity * (conversionFactor / 1000);
-        // total = unit_price (per kg) × quantity_in_kg
-        total = unitPrice * qtyInKg;
-
-        if (kgPreview && qtyInKgPreview && pricePerKgPreview) {
-          qtyInKgPreview.textContent = qtyInKg.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          });
-          // price_per_kg = unit_price (since unit_price IS the price per kg)
-          pricePerKgPreview.textContent = unitPrice.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          });
-          kgPreview.style.display = "block";
-        }
-      } else {
-        // Fallback: simple calculation
-        total = quantity * unitPrice;
-        if (kgPreview) kgPreview.style.display = "none";
-      }
-    } else {
-      total = quantity * unitPrice;
-    }
-
-    totalPriceDisplay.value = total.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-
-    // Check for supplier advance after calculating total
-    checkSupplierAdvance();
-  }
-
-  /**
    * Check if supplier has available advance for the total amount
    */
   function checkSupplierAdvance() {
@@ -344,9 +534,9 @@
       // Reset dependent selects
       resetSelect(locationSelect, "Select Location");
       resetSelect(categorySelect, "Select Category");
-      resetSelect(categoryTypeSelect, "Select Category Type");
-      resetSelect(typeUnitSelect, "Select Unit");
       resetSelect(accountSelect, "Select Account");
+      categoryTypeOptionsCache = [];
+      resetAllLineItems();
 
       // Clear supplier advance info
       if (supplierAdvanceInfo) {
@@ -422,9 +612,21 @@
     categorySelect.addEventListener("change", function () {
       const categoryId = this.value;
 
-      // Reset dependent selects
-      resetSelect(categoryTypeSelect, "Select Category Type");
-      resetSelect(typeUnitSelect, "Select Unit");
+      categoryTypeOptionsCache = [];
+      const rows = getLineRows();
+      rows.forEach(function (row) {
+        const categoryTypeSelect = row.querySelector(".category-type-select");
+        const typeUnitSelect = row.querySelector(".type-unit-select");
+        if (categoryTypeSelect) {
+          resetSelect(categoryTypeSelect, "Select Category first");
+          categoryTypeSelect.disabled = true;
+        }
+        if (typeUnitSelect) {
+          resetSelect(typeUnitSelect, "Select Category Type first");
+        }
+        calculateLineTotal(row);
+      });
+      calculateGrandTotal();
 
       if (!categoryId) return;
 
@@ -433,55 +635,71 @@
         "get_category_types",
         { category_id: categoryId },
         function (data) {
-          populateSelect(
-            categoryTypeSelect,
-            data,
-            "id",
-            "name",
-            "Select Category Type",
-          );
+          categoryTypeOptionsCache = Array.isArray(data) ? data : [];
+          populateCategoryTypesForAllRows(categoryTypeOptionsCache);
         },
       );
     });
   }
 
-  // Category Type Change Handler
-  if (categoryTypeSelect) {
-    categoryTypeSelect.addEventListener("change", function () {
-      const categoryTypeId = this.value;
+  // Dynamic line item events
+  if (lineItemsContainer) {
+    lineItemsContainer.addEventListener("change", function (event) {
+      const target = event.target;
+      const row = target.closest(".receive-line-item");
+      if (!row) return;
 
-      // Reset type-unit select
-      resetSelect(typeUnitSelect, "Select Unit");
+      if (target.classList.contains("category-type-select")) {
+        loadTypeUnitsForRow(row, target.value);
+        return;
+      }
 
-      if (!categoryTypeId) return;
+      if (
+        target.classList.contains("type-unit-select") ||
+        target.classList.contains("quantity-input") ||
+        target.classList.contains("unit-price-input")
+      ) {
+        calculateLineTotal(row);
+        calculateGrandTotal();
+      }
+    });
 
-      // Fetch type-unit assignments (returns category_type_units.id as value)
-      postAjax(
-        "get_type_units",
-        { category_type_id: categoryTypeId },
-        function (data) {
-          populateSelect(
-            typeUnitSelect,
-            data,
-            "id",
-            "unit_name",
-            "Select Unit",
-          );
-        },
-      );
+    lineItemsContainer.addEventListener("input", function (event) {
+      const target = event.target;
+      if (
+        !target.classList.contains("quantity-input") &&
+        !target.classList.contains("unit-price-input")
+      ) {
+        return;
+      }
+
+      const row = target.closest(".receive-line-item");
+      if (!row) return;
+
+      calculateLineTotal(row);
+      calculateGrandTotal();
+    });
+
+    lineItemsContainer.addEventListener("click", function (event) {
+      const removeBtn = event.target.closest(".remove-line-item-btn");
+      if (!removeBtn) return;
+
+      const row = removeBtn.closest(".receive-line-item");
+      if (!row) return;
+
+      row.remove();
+      reindexLineRows();
+      calculateGrandTotal();
     });
   }
 
-  // Calculate total on input change
-  if (quantityInput) {
-    quantityInput.addEventListener("input", calculateTotal);
-  }
-  if (unitPriceInput) {
-    unitPriceInput.addEventListener("input", calculateTotal);
-  }
-  // Recalculate when unit changes (for kg conversion)
-  if (typeUnitSelect) {
-    typeUnitSelect.addEventListener("change", calculateTotal);
+  if (addReceiveItemBtn && lineItemsContainer) {
+    addReceiveItemBtn.addEventListener("click", function () {
+      const index = getLineRows().length;
+      const row = createLineItemRow(index);
+      lineItemsContainer.appendChild(row);
+      reindexLineRows();
+    });
   }
 
   if (receiveStockForm) {
@@ -496,6 +714,46 @@
           text: "Type supplier name and pick an existing supplier from suggestions.",
         });
         return;
+      }
+
+      const rows = getLineRows();
+      for (let i = 0; i < rows.length; i += 1) {
+        const row = rows[i];
+        const typeUnitSelect = row.querySelector(".type-unit-select");
+        const quantityInput = row.querySelector(".quantity-input");
+        const unitPriceInput = row.querySelector(".unit-price-input");
+
+        if (!typeUnitSelect || !typeUnitSelect.value) {
+          e.preventDefault();
+          Swal.fire({
+            icon: "warning",
+            title: "Unit Required",
+            text: "Select unit for item #" + (i + 1) + ".",
+          });
+          return;
+        }
+
+        const quantity = parseFloat(quantityInput?.value || "0") || 0;
+        if (quantity <= 0) {
+          e.preventDefault();
+          Swal.fire({
+            icon: "warning",
+            title: "Invalid Quantity",
+            text: "Quantity must be greater than zero for item #" + (i + 1) + ".",
+          });
+          return;
+        }
+
+        const unitPrice = parseFloat(unitPriceInput?.value || "0") || 0;
+        if (unitPrice <= 0) {
+          e.preventDefault();
+          Swal.fire({
+            icon: "warning",
+            title: "Invalid Price",
+            text: "Price/kg must be greater than zero for item #" + (i + 1) + ".",
+          });
+          return;
+        }
       }
 
       const method = getSelectedPaymentMethod();
@@ -524,6 +782,8 @@
     });
   }
 
+  reindexLineRows();
+  calculateGrandTotal();
   syncSupplierIdFromInput();
   updatePaymentMethodUI();
 
