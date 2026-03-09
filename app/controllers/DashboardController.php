@@ -96,6 +96,22 @@ class DashboardController extends Controller
                           AND sp.status IN ('pending', 'partial')
                     ) as loan_total,
 
+                                        (
+                                                SELECT COALESCE(SUM(a.balance), 0)
+                                                FROM accounts a
+                                                WHERE a.location_id = l.id
+                                                    AND a.identifiers = 1
+                                                    AND a.status = 'active'
+                                        ) as bank_total,
+
+                                        (
+                                                SELECT COALESCE(SUM(a.balance), 0)
+                                                FROM accounts a
+                                                WHERE a.location_id = l.id
+                                                    AND a.identifiers = 2
+                                                    AND a.status = 'active'
+                                        ) as caisse_total,
+
                     (
                         SELECT COALESCE(SUM(ec.amount), 0)
                         FROM tbl_expenseconsume ec
@@ -146,6 +162,8 @@ class DashboardController extends Controller
             'advances_total' => 0.0,
             'approvisionnement_total' => 0.0,
             'loan_total' => 0.0,
+            'bank_total' => 0.0,
+            'caisse_total' => 0.0,
             'expense_cat_1_total' => 0.0,
             'expense_cat_2_total' => 0.0,
             'expense_cat_3_total' => 0.0,
@@ -168,6 +186,8 @@ class DashboardController extends Controller
             $generalLocationTotals['advances_total'] += (float)($locationCard['advances_total'] ?? 0);
             $generalLocationTotals['approvisionnement_total'] += (float)($locationCard['approvisionnement_total'] ?? 0);
             $generalLocationTotals['loan_total'] += (float)($locationCard['loan_total'] ?? 0);
+            $generalLocationTotals['bank_total'] += (float)($locationCard['bank_total'] ?? 0);
+            $generalLocationTotals['caisse_total'] += (float)($locationCard['caisse_total'] ?? 0);
             $generalLocationTotals['expense_cat_1_total'] += $expenseCat1;
             $generalLocationTotals['expense_cat_2_total'] += $expenseCat2;
             $generalLocationTotals['expense_cat_3_total'] += (float)($locationCard['expense_cat_3_total'] ?? 0);

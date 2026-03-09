@@ -88,8 +88,8 @@ class ProfileController extends Controller
         
         $userId = $loggedInUser['id'];
         
-        // Get current user
-        $user = $this->userModel->find($userId);
+        // Get current user with password for verification
+        $user = $this->userModel->findByWithPassword('id', $userId);
         
         if (!$user) {
             $_SESSION['flash_error'] = 'User not found';
@@ -201,7 +201,7 @@ class ProfileController extends Controller
         }
         
         // Verify current password
-        if (!password_verify($currentPassword, $user['password'])) {
+        if (empty($user['password']) || !password_verify($currentPassword, $user['password'])) {
             $_SESSION['flash_error'] = 'Current password is incorrect';
             $response->redirect(APP_URL . '/profile/change-password');
             return;

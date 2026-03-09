@@ -121,6 +121,8 @@
                     <div class="col-md-3"><small class="text-muted d-block">Stock Value (Cat 1)</small><strong><?= number_format((float)($generalLocationTotals['stock_value'] ?? 0), 2) ?></strong></div>
                     <div class="col-md-3"><small class="text-muted d-block">Approvisionnement</small><strong><?= number_format((float)($generalLocationTotals['approvisionnement_total'] ?? 0), 2) ?></strong></div>
                     <div class="col-md-3"><small class="text-muted d-block">Loan</small><strong><?= number_format((float)($generalLocationTotals['loan_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Bank</small><strong><?= number_format((float)($generalLocationTotals['bank_total'] ?? 0), 2) ?></strong></div>
+                    <div class="col-md-3"><small class="text-muted d-block">Caisse</small><strong><?= number_format((float)($generalLocationTotals['caisse_total'] ?? 0), 2) ?></strong></div>
                     <div class="col-md-3"><small class="text-muted d-block">Total Advances</small><strong><?= number_format((float)($generalLocationTotals['advances_total'] ?? 0), 2) ?></strong></div>
                     <div class="col-md-3"><small class="text-muted d-block">Exploitable</small><strong><?= number_format((float)($generalLocationTotals['expense_cat_1_total'] ?? 0), 2) ?></strong></div>
                     <div class="col-md-3"><small class="text-muted d-block">Non-Exploitable</small><strong><?= number_format((float)($generalLocationTotals['expense_cat_2_total'] ?? 0), 2) ?></strong></div>
@@ -173,6 +175,14 @@
                                         <div class="col-6">
                                             <div class="small text-muted">Loan</div>
                                             <div class="fw-semibold"><?= number_format((float)($locationCard['loan_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Bank</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['bank_total'] ?? 0), 2) ?></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small text-muted">Caisse</div>
+                                            <div class="fw-semibold"><?= number_format((float)($locationCard['caisse_total'] ?? 0), 2) ?></div>
                                         </div>
                                         <div class="col-6">
                                             <div class="small text-muted">Total Advance</div>
