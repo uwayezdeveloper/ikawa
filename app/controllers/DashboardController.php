@@ -168,6 +168,7 @@ class DashboardController extends Controller
             'advances_total' => 0.0,
             'approvisionnement_total' => 0.0,
             'loan_total' => 0.0,
+            'payed_total' => 0.0,
             'bank_total' => 0.0,
             'caisse_total' => 0.0,
             'expense_cat_1_total' => 0.0,
@@ -180,18 +181,21 @@ class DashboardController extends Controller
         foreach ($locationCards as &$locationCard) {
             $cheriesQty = (float)($locationCard['cheries_quantity'] ?? 0);
             $stockValueByCat1 = (float)($locationCard['stock_value'] ?? 0);
+            $loanTotal = (float)($locationCard['loan_total'] ?? 0);
             $expenseCat1 = (float)($locationCard['expense_cat_1_total'] ?? 0);
             $expenseCat2 = (float)($locationCard['expense_cat_2_total'] ?? 0);
             $productionAmount = $stockValueByCat1 + $expenseCat1 + $expenseCat2;
 
             $locationCard['production_cost_per_kg'] = $cheriesQty > 0 ? ($productionAmount / $cheriesQty) : 0.0;
+            $locationCard['payed_total'] = $stockValueByCat1 - $loanTotal;
 
             $generalLocationTotals['locations_count'] += 1;
             $generalLocationTotals['cheries_quantity'] += $cheriesQty;
             $generalLocationTotals['stock_value'] += $stockValueByCat1;
             $generalLocationTotals['advances_total'] += (float)($locationCard['advances_total'] ?? 0);
             $generalLocationTotals['approvisionnement_total'] += (float)($locationCard['approvisionnement_total'] ?? 0);
-            $generalLocationTotals['loan_total'] += (float)($locationCard['loan_total'] ?? 0);
+            $generalLocationTotals['loan_total'] += $loanTotal;
+            $generalLocationTotals['payed_total'] += (float)($locationCard['payed_total'] ?? 0);
             $generalLocationTotals['bank_total'] += (float)($locationCard['bank_total'] ?? 0);
             $generalLocationTotals['caisse_total'] += (float)($locationCard['caisse_total'] ?? 0);
             $generalLocationTotals['expense_cat_1_total'] += $expenseCat1;
