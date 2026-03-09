@@ -324,13 +324,18 @@ class ExpenseTransaction extends Model
      */
     public function getAccountsByUserLocation($userId): array
     {
+        $locationId = $this->getUserLocationId((int)$userId);
+        if ($locationId <= 0) {
+            return [];
+        }
+
         $sql = "SELECT a.* 
                 FROM accounts a
-                INNER JOIN locations l ON a.location_id = l.id
                 WHERE a.status = 'active'
+                  AND a.location_id = :location_id
                 ORDER BY a.account_name ASC";
-        
-        return Database::fetchAll($sql);
+
+        return Database::fetchAll($sql, ['location_id' => $locationId]);
     }
 
     /**
