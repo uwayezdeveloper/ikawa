@@ -69,7 +69,13 @@ class DashboardController extends Controller
         $locationCards = Database::fetchAll(
             "SELECT l.id,
                     l.name as location_name,
-                    COALESCE(SUM(CASE WHEN pc.id = 1 THEN ss.total_quantity ELSE 0 END), 0) as cheries_quantity,
+                    (
+                    SELECT COALESCE(SUM(sr.quantity_in_kg), 0)
+                    FROM stock_receives sr
+                    WHERE sr.location_id = l.id
+                      AND sr.product_category_id = 1
+                      AND sr.status = 'approved'
+                    ) as cheries_quantity,
                     COALESCE(SUM(CASE WHEN pc.id = 1 THEN ss.total_value ELSE 0 END), 0) as stock_value,
 
                     (

@@ -534,14 +534,14 @@ class StationFinanceController extends Controller
 
     private function getDetailedExpenseReportData(int $locationId): array
     {
-        $cheriesQuantity = (float)(Database::fetch(
-            "SELECT COALESCE(SUM(ss.total_quantity), 0) AS total
-             FROM stock_summary ss
-             INNER JOIN product_categories pc ON pc.id = ss.product_category_id
-             WHERE ss.location_id = :location_id
-               AND pc.id = 1",
-            ['location_id' => $locationId]
-        )['total'] ?? 0);
+                $cheriesQuantity = (float)(Database::fetch(
+                        "SELECT COALESCE(SUM(sr.quantity_in_kg), 0) AS total
+                         FROM stock_receives sr
+                         WHERE sr.location_id = :location_id
+                             AND sr.product_category_id = 1
+                             AND sr.status = 'approved'",
+                        ['location_id' => $locationId]
+                )['total'] ?? 0);
 
         $stockValue = (float)(Database::fetch(
             "SELECT COALESCE(SUM(ss.total_value), 0) AS total
@@ -691,12 +691,12 @@ class StationFinanceController extends Controller
         )['total'] ?? 0);
 
                 $stockCheriesQuantity = (float)(Database::fetch(
-                        "SELECT COALESCE(SUM(ss.total_quantity), 0) as total
-                         FROM stock_summary ss
-                         INNER JOIN product_categories pc ON pc.id = ss.product_category_id
-                         WHERE ss.location_id = :location_id
-                             AND pc.id = 1",
-                        ['location_id' => $locationId]
+                    "SELECT COALESCE(SUM(sr.quantity_in_kg), 0) as total
+                     FROM stock_receives sr
+                     WHERE sr.location_id = :location_id
+                         AND sr.product_category_id = 1
+                         AND sr.status = 'approved'",
+                    ['location_id' => $locationId]
                 )['total'] ?? 0);
 
         $journalBankBreakdown = $this->getJournalBankBreakdown($locationId);

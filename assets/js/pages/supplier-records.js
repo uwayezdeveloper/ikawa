@@ -138,6 +138,32 @@
     }
 
     function buildStatementData(productRows, timelineRows) {
+      function parseDateTime(value) {
+        if (!value) return NaN;
+        const t = new Date(value).getTime();
+        return Number.isNaN(t) ? NaN : t;
+      }
+
+      function combineDateWithTime(dateValue, dateTimeValue) {
+        const dateOnly = String(dateValue || "").slice(0, 10);
+        const dateTimeText = String(dateTimeValue || "").trim();
+
+        if (!dateOnly) {
+          return dateTimeText || "";
+        }
+
+        if (!dateTimeText) {
+          return dateOnly + " 00:00:00";
+        }
+
+        const hhmmssMatch = dateTimeText.match(/(\d{2}:\d{2}:\d{2})/);
+        if (hhmmssMatch && hhmmssMatch[1]) {
+          return dateOnly + " " + hhmmssMatch[1];
+        }
+
+        return dateOnly + " 00:00:00";
+      }
+
       const productTypesMap = new Map();
 
       productRows.forEach(function (item) {
@@ -155,51 +181,80 @@
       });
 
       const events = [];
+      let eventOrder = 0;
 
       timelineRows
         .filter(function (row) {
           return String(row.type || "") === "advance";
         })
-        .forEach(function (row) {
+        .forEach(function (row, idx) {
+          const effectiveDateTime = combineDateWithTime(row.date, row.datetime || row.date);
           events.push({
             date: row.date,
-            datetime: row.datetime || row.date,
+            datetime: effectiveDateTime,
             action: "advance",
             amount: Number(row.debit || 0),
+            sequence: eventOrder++,
           });
         });
 
-      productRows.forEach(function (item) {
+      productRows.forEach(function (item, idx) {
+        const method = resolvePaymentMethod(item.payment_method, item.advance_amount, item.account_amount);
+        const payableTotal = Number(item.payable_total != null ? item.payable_total : item.payable_amount || 0);
+        const purchaseLoanAmount = payableTotal > 0 ? payableTotal : (method === "pay_later" ? Number(item.total_price || 0) : 0);
+        const advanceUsedAmount = Number(item.advance_amount || 0);
+        const purchaseDateTime = combineDateWithTime(item.receive_date, item.created_at || item.receive_date);
+
         events.push({
           date: item.receive_date,
-          datetime: item.receive_date,
+          datetime: purchaseDateTime,
           action: "purchase",
           amount: Number(item.total_price || 0),
+          loanAmount: purchaseLoanAmount,
+          advanceUsedAmount: advanceUsedAmount,
           amountPerKg: Number(item.unit_price || 0),
           productType: String(item.type_name || item.product_name || "Product").trim(),
           quantity: Number(item.quantity || 0),
           quantityInKg: Number(item.quantity_in_kg != null ? item.quantity_in_kg : item.quantity || 0),
           unitSymbol: String(item.unit_symbol || "").trim(),
+          sequence: eventOrder++,
         });
+
+        // Add explicit row when this purchase consumed supplier advance.
+        if (advanceUsedAmount > 0) {
+          events.push({
+            date: item.receive_date,
+            datetime: purchaseDateTime,
+            action: "advance_usage",
+            amount: advanceUsedAmount,
+            sequence: eventOrder++,
+          });
+        }
       });
 
       timelineRows
         .filter(function (row) {
           return String(row.type || "") === "payment";
         })
-        .forEach(function (row) {
+        .forEach(function (row, idx) {
           events.push({
             date: row.date,
             datetime: row.datetime || row.date,
             action: "payment",
             amount: Number(row.debit || 0),
+            sequence: eventOrder++,
           });
         });
 
       events.sort(function (a, b) {
-        const ad = new Date(a.datetime || a.date || 0).getTime();
-        const bd = new Date(b.datetime || b.date || 0).getTime();
-        return ad - bd;
+        const ad = parseDateTime(a.datetime || a.date || 0);
+        const bd = parseDateTime(b.datetime || b.date || 0);
+
+        if (ad !== bd) {
+          return ad - bd;
+        }
+
+        return Number(a.sequence || 0) - Number(b.sequence || 0);
       });
 
       const productTotals = {};
@@ -235,7 +290,7 @@
           row.totalInKg = money(runningTotalKg);
           row.stockValue = money(runningStockValue);
         } else if (event.action === "purchase") {
-          runningRemaining -= event.amount;
+          runningRemaining -= Number(event.loanAmount || 0);
           runningStockValue += event.amount;
           const quantityInKg = Number(event.quantityInKg != null ? event.quantityInKg : event.quantity || 0);
           runningTotalKg += quantityInKg;
@@ -251,6 +306,12 @@
           row.stockValue = money(runningStockValue);
         } else if (event.action === "payment") {
           runningRemaining += event.amount;
+          row.amount = money(event.amount);
+          row.remaining = money(runningRemaining);
+          row.totalInKg = money(runningTotalKg);
+          row.stockValue = money(runningStockValue);
+        } else if (event.action === "advance_usage") {
+          runningRemaining -= event.amount;
           row.amount = money(event.amount);
           row.remaining = money(runningRemaining);
           row.totalInKg = money(runningTotalKg);
@@ -383,6 +444,8 @@
           ? "advance"
           : row.action === "payment"
           ? "payment"
+          : row.action === "advance_usage"
+          ? "paid by advance"
           : "purchase";
 
         const cells = [
