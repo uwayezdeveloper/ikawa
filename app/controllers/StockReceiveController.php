@@ -42,7 +42,8 @@ class StockReceiveController extends Controller
             return $response->redirect(APP_URL . '/dashboard');
         }
 
-        $receives = $this->stockReceiveModel->getAll();
+        $currentLocationId = isset($user['location_id']) ? (int)$user['location_id'] : 0;
+        $receives = $this->stockReceiveModel->getAllByLocation($currentLocationId);
         $locationTypes = Database::fetchAll("SELECT id, name FROM location_types WHERE status = 'active' ORDER BY name");
         $suppliers = Database::fetchAll("SELECT id, name FROM suppliers WHERE status = 'active' ORDER BY name");
 

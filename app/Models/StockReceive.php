@@ -75,6 +75,84 @@ class StockReceive extends Model
     }
 
     /**
+     * Get stock receives created by one user
+     */
+    public function getAllByCreatedBy(int $userId): array
+    {
+        $sql = "SELECT sr.*, 
+                lt.name as location_type_name,
+                l.name as location_name,
+                s.name as supplier_name,
+                pc.name as category_name,
+                ct.name as type_name,
+                mu.name as unit_name,
+                mu.symbol as unit_symbol,
+                CONCAT(u.first_name, ' ', u.last_name) as created_by_name,
+                CONCAT(ua.first_name, ' ', ua.last_name) as approved_by_name,
+                a.account_name,
+                sa.advance_number,
+                sr.payment_method,
+                sr.advance_amount,
+                sr.account_amount,
+                sr.payable_amount
+                FROM {$this->table} sr
+                LEFT JOIN location_types lt ON sr.location_type_id = lt.id
+                LEFT JOIN locations l ON sr.location_id = l.id
+                LEFT JOIN suppliers s ON sr.supplier_id = s.id
+                LEFT JOIN product_categories pc ON sr.product_category_id = pc.id
+                LEFT JOIN category_type_units ctu ON sr.category_type_unit_id = ctu.id
+                LEFT JOIN category_types ct ON ctu.category_type_id = ct.id
+                LEFT JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
+                LEFT JOIN users u ON sr.created_by = u.id
+                LEFT JOIN users ua ON sr.approved_by = ua.id
+                LEFT JOIN accounts a ON sr.account_id = a.id
+                LEFT JOIN supplier_advances sa ON sr.advance_id = sa.id
+                WHERE sr.created_by = :created_by
+                ORDER BY sr.created_at DESC";
+
+        return Database::fetchAll($sql, ['created_by' => $userId]);
+    }
+
+    /**
+     * Get stock receives by location (for logged-in user's location history)
+     */
+    public function getAllByLocation(int $locationId): array
+    {
+        $sql = "SELECT sr.*, 
+                lt.name as location_type_name,
+                l.name as location_name,
+                s.name as supplier_name,
+                pc.name as category_name,
+                ct.name as type_name,
+                mu.name as unit_name,
+                mu.symbol as unit_symbol,
+                CONCAT(u.first_name, ' ', u.last_name) as created_by_name,
+                CONCAT(ua.first_name, ' ', ua.last_name) as approved_by_name,
+                a.account_name,
+                sa.advance_number,
+                sr.payment_method,
+                sr.advance_amount,
+                sr.account_amount,
+                sr.payable_amount
+                FROM {$this->table} sr
+                LEFT JOIN location_types lt ON sr.location_type_id = lt.id
+                LEFT JOIN locations l ON sr.location_id = l.id
+                LEFT JOIN suppliers s ON sr.supplier_id = s.id
+                LEFT JOIN product_categories pc ON sr.product_category_id = pc.id
+                LEFT JOIN category_type_units ctu ON sr.category_type_unit_id = ctu.id
+                LEFT JOIN category_types ct ON ctu.category_type_id = ct.id
+                LEFT JOIN measurement_units mu ON ctu.measurement_unit_id = mu.id
+                LEFT JOIN users u ON sr.created_by = u.id
+                LEFT JOIN users ua ON sr.approved_by = ua.id
+                LEFT JOIN accounts a ON sr.account_id = a.id
+                LEFT JOIN supplier_advances sa ON sr.advance_id = sa.id
+                WHERE sr.location_id = :location_id
+                ORDER BY sr.created_at DESC";
+
+        return Database::fetchAll($sql, ['location_id' => $locationId]);
+    }
+
+    /**
      * Get stock receives by location
      */
     public function getByLocation(int $locationId): array
