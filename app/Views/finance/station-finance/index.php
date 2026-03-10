@@ -190,7 +190,7 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
                             <?php foreach ($advances as $advance): ?>
                             <tr>
                                 <td>
-                                    <strong><?= htmlspecialchars($advance['supplier_name']) ?></strong>
+                                    <strong><?= htmlspecialchars((string)($advance['supplier_name'] ?? 'Unknown Supplier')) ?></strong>
                                     <br><small class="text-muted"><?= $advance['advance_number'] ?></small>
                                 </td>
                                 <td><?= date('M d, Y', strtotime($advance['advance_date'])) ?></td>
@@ -245,7 +245,7 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
                             <?php foreach ($payables as $payable): ?>
                             <tr>
                                 <td>
-                                    <strong><?= htmlspecialchars($payable['supplier_name']) ?></strong>
+                                    <strong><?= htmlspecialchars((string)($payable['supplier_name'] ?? 'Unknown Supplier')) ?></strong>
                                     <br><small class="text-muted"><?= $payable['payable_number'] ?></small>
                                 </td>
                                 <td>
@@ -269,7 +269,7 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
                                     <button type="button" class="btn btn-sm btn-success pay-payable-btn"
                                         data-payable-id="<?= $payable['id'] ?>"
                                         data-remaining="<?= $payable['amount'] - $payable['paid_amount'] ?>"
-                                        data-supplier="<?= htmlspecialchars($payable['supplier_name']) ?>">
+                                        data-supplier="<?= htmlspecialchars((string)($payable['supplier_name'] ?? 'Unknown Supplier')) ?>">
                                         <i class="ti ti-cash"></i> Pay
                                     </button>
                                 </td>
