@@ -42,11 +42,17 @@ class SupplierRecordController extends Controller
             return $response->redirect(APP_URL . '/dashboard');
         }
 
-        // Get all active suppliers
-        $suppliers = $this->getActiveSuppliers();
+        $userLocationId = (int)($user['location_id'] ?? 0);
+
+        // Get active suppliers for logged-in user's location only
+        $suppliers = $this->getActiveSuppliers($userLocationId);
         
-        // Get selected supplier
-        $selectedSupplierId = $_GET['supplier_id'] ?? ($suppliers[0]['id'] ?? null);
+        // Get selected supplier (must belong to the filtered list)
+        $selectedSupplierId = (int)($_GET['supplier_id'] ?? 0);
+        $allowedSupplierIds = array_column($suppliers, 'id');
+        if ($selectedSupplierId <= 0 || !in_array($selectedSupplierId, $allowedSupplierIds)) {
+            $selectedSupplierId = (int)($suppliers[0]['id'] ?? 0);
+        }
         
         $records = [];
         $supplierInfo = null;
@@ -58,7 +64,7 @@ class SupplierRecordController extends Controller
         $settingModel = new Setting();
         $companySettings = $settingModel->getCompanySettings();
 
-        if ($selectedSupplierId) {
+        if ($selectedSupplierId > 0) {
             $supplierInfo = $this->supplierModel->find($selectedSupplierId);
             $records = $this->getSupplierRecords($selectedSupplierId);
             $summary = $this->getSupplierSummary($selectedSupplierId);
@@ -82,14 +88,19 @@ class SupplierRecordController extends Controller
     /**
      * Get active suppliers
      */
-    private function getActiveSuppliers(): array
+    private function getActiveSuppliers(int $locationId): array
     {
+        if ($locationId <= 0) {
+            return [];
+        }
+
         $sql = "SELECT s.*, st.name as type_name 
                 FROM suppliers s
                 LEFT JOIN supplier_types st ON s.supplier_type_id = st.id
                 WHERE s.status = 'active' 
+                AND s.address = :location_id
                 ORDER BY s.name";
-        return Database::fetchAll($sql);
+        return Database::fetchAll($sql, ['location_id' => $locationId]);
     }
 
     /**

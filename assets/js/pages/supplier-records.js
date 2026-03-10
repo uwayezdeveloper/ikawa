@@ -1,12 +1,97 @@
 (function () {
   "use strict";
 
-  const supplierSelect = document.getElementById("supplierSelect");
-  if (supplierSelect) {
-    supplierSelect.addEventListener("change", function () {
-      if (this.value) {
-        window.location.href = window.APP_URL + "/suppliers/records?supplier_id=" + this.value;
+  const supplierSearchInput = document.getElementById("supplierSearchInput");
+  const supplierSearchOptions = document.getElementById("supplierSearchOptions");
+  const supplierSearchId = document.getElementById("supplierSearchId");
+  const supplierSearchHelp = document.getElementById("supplierSearchHelp");
+  const openSupplierRecordBtn = document.getElementById("openSupplierRecordBtn");
+  const currentSupplierIdFromUrl = new URLSearchParams(window.location.search).get("supplier_id") || "";
+
+  function syncSearchedSupplierId() {
+    if (!supplierSearchInput || !supplierSearchOptions || !supplierSearchId) return;
+
+    const typedName = String(supplierSearchInput.value || "").trim().toLowerCase();
+    if (!typedName) {
+      supplierSearchId.value = "";
+      if (supplierSearchHelp) {
+        supplierSearchHelp.className = "text-muted";
+        supplierSearchHelp.textContent = "Search supplier/farmer in your location and open records.";
       }
+      return null;
+    }
+
+    const matchedOption = Array.from(supplierSearchOptions.options).find(function (opt) {
+      return String(opt.value || "").trim().toLowerCase() === typedName;
+    });
+
+    supplierSearchId.value = matchedOption ? String(matchedOption.dataset.id || "") : "";
+
+    if (supplierSearchHelp) {
+      if (matchedOption) {
+        supplierSearchHelp.className = "text-success";
+        supplierSearchHelp.textContent = "Supplier/Farmer found in your location.";
+      } else {
+        supplierSearchHelp.className = "text-danger";
+        supplierSearchHelp.textContent =
+          'No supplier/farmer on your location who is named "' +
+          String(supplierSearchInput.value || "").trim() +
+          '".';
+      }
+    }
+
+    return matchedOption || null;
+  }
+
+  function openSupplierRecord() {
+    if (!supplierSearchId || !supplierSearchId.value) {
+      if (typeof window.Swal !== "undefined") {
+        window.Swal.fire({
+          icon: "warning",
+          title: "Supplier/Farmer Not Found",
+          text: "Search and select an existing supplier/farmer from your location.",
+        });
+      }
+      return;
+    }
+
+    window.location.href = window.APP_URL + "/suppliers/records?supplier_id=" + supplierSearchId.value;
+  }
+
+  if (supplierSearchInput) {
+    supplierSearchInput.addEventListener("input", function () {
+      const matchedOption = syncSearchedSupplierId();
+      if (!matchedOption) return;
+
+      const matchedId = String(matchedOption.dataset.id || "");
+      if (matchedId && matchedId !== String(currentSupplierIdFromUrl)) {
+        openSupplierRecord();
+      }
+    });
+
+    supplierSearchInput.addEventListener("change", function () {
+      const matchedOption = syncSearchedSupplierId();
+      if (!matchedOption) return;
+
+      const matchedId = String(matchedOption.dataset.id || "");
+      if (matchedId && matchedId !== String(currentSupplierIdFromUrl)) {
+        openSupplierRecord();
+      }
+    });
+    supplierSearchInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        syncSearchedSupplierId();
+        openSupplierRecord();
+      }
+    });
+    syncSearchedSupplierId();
+  }
+
+  if (openSupplierRecordBtn) {
+    openSupplierRecordBtn.addEventListener("click", function () {
+      syncSearchedSupplierId();
+      openSupplierRecord();
     });
   }
 

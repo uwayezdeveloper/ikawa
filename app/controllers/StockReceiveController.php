@@ -45,7 +45,10 @@ class StockReceiveController extends Controller
         $currentLocationId = isset($user['location_id']) ? (int)$user['location_id'] : 0;
         $receives = $this->stockReceiveModel->getAllByLocation($currentLocationId);
         $locationTypes = Database::fetchAll("SELECT id, name FROM location_types WHERE status = 'active' ORDER BY name");
-        $suppliers = Database::fetchAll("SELECT id, name FROM suppliers WHERE status = 'active' ORDER BY name");
+        $suppliers = Database::fetchAll(
+            "SELECT id, name FROM suppliers WHERE status = 'active' AND address = :location_id ORDER BY name",
+            ['location_id' => $currentLocationId]
+        );
 
         return View::render('stock/receive-stock', [
             'title' => 'Receive Stock',
@@ -219,6 +222,17 @@ class StockReceiveController extends Controller
         if (empty($locationTypeId) || empty($locationId) || empty($supplierId) || 
             empty($categoryId)) {
             $_SESSION['flash_error'] = 'All dropdown fields are required';
+            return $response->redirect(APP_URL . '/stock/receives');
+        }
+
+        $loggedInLocationId = (int)(($_SESSION['user']['location_id'] ?? 0));
+        $supplier = Database::fetch(
+            "SELECT id FROM suppliers WHERE id = :id AND status = 'active' AND address = :location_id",
+            ['id' => $supplierId, 'location_id' => $loggedInLocationId]
+        );
+
+        if (!$supplier) {
+            $_SESSION['flash_error'] = 'Selected supplier/farmer is not available in the chosen location';
             return $response->redirect(APP_URL . '/stock/receives');
         }
 

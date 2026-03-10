@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <?php endforeach; ?>
                         </datalist>
                         <input type="hidden" name="supplier_id" id="supplierIdInput">
-                        <small class="text-muted">Start typing supplier name and select from suggestions.</small>
+                        <small class="text-muted" id="supplierSearchHelp">Start typing supplier name and select from suggestions.</small>
                     </div>
 
                     <!-- Payment Method -->

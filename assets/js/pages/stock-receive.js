@@ -14,6 +14,7 @@
   const supplierSearchInput = document.getElementById("supplierSearchInput");
   const supplierIdInput = document.getElementById("supplierIdInput");
   const supplierOptions = document.getElementById("supplierOptions");
+  const supplierSearchHelp = document.getElementById("supplierSearchHelp");
   const accountSelect = document.getElementById("accountSelect");
   const accountWrap = document.getElementById("accountWrap");
   const supplierAdvanceInfo = document.getElementById("supplierAdvanceInfo");
@@ -366,6 +367,10 @@
     const typedName = String(supplierSearchInput.value || "").trim().toLowerCase();
     if (!typedName) {
       supplierIdInput.value = "";
+      if (supplierSearchHelp) {
+        supplierSearchHelp.className = "text-muted";
+        supplierSearchHelp.textContent = "Start typing supplier name and select from suggestions.";
+      }
       return;
     }
 
@@ -374,6 +379,19 @@
     });
 
     supplierIdInput.value = matchedOption ? String(matchedOption.dataset.id || "") : "";
+
+    if (supplierSearchHelp) {
+      if (matchedOption) {
+        supplierSearchHelp.className = "text-success";
+        supplierSearchHelp.textContent = "Supplier/Farmer selected for this location.";
+      } else {
+        supplierSearchHelp.className = "text-danger";
+        supplierSearchHelp.textContent =
+          'No supplier/farmer on this location who is named "' +
+          String(supplierSearchInput.value || "").trim() +
+          '".';
+      }
+    }
   }
 
   function setAccountEnabledState() {

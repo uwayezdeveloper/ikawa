@@ -18,14 +18,27 @@ $payables = $summary['payables'] ?? [];
         </nav>
     </div>
     <div class="d-flex gap-2">
-        <select id="supplierSelect" class="form-select" style="min-width: 300px;">
-            <option value="">Select Supplier</option>
-            <?php foreach ($suppliers as $supplier): ?>
-            <option value="<?= $supplier['id'] ?>" <?= $supplier['id'] == $selectedSupplierId ? 'selected' : '' ?>>
-                <?= htmlspecialchars($supplier['name']) ?> (<?= htmlspecialchars($supplier['type_name'] ?? 'N/A') ?>)
-            </option>
-            <?php endforeach; ?>
-        </select>
+        <div style="min-width: 340px;">
+            <input
+                type="text"
+                class="form-control"
+                id="supplierSearchInput"
+                list="supplierSearchOptions"
+                placeholder="Type supplier/farmer name..."
+                value="<?= htmlspecialchars((string)($supplierInfo['name'] ?? '')) ?>"
+                autocomplete="off"
+            >
+            <datalist id="supplierSearchOptions">
+                <?php foreach ($suppliers as $supplier): ?>
+                    <option value="<?= htmlspecialchars($supplier['name']) ?>" data-id="<?= (int)$supplier['id'] ?>"></option>
+                <?php endforeach; ?>
+            </datalist>
+            <input type="hidden" id="supplierSearchId" value="<?= (int)($selectedSupplierId ?? 0) ?>">
+            <small class="text-muted" id="supplierSearchHelp">Search supplier/farmer in your location and open records.</small>
+        </div>
+        <button type="button" id="openSupplierRecordBtn" class="btn btn-primary">
+            <i class="ti ti-search me-1"></i> Open
+        </button>
         <?php if ($selectedSupplierId): ?>
         <button type="button" id="downloadPdfBtn" class="btn btn-danger">
             <i class="ti ti-file-type-pdf me-1"></i> Download PDF
@@ -398,7 +411,7 @@ $payables = $summary['payables'] ?? [];
 <?php else: ?>
 <div class="alert alert-info">
     <i class="ti ti-info-circle me-2"></i>
-    Please select a supplier to view their records.
+    No supplier/farmer available for your location.
 </div>
 <?php endif; ?>
 
