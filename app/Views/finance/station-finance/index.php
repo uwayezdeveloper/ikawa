@@ -2,7 +2,6 @@
 $permissions = $user['permissions'] ?? [];
 $location = $financeData['location'] ?? null;
 $accounts = $financeData['accounts'] ?? [];
-$transactions = $financeData['transactions'] ?? [];
 $payables = $financeData['payables'] ?? [];
 $payableSummary = $financeData['payableSummary'] ?? [];
 $advances = $financeData['advances'] ?? [];
@@ -218,7 +217,7 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
 
 <div class="row">
     <!-- Pending Payables Section -->
-    <div class="col-md-6 mb-4">
+    <div class="col-12 mb-4">
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="ti ti-clock-dollar me-2"></i>Pending Payables</h5>
@@ -273,63 +272,6 @@ $totalAdvances = $financeData['totalAdvances'] ?? 0;
                                         data-supplier="<?= htmlspecialchars($payable['supplier_name']) ?>">
                                         <i class="ti ti-cash"></i> Pay
                                     </button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Transactions Section -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="ti ti-arrows-exchange me-2"></i>Recent Transactions</h5>
-                <a href="<?= APP_URL ?>/finance/transactions" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            <div class="card-body p-0">
-                <?php if (empty($transactions)): ?>
-                <div class="text-center py-4 text-muted">
-                    <i class="ti ti-receipt-off fs-1 mb-2 d-block"></i>
-                    No transactions yet
-                </div>
-                <?php else: ?>
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table table-hover mb-0">
-                        <thead class="bg-light sticky-top">
-                            <tr>
-                                <th>Account</th>
-                                <th>Type</th>
-                                <th class="text-end">Amount</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($transactions as $tx): ?>
-                            <tr>
-                                <td>
-                                    <?= htmlspecialchars($tx['account_name']) ?>
-                                    <br><small
-                                        class="text-muted"><?= htmlspecialchars($tx['description'] ?? '') ?></small>
-                                </td>
-                                <td>
-                                    <span
-                                        class="badge bg-<?= $tx['transaction_type'] === 'credit' ? 'success' : 'danger' ?>">
-                                        <?= ucfirst($tx['transaction_type']) ?>
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <span
-                                        class="<?= $tx['transaction_type'] === 'credit' ? 'text-success' : 'text-danger' ?>">
-                                        <?= $tx['transaction_type'] === 'credit' ? '+' : '-' ?><?= number_format($tx['amount'], 2) ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <small><?= date('M d, H:i', strtotime($tx['created_at'])) ?></small>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
