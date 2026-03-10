@@ -52,16 +52,23 @@
                                 <select class="form-select" id="account_id" name="account_id" required>
                                     <option value="">Choose account to recharge...</option>
                                     <?php foreach ($receivingAccounts ?? [] as $account): ?>
+                                        <?php
+                                            $accountName = (string)($account['account_name'] ?? 'Unnamed Account');
+                                            $accountNumber = (string)($account['account_number'] ?? 'N/A');
+                                            $bankName = (string)($account['bank_name'] ?? 'N/A');
+                                            $currencyName = (string)($account['currency_name'] ?? ('Currency ID ' . ($account['currency_type'] ?? 'N/A')));
+                                            $currencySign = (string)($account['currency_sign'] ?? '$');
+                                            $balanceText = number_format((float)($account['balance'] ?? 0), 2);
+                                        ?>
                                         <option value="<?= $account['id'] ?>" 
                                                 data-balance="<?= $account['balance'] ?>"
-                                                data-account-name="<?= htmlspecialchars($account['account_name']) ?>"
-                                                data-account-number="<?= htmlspecialchars($account['account_number'] ?? 'N/A') ?>"
+                                                data-account-name="<?= htmlspecialchars($accountName) ?>"
+                                                data-account-number="<?= htmlspecialchars($accountNumber) ?>"
                                                 data-location="<?= htmlspecialchars($account['location_name'] ?? 'N/A') ?>"
-                                                data-payment-mode="<?= htmlspecialchars($account['payment_mode_name'] ?? 'N/A') ?>">
-                                            <?= htmlspecialchars($account['account_name']) ?> 
-                                            <?php if ($account['account_number']): ?>
-                                                (<?= htmlspecialchars($account['account_number']) ?>)
-                                            <?php endif; ?>
+                                                data-payment-mode="<?= htmlspecialchars($account['payment_mode_name'] ?? 'N/A') ?>"
+                                                data-bank-name="<?= htmlspecialchars($bankName) ?>"
+                                                data-currency-name="<?= htmlspecialchars($currencyName) ?>">
+                                            <?= htmlspecialchars($accountName) ?> | <?= htmlspecialchars($accountNumber) ?> | <?= htmlspecialchars($bankName) ?> | <?= htmlspecialchars($currencyName) ?> (<?= htmlspecialchars($currencySign) ?><?= $balanceText ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>

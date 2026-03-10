@@ -177,9 +177,13 @@ class Account extends Model
      */
     public function getByLocation(int $locationId): array
     {
-        $sql = "SELECT a.*, pm.name as payment_mode_name
+        $sql = "SELECT a.*, 
+            pm.name as payment_mode_name,
+            ct.curre_name as currency_name,
+            ct.sign as currency_sign
                 FROM {$this->table} a
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+            LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                 WHERE a.location_id = :location_id AND a.status = 'active'
                 ORDER BY a.account_name ASC";
         return Database::fetchAll($sql, ['location_id' => $locationId]);
@@ -211,11 +215,14 @@ class Account extends Model
         $sql = "SELECT a.*, 
                 lt.name as location_type_name,
                 l.name as location_name,
-                pm.name as payment_mode_name
+                pm.name as payment_mode_name,
+                ct.curre_name as currency_name,
+                ct.sign as currency_sign
                 FROM {$this->table} a
                 LEFT JOIN location_types lt ON a.location_type_id = lt.id
                 LEFT JOIN locations l ON a.location_id = l.id
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                 WHERE a.status = 'active' AND a.balance > 0 AND a.location_type_id = 3";
         
         $params = [];
@@ -225,11 +232,14 @@ class Account extends Model
             $sql = "SELECT a.*, 
                     lt.name as location_type_name,
                     l.name as location_name,
-                    pm.name as payment_mode_name
+                    pm.name as payment_mode_name,
+                    ct.curre_name as currency_name,
+                    ct.sign as currency_sign
                     FROM {$this->table} a
                     LEFT JOIN location_types lt ON a.location_type_id = lt.id
                     LEFT JOIN locations l ON a.location_id = l.id
                     LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                    LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                     WHERE a.status = 'active' AND a.balance > 0 AND a.location_type_id = :location_type_id";
             $params['location_type_id'] = $locationTypeId;
         }
@@ -275,16 +285,19 @@ class Account extends Model
     /**
      * Get accounts suitable for receiving transfers
      */
-    public function getReceivingAccounts(int $excludeAccountId = null): array
+    public function getReceivingAccounts(?int $excludeAccountId = null): array
     {
         $sql = "SELECT a.*, 
                 lt.name as location_type_name,
                 l.name as location_name,
-                pm.name as payment_mode_name
+                pm.name as payment_mode_name,
+                ct.curre_name as currency_name,
+                ct.sign as currency_sign
                 FROM {$this->table} a
                 LEFT JOIN location_types lt ON a.location_type_id = lt.id
                 LEFT JOIN locations l ON a.location_id = l.id
                 LEFT JOIN payment_modes pm ON a.payment_mode_id = pm.id
+                LEFT JOIN tbl_currency_type ct ON a.currency_type = ct.currency_id
                 WHERE a.status = 'active'";
         
         $params = [];

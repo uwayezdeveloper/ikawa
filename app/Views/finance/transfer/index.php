@@ -62,17 +62,23 @@
                                 <select class="form-select" id="from_account_id" name="from_account_id" required>
                                     <option value="">Choose source account...</option>
                                     <?php foreach ($transferAccounts ?? [] as $account): ?>
+                                        <?php
+                                            $accountName = (string)($account['account_name'] ?? 'Unnamed Account');
+                                            $accountNumber = (string)($account['account_number'] ?? 'N/A');
+                                            $bankName = (string)($account['bank_name'] ?? 'N/A');
+                                            $currencyName = (string)($account['currency_name'] ?? ('Currency ID ' . ($account['currency_type'] ?? 'N/A')));
+                                            $currencySign = (string)($account['currency_sign'] ?? '$');
+                                            $balanceText = number_format((float)($account['balance'] ?? 0), 2);
+                                        ?>
                                         <option value="<?= $account['id'] ?>" 
                                                 data-balance="<?= $account['balance'] ?>"
-                                                data-account-name="<?= htmlspecialchars($account['account_name']) ?>"
-                                                data-account-number="<?= htmlspecialchars($account['account_number'] ?? 'N/A') ?>"
+                                                data-account-name="<?= htmlspecialchars($accountName) ?>"
+                                                data-account-number="<?= htmlspecialchars($accountNumber) ?>"
                                                 data-location="<?= htmlspecialchars($account['location_name'] ?? 'N/A') ?>"
-                                                data-location-type="<?= htmlspecialchars($account['location_type_name'] ?? 'N/A') ?>">
-                                            <?= htmlspecialchars($account['account_name']) ?> 
-                                            <span class="text-success">(Balance: $<?= number_format($account['balance'], 2) ?>)</span>
-                                            <?php if ($account['account_number']): ?>
-                                                - <?= htmlspecialchars($account['account_number']) ?>
-                                            <?php endif; ?>
+                                                data-location-type="<?= htmlspecialchars($account['location_type_name'] ?? 'N/A') ?>"
+                                                data-bank-name="<?= htmlspecialchars($bankName) ?>"
+                                                data-currency-name="<?= htmlspecialchars($currencyName) ?>">
+                                            <?= htmlspecialchars($accountName) ?> | <?= htmlspecialchars($accountNumber) ?> | <?= htmlspecialchars($bankName) ?> | <?= htmlspecialchars($currencyName) ?> (<?= htmlspecialchars($currencySign) ?><?= $balanceText ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -91,16 +97,22 @@
                                 <select class="form-select" id="to_account_id" name="to_account_id" required>
                                     <option value="">Choose destination account...</option>
                                     <?php foreach ($receivingAccounts ?? [] as $account): ?>
+                                        <?php
+                                            $accountName = (string)($account['account_name'] ?? 'Unnamed Account');
+                                            $accountNumber = (string)($account['account_number'] ?? 'N/A');
+                                            $bankName = (string)($account['bank_name'] ?? 'N/A');
+                                            $currencyName = (string)($account['currency_name'] ?? ('Currency ID ' . ($account['currency_type'] ?? 'N/A')));
+                                            $currencySign = (string)($account['currency_sign'] ?? '$');
+                                            $balanceText = number_format((float)($account['balance'] ?? 0), 2);
+                                        ?>
                                         <option value="<?= $account['id'] ?>" 
                                                 data-balance="<?= $account['balance'] ?>"
-                                                data-account-name="<?= htmlspecialchars($account['account_name']) ?>"
-                                                data-account-number="<?= htmlspecialchars($account['account_number'] ?? 'N/A') ?>"
-                                                data-location="<?= htmlspecialchars($account['location_name'] ?? 'N/A') ?>">
-                                            <?= htmlspecialchars($account['account_name']) ?> 
-                                            <span class="text-info">(Balance: $<?= number_format($account['balance'], 2) ?>)</span>
-                                            <?php if ($account['account_number']): ?>
-                                                - <?= htmlspecialchars($account['account_number']) ?>
-                                            <?php endif; ?>
+                                                data-account-name="<?= htmlspecialchars($accountName) ?>"
+                                                data-account-number="<?= htmlspecialchars($accountNumber) ?>"
+                                                data-location="<?= htmlspecialchars($account['location_name'] ?? 'N/A') ?>"
+                                                data-bank-name="<?= htmlspecialchars($bankName) ?>"
+                                                data-currency-name="<?= htmlspecialchars($currencyName) ?>">
+                                            <?= htmlspecialchars($accountName) ?> | <?= htmlspecialchars($accountNumber) ?> | <?= htmlspecialchars($bankName) ?> | <?= htmlspecialchars($currencyName) ?> (<?= htmlspecialchars($currencySign) ?><?= $balanceText ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
