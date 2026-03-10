@@ -1,6 +1,9 @@
 <?php
 $rows = $journalRows ?? [];
 $totals = $journalTotals ?? ['debit' => 0, 'credit' => 0, 'balance' => 0];
+$canSelectLocation = (bool)($canSelectLocation ?? false);
+$locations = $locations ?? [];
+$selectedLocationId = (int)($selectedLocationId ?? ($location['id'] ?? 0));
 
 $formatJournalDateTime = static function ($value): string {
     $raw = trim((string)$value);
@@ -44,10 +47,24 @@ $formatJournalDateTime = static function ($value): string {
 <div class="card mb-3">
     <div class="card-body">
         <form method="GET" action="<?= APP_URL ?>/finance/station-finances/journal" class="row g-2 align-items-end">
+            <?php if ($canSelectLocation): ?>
+            <div class="col-md-4">
+                <label for="location_id" class="form-label mb-1">Location</label>
+                <select id="location_id" name="location_id" class="form-select">
+                    <?php foreach ($locations as $loc): ?>
+                    <option value="<?= (int)$loc['id'] ?>" <?= (int)$loc['id'] === $selectedLocationId ? 'selected' : '' ?>>
+                        <?= htmlspecialchars(($loc['type_name'] ?? 'Location') . ' - ' . ($loc['name'] ?? 'N/A')) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php else: ?>
             <div class="col-md-4">
                 <label class="form-label mb-1">Location</label>
                 <input type="text" class="form-control" value="<?= htmlspecialchars($location['name'] ?? 'N/A') ?>" disabled>
+                <input type="hidden" name="location_id" value="<?= (int)($location['id'] ?? 0) ?>">
             </div>
+            <?php endif; ?>
             <div class="col-md-3">
                 <label for="date_from" class="form-label mb-1">From</label>
                 <input type="date" id="date_from" name="date_from" class="form-control" value="<?= htmlspecialchars((string)($dateFrom ?? '')) ?>">

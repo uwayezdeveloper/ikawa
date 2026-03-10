@@ -43,6 +43,53 @@ class StationFinanceController extends Controller
     }
 
     /**
+     * Determine whether the logged-in user can report across locations.
+     */
+    private function canSelectAnyLocation(?array $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        // Only users assigned to HQ/main location (id = 1) can switch report locations.
+        return (int)($user['location_id'] ?? 0) === 1;
+    }
+
+    /**
+     * Resolve report location context (selected location + available locations for admins).
+     */
+    private function resolveReportLocationContext(array $user): array
+    {
+        $canSelectLocation = $this->canSelectAnyLocation($user);
+        $locations = $canSelectLocation ? $this->getActiveLocations() : [];
+
+        $userLocationId = (int)($user['location_id'] ?? 0);
+        $requestedLocationId = (int)($_GET['location_id'] ?? 0);
+
+        if ($canSelectLocation) {
+            $selectedLocationId = $requestedLocationId > 0
+                ? $requestedLocationId
+                : ($userLocationId > 0 ? $userLocationId : (int)($locations[0]['id'] ?? 0));
+
+            if (!empty($locations)) {
+                $validLocationIds = array_map(static fn(array $location): int => (int)$location['id'], $locations);
+                if (!in_array($selectedLocationId, $validLocationIds, true)) {
+                    $selectedLocationId = (int)($locations[0]['id'] ?? 0);
+                }
+            }
+        } else {
+            $selectedLocationId = $userLocationId;
+        }
+
+        return [
+            'canSelectLocation' => $canSelectLocation,
+            'locations' => $locations,
+            'selectedLocationId' => $selectedLocationId,
+            'userLocationId' => $userLocationId,
+        ];
+    }
+
+    /**
      * Display station finance overview
      */
     public function index($request, $response)
@@ -423,7 +470,8 @@ class StationFinanceController extends Controller
             return $response->redirect(APP_URL . '/dashboard');
         }
 
-        $locationId = (int)($user['location_id'] ?? 0);
+        $locationContext = $this->resolveReportLocationContext($user);
+        $locationId = (int)($locationContext['selectedLocationId'] ?? 0);
         if ($locationId <= 0) {
             $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
             return $response->redirect(APP_URL . '/finance/station-finances');
@@ -447,6 +495,9 @@ class StationFinanceController extends Controller
             'title' => 'Location Journal',
             'user' => $user,
             'location' => $location,
+            'locations' => $locationContext['locations'],
+            'canSelectLocation' => $locationContext['canSelectLocation'],
+            'selectedLocationId' => $locationId,
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
             'journalRows' => $journal['rows'],
@@ -466,19 +517,15 @@ class StationFinanceController extends Controller
             return $response->redirect(APP_URL . '/dashboard');
         }
 
-        $userLocationId = (int)($user['location_id'] ?? 0);
-        if ($userLocationId <= 0) {
+        $locationContext = $this->resolveReportLocationContext($user);
+        $locationId = (int)($locationContext['selectedLocationId'] ?? 0);
+
+        if ($locationId <= 0) {
             $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
             return $response->redirect(APP_URL . '/finance/station-finances');
         }
 
         $debugMode = (string)($_GET['debug'] ?? '') === '1';
-        $debugLocationId = (int)($_GET['location_id'] ?? 0);
-
-        $locationId = $userLocationId;
-        if ($debugMode && $debugLocationId > 0) {
-            $locationId = $debugLocationId;
-        }
 
         $location = $this->locationModel->find($locationId);
         $report = $this->getFinalLocationReportData($locationId);
@@ -489,11 +536,14 @@ class StationFinanceController extends Controller
             'title' => 'Final Location Report',
             'user' => $user,
             'location' => $location,
+            'locations' => $locationContext['locations'],
+            'canSelectLocation' => $locationContext['canSelectLocation'],
+            'selectedLocationId' => $locationId,
             'report' => $report,
             'debugMode' => $debugMode,
             'expenseDebug' => $expenseDebug,
             'accountDebug' => $accountDebug,
-            'userLocationId' => $userLocationId,
+            'userLocationId' => $locationContext['userLocationId'],
             'effectiveLocationId' => $locationId,
             'scripts' => ['js/pages/station-final-report.js']
         ], 'main');
@@ -510,7 +560,8 @@ class StationFinanceController extends Controller
             return $response->redirect(APP_URL . '/dashboard');
         }
 
-        $locationId = (int)($user['location_id'] ?? 0);
+        $locationContext = $this->resolveReportLocationContext($user);
+        $locationId = (int)($locationContext['selectedLocationId'] ?? 0);
         if ($locationId <= 0) {
             $_SESSION['flash_error'] = 'Your account has no location assigned. Contact administrator.';
             return $response->redirect(APP_URL . '/finance/station-finances');
@@ -523,6 +574,9 @@ class StationFinanceController extends Controller
             'title' => 'Detailed Expense Report',
             'user' => $user,
             'location' => $location,
+            'locations' => $locationContext['locations'],
+            'canSelectLocation' => $locationContext['canSelectLocation'],
+            'selectedLocationId' => $locationId,
             'detailedExpenseRows' => $detailedExpense['rows'],
             'detailedExpenseTotalAmount' => $detailedExpense['total_amount'],
             'detailedExpenseTotalPerKg' => $detailedExpense['total_per_kg'],

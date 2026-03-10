@@ -4,6 +4,9 @@ $detailedExpenseTotalAmount = (float)($detailedExpenseTotalAmount ?? 0);
 $detailedExpenseTotalPerKg = (float)($detailedExpenseTotalPerKg ?? 0);
 $cheriesQuantity = (float)($cheriesQuantity ?? 0);
 $generatedAt = $generatedAt ?? date('Y-m-d H:i:s');
+$canSelectLocation = (bool)($canSelectLocation ?? false);
+$locations = $locations ?? [];
+$selectedLocationId = (int)($selectedLocationId ?? ($location['id'] ?? 0));
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -21,6 +24,28 @@ $generatedAt = $generatedAt ?? date('Y-m-d H:i:s');
         <i class="ti ti-file-type-pdf me-1"></i> Download PDF
     </button>
 </div>
+
+<?php if ($canSelectLocation): ?>
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" action="<?= APP_URL ?>/finance/station-finances/detailed-expense-report" class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label for="location_id" class="form-label mb-1">Location</label>
+                <select id="location_id" name="location_id" class="form-select">
+                    <?php foreach ($locations as $loc): ?>
+                    <option value="<?= (int)$loc['id'] ?>" <?= (int)$loc['id'] === $selectedLocationId ? 'selected' : '' ?>>
+                        <?= htmlspecialchars(($loc['type_name'] ?? 'Location') . ' - ' . ($loc['name'] ?? 'N/A')) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="card mb-3">
     <div class="card-body py-3">
