@@ -7,6 +7,15 @@
   const supplierSearchHelp = document.getElementById("supplierSearchHelp");
   const openSupplierRecordBtn = document.getElementById("openSupplierRecordBtn");
   const currentSupplierIdFromUrl = new URLSearchParams(window.location.search).get("supplier_id") || "";
+  const canViewAllSuppliers = Boolean(window.CAN_VIEW_ALL_SUPPLIERS);
+
+  const defaultSearchMessage = canViewAllSuppliers
+    ? "Search supplier/farmer across all registered locations and open records."
+    : "Search supplier/farmer in your location and open records.";
+
+  const foundMessage = canViewAllSuppliers
+    ? "Supplier/Farmer found in system records."
+    : "Supplier/Farmer found in your location.";
 
   function syncSearchedSupplierId() {
     if (!supplierSearchInput || !supplierSearchOptions || !supplierSearchId) return;
@@ -16,7 +25,7 @@
       supplierSearchId.value = "";
       if (supplierSearchHelp) {
         supplierSearchHelp.className = "text-muted";
-        supplierSearchHelp.textContent = "Search supplier/farmer in your location and open records.";
+        supplierSearchHelp.textContent = defaultSearchMessage;
       }
       return null;
     }
@@ -30,13 +39,16 @@
     if (supplierSearchHelp) {
       if (matchedOption) {
         supplierSearchHelp.className = "text-success";
-        supplierSearchHelp.textContent = "Supplier/Farmer found in your location.";
+        supplierSearchHelp.textContent = foundMessage;
       } else {
         supplierSearchHelp.className = "text-danger";
-        supplierSearchHelp.textContent =
-          'No supplier/farmer on your location who is named "' +
-          String(supplierSearchInput.value || "").trim() +
-          '".';
+        supplierSearchHelp.textContent = canViewAllSuppliers
+          ? 'No supplier/farmer in system records who is named "' +
+            String(supplierSearchInput.value || "").trim() +
+            '".'
+          : 'No supplier/farmer on your location who is named "' +
+            String(supplierSearchInput.value || "").trim() +
+            '".';
       }
     }
 
@@ -49,7 +61,9 @@
         window.Swal.fire({
           icon: "warning",
           title: "Supplier/Farmer Not Found",
-          text: "Search and select an existing supplier/farmer from your location.",
+          text: canViewAllSuppliers
+            ? "Search and select an existing supplier/farmer from system records."
+            : "Search and select an existing supplier/farmer from your location.",
         });
       }
       return;

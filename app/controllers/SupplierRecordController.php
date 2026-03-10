@@ -32,6 +32,14 @@ class SupplierRecordController extends Controller
     }
 
     /**
+     * Users assigned to location_id = 1 can view supplier records across all locations.
+     */
+    private function canViewAllSuppliers(?array $user): bool
+    {
+        return (int)($user['location_id'] ?? 0) === 1;
+    }
+
+    /**
      * Display supplier records page
      */
     public function index($request, $response)
@@ -43,9 +51,10 @@ class SupplierRecordController extends Controller
         }
 
         $userLocationId = (int)($user['location_id'] ?? 0);
+        $canViewAllSuppliers = $this->canViewAllSuppliers($user);
 
-        // Get active suppliers for logged-in user's location only
-        $suppliers = $this->getActiveSuppliers($userLocationId);
+        // Users at location 1 can search active suppliers system-wide.
+        $suppliers = $this->getActiveSuppliers($userLocationId, $canViewAllSuppliers);
         
         // Get selected supplier (must belong to the filtered list)
         $selectedSupplierId = (int)($_GET['supplier_id'] ?? 0);
@@ -74,6 +83,7 @@ class SupplierRecordController extends Controller
         return View::render('suppliers/records/index', [
             'title' => 'Supplier Records',
             'user' => $user,
+            'canViewAllSuppliers' => $canViewAllSuppliers,
             'suppliers' => $suppliers,
             'selectedSupplierId' => $selectedSupplierId,
             'supplierInfo' => $supplierInfo,
@@ -88,10 +98,19 @@ class SupplierRecordController extends Controller
     /**
      * Get active suppliers
      */
-    private function getActiveSuppliers(int $locationId): array
+    private function getActiveSuppliers(int $locationId, bool $allLocations = false): array
     {
-        if ($locationId <= 0) {
+        if (!$allLocations && $locationId <= 0) {
             return [];
+        }
+
+        if ($allLocations) {
+            $sql = "SELECT s.*, st.name as type_name 
+                    FROM suppliers s
+                    LEFT JOIN supplier_types st ON s.supplier_type_id = st.id
+                    WHERE s.status = 'active'
+                    ORDER BY s.name";
+            return Database::fetchAll($sql);
         }
 
         $sql = "SELECT s.*, st.name as type_name 
@@ -101,6 +120,35 @@ class SupplierRecordController extends Controller
                 AND s.address = :location_id
                 ORDER BY s.name";
         return Database::fetchAll($sql, ['location_id' => $locationId]);
+    }
+
+    /**
+     * Validate whether current user can access the selected supplier.
+     */
+    private function canAccessSupplier(int $supplierId, int $locationId, bool $allLocations): bool
+    {
+        if ($supplierId <= 0) {
+            return false;
+        }
+
+        if ($allLocations) {
+            $row = Database::fetch(
+                "SELECT id FROM suppliers WHERE id = :supplier_id AND status = 'active' LIMIT 1",
+                ['supplier_id' => $supplierId]
+            );
+            return !empty($row);
+        }
+
+        if ($locationId <= 0) {
+            return false;
+        }
+
+        $row = Database::fetch(
+            "SELECT id FROM suppliers WHERE id = :supplier_id AND status = 'active' AND address = :location_id LIMIT 1",
+            ['supplier_id' => $supplierId, 'location_id' => $locationId]
+        );
+
+        return !empty($row);
     }
 
     /**
@@ -378,10 +426,21 @@ class SupplierRecordController extends Controller
      */
     private function getRecordsAjax($request, $response)
     {
-        $supplierId = $_POST['supplier_id'] ?? null;
+        $user = $_SESSION['user'] ?? null;
+        if (!$this->hasPermission('view-supplier-records')) {
+            return $response->json(['success' => false, 'message' => 'Permission denied']);
+        }
+
+        $supplierId = (int)($_POST['supplier_id'] ?? 0);
+        $userLocationId = (int)($user['location_id'] ?? 0);
+        $canViewAllSuppliers = $this->canViewAllSuppliers($user);
         
-        if (!$supplierId) {
+        if ($supplierId <= 0) {
             return $response->json(['success' => false, 'message' => 'Supplier is required']);
+        }
+
+        if (!$this->canAccessSupplier($supplierId, $userLocationId, $canViewAllSuppliers)) {
+            return $response->json(['success' => false, 'message' => 'You cannot access this supplier record']);
         }
 
         $records = $this->getSupplierRecords($supplierId);

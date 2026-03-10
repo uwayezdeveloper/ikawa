@@ -3,6 +3,7 @@ $permissions = $user['permissions'] ?? [];
 $advances = $summary['advances'] ?? [];
 $stock = $summary['stock'] ?? [];
 $payables = $summary['payables'] ?? [];
+$canViewAllSuppliers = (bool)($canViewAllSuppliers ?? false);
 ?>
 
 <!-- Page Header -->
@@ -34,7 +35,11 @@ $payables = $summary['payables'] ?? [];
                 <?php endforeach; ?>
             </datalist>
             <input type="hidden" id="supplierSearchId" value="<?= (int)($selectedSupplierId ?? 0) ?>">
-            <small class="text-muted" id="supplierSearchHelp">Search supplier/farmer in your location and open records.</small>
+            <small class="text-muted" id="supplierSearchHelp">
+                <?= $canViewAllSuppliers
+                    ? 'Search supplier/farmer across all registered locations and open records.'
+                    : 'Search supplier/farmer in your location and open records.' ?>
+            </small>
         </div>
         <button type="button" id="openSupplierRecordBtn" class="btn btn-primary">
             <i class="ti ti-search me-1"></i> Open
@@ -411,12 +416,15 @@ $payables = $summary['payables'] ?? [];
 <?php else: ?>
 <div class="alert alert-info">
     <i class="ti ti-info-circle me-2"></i>
-    No supplier/farmer available for your location.
+    <?= $canViewAllSuppliers
+        ? 'No active supplier/farmer available in the system.'
+        : 'No supplier/farmer available for your location.' ?>
 </div>
 <?php endif; ?>
 
 <script>
 window.APP_URL = '<?= APP_URL ?>';
+window.CAN_VIEW_ALL_SUPPLIERS = <?= $canViewAllSuppliers ? 'true' : 'false' ?>;
 <?php if ($supplierInfo): ?>
 window.supplierRecordsPayload = {
     company: <?= json_encode($companySettings ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
